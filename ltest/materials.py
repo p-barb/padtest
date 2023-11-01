@@ -1,6 +1,6 @@
 import numpy as np
  
-def set_concrete_plate(fc, gamma, d, young_modulus=None, poisson=0.4):
+def concrete(fc, gamma, d, young_modulus=None, poisson=0.4):
     """Creates a dictionary with the required plate properties based on
     the concrete type.
 
@@ -24,9 +24,9 @@ def set_concrete_plate(fc, gamma, d, young_modulus=None, poisson=0.4):
         material.
     """
     concrete = {}
-    concrete['fc'] = fc * 1000 # kPa
+    concrete['fc'] = fc # kPa
     if young_modulus is None:
-        concrete['E'] = 4700 *  np.sqrt(concrete['fc']) # kPa
+        concrete['E'] = 4700 *  np.sqrt(concrete['fc']) *1000 # kPa
     else:
         concrete['E'] = young_modulus
     concrete['nu'] = poisson 
@@ -34,4 +34,6 @@ def set_concrete_plate(fc, gamma, d, young_modulus=None, poisson=0.4):
     concrete['EI'] = concrete['E'] * d**3/12
     concrete['d'] = np.sqrt(12 * concrete['EI'] / concrete['EA'])
     concrete['Gref'] = concrete['EA'] / concrete['d']  / (2 * (1 + concrete['nu'])) # KPa
+    concrete['gamma'] = gamma
+    concrete['w'] = concrete['gamma'] * concrete['d']
     return concrete

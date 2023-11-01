@@ -45,19 +45,19 @@ class Polygon():
             0 area polygon.
         """
         vertex = self._closed_vertex()
-        self._area = 0
+        area = 0
+        cx = 0
+        cy = 0
         for idx in range(self._nvertex):
-            self._area += vertex[idx, 0] * vertex[idx + 1, 1] - vertex[idx + 1, 0] * vertex[idx, 1]
-        self._area /= 2
-        if self._area == 0:
-            raise RuntimeError('Polygon has 0 area.')
-        
-        self._centroid = np.array([0, 0])
-        for idx in range(self._nvertex - 1):
-            self._centroid[0] += (vertex[idx, 0] + vertex[idx + 1, 0]) * (vertex[idx, 0] * vertex[idx + 1, 1] - vertex[idx + 1, 0] * vertex[idx, 1])
-            self._centroid[1] += (vertex[idx, 1] + vertex[idx + 1, 1]) * (vertex[idx, 0] * vertex[idx + 1, 1] - vertex[idx + 1, 0] * vertex[idx, 1])
-        self._centroid = self._centroid / (6 * self._area)
-        self._area = np.abs(self._area)
+            x = vertex[idx, 0] * vertex[idx + 1, 1] - vertex[idx + 1, 0] * vertex[idx, 1]
+            cx += (vertex[idx, 0] + vertex[idx + 1, 0]) * x
+            cy += (vertex[idx, 1] + vertex[idx + 1, 1]) * x
+            area += x
+        area /= 2
+        if area == 0:
+            raise RuntimeError('Polygon has no area.')            
+        self._centroid = np.array([cx, cy]) / (6 * area)
+        self._area = np.abs(area)
 
     def _set_bounding_box(self):
         """Computes polygo bounding box.
