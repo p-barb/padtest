@@ -1,7 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import Polygon as PatchPolygon
-
 
 class Polygon():
     """2D clsoed polygon.

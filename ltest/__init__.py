@@ -1,3 +1,5 @@
-from ltest.geometry import Geometry
-from ltest.model import Model
-from ltest.materials import concrete
+from ltest.model.plate import PlateModel
+from ltest.model.solid import SolidModel
+load = SolidModel.load
+from ltest.material.plate import PlateMaterial
+concrete = PlateMaterial.concrete
