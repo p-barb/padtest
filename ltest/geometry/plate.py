@@ -29,16 +29,19 @@ class Plategeometry(Geometry):
         ratchetting occurs [m].
     interface : bool, dict, None, optional
         If True includes all interfaces between the footing and
-        soil. A dictionary with fields 'column', 'top', 'bottom' and
-        'lateral' can be provided for a solid foundation, or
-        'column', 'top' and 'bottom' for a plate foundation. If a
-        field is True then the interface is activated. Missing
-        fields are assumed to be None. If None, only the column
-        interfac is activated. By default None.
+        soil. A dictionary with fields 'column', 'top' and 'bottom'
+        can be provided. If a field is True then the interface is
+        activated. Missing fields are assumed to be False.
+        If None, only the column interface is activated. By default None.
     model_widht : float, optional
         User specified model width [m]. By default None.
     model_depth : float, optional
         User specified model depth [m]. By default None.
+    
+    Methods
+    -------
+    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False)
+        Foundation plot.
     """
 
     def __init__(self, b, d, dstrata=None, wt=None, fill_angle=None,
@@ -70,12 +73,10 @@ class Plategeometry(Geometry):
             ratchetting occurs [m].
         interface : bool, dict, None, optional
             If True includes all interfaces between the footing and
-            soil. A dictionary with fields 'column', 'top', 'bottom' and
-            'lateral' can be provided for a solid foundation, or
-            'column', 'top' and 'bottom' for a plate foundation. If a
-            field is True then the interface is activated. Missing
-            fields are assumed to be None. If None, only the column
-            interfac is activated. By default None.
+            soil. A dictionary with fields 'column', 'top' and 'bottom'
+            can be provided. If a field is True then the interface is
+            activated. Missing fields are assumed to be False.
+            If None, only the column interface is activated. By default None.
         model_widht : float, optional
             User specified model width [m]. By default None.
         model_depth : float, optional

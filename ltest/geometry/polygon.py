@@ -3,6 +3,20 @@ import matplotlib.pyplot as plt
 
 class Polygon():
     """2D clsoed polygon.
+
+    Parameters
+    ----------
+    vertex : array-llike
+        (nv, 2) vertex cooodrinates.
+
+    Methods
+    -------
+    in_strata(zstrata)
+        Identifies the strata where the polygon is located.
+    add_2_model(g_i)
+        Adds the polygon as a Plaxis model structure.
+    plot(figsize=3)
+        Creates a figure showing the polygon and its centroid.
     """
     
     def __init__(self, vertex):

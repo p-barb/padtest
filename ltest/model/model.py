@@ -12,11 +12,110 @@ from ltest.material.soil import SoilMaterial
 
 
 class Model(ABC):
-    """Base class for models."""
+    """Base class for models.
+    
+    Parameters
+    ----------
+    s_i : Server
+        Plaxis Input Application remote sripting server.
+    g_i : PlxProxyGlobalObject
+        Global object of the current open Plaxis model in Input.
+    g_o : PlxProxyGlobalObject
+        Global object of the current open Plaxis model in Output.
+    model_type : str
+        Model type: 'axisymmetry' or 'planestrain'.
+    element_type : str
+        Element type: '6-Noded' or '15-Noded'.
+    title : str
+        Model title in Plaxis.
+    comments : str
+        Model comments in Plaxis.
+    soil : soil : dict, list
+        Dictionary with the material properties or list of
+        dictionaries.
+    fill : fill : dict, list
+        Dictionary with the fill properties or list of dictionaries.
+    ratchetting_material  : dict, None
+        Dictionary with the material properties after ratchetting.
+    ratchetting_threshold : float, None
+        Upwards displacement threshold that when surpassed by any
+        output location under the foundation the material under
+        it is replaced by the ratchetting material.
+    mesh_density : float
+        Mesh density.
+    locations : array-like
+        Location of output points in the foundation bottom, measured
+        as [0, 1] where 0 is the center of the foundation and 1 the
+        edge.
+    excavation : bool
+        If True in models with fill, the excavation and fill
+        processes are included in the initial phases.
 
-    def __init__(self, s_i, g_i, g_o, model_type, title, comments, soil, fill,
-                 ratchetting_material, ratchetting_threshold, mesh_density,
-                 locations, excavation):
+    Methods
+    -------
+    build()
+        Builds the model in Plaxis.
+    regen(s_i, g_i, g_o, test=False) : 
+        Regenerates the model in Plaxis. Optinoally it recalculates
+        previous load tests.
+    save(filename)
+        Saves model to file. Plaxis objects cannot be stored, only
+        input properties and results. When loaded, the model can
+        be regenerated with <regen> method.
+    load(filename)
+        Loads saved test.
+    failure_test(testid, test, max_load=np.inf, start_load=50, load_factor=2, load_increment=0)
+        Test the foundation until the model does not converge.
+    load_test(testid, load, delete_phases=True)
+        Conducts a load test in the model.
+    delete_test( testid, delete_phases=True) 
+        Deletes a test from the model.
+    plot_test(testid, phase=None, location=None, compression_positive=True, pullout_positive=True, reset_start=False, legend=False, figsize=(6, 4)) 
+        Plots test results.
+    """
+
+    def __init__(self, s_i, g_i, g_o, model_type, element_type, title,
+                 comments, soil, fill, ratchetting_material,
+                 ratchetting_threshold, mesh_density, locations, excavation):
+        """Init method.
+
+        Parameters
+        ----------
+        s_i : Server
+            Plaxis Input Application remote sripting server.
+        g_i : PlxProxyGlobalObject
+            Global object of the current open Plaxis model in Input.
+        g_o : PlxProxyGlobalObject
+            Global object of the current open Plaxis model in Output.
+        model_type : str
+            Model type: 'axisymmetry' or 'planestrain'.
+        element_type : str
+            Element type: '6-Noded' or '15-Noded'.
+        title : str
+            Model title in Plaxis.
+        comments : str
+            Model comments in Plaxis.
+        soil : soil : dict, list
+            Dictionary with the material properties or list of
+            dictionaries.
+        fill : fill : dict, list
+            Dictionary with the fill properties or list of dictionaries.
+        ratchetting_material  : dict, None
+            Dictionary with the material properties after ratchetting.
+        ratchetting_threshold : float
+            Upwards displacement threshold that when surpassed by any
+            output location under the foundation the material under
+            it is replaced by the ratchetting material.
+        mesh_density : float
+            Mesh density.
+        locations : array-like
+            (nloc, 1) location of output points in the foundation
+            bottom, measured as [0, 1] where 0 is the center of the
+            foundation and 1 the edge.
+        excavation : bool
+            If True in models with fill, the excavation and fill
+            processes are included in the initial phases.        
+        """
         self._s_i = s_i
         self._g_i = g_i
         self._g_o = g_o
@@ -25,7 +124,7 @@ class Model(ABC):
         self._soil_material_plx = {} # Plaxis objects of the materials
         self._plate_material_plx = {} # Plaxis objects of the materials
         self._iphases = {}
-        self._init_model_settings(title, comments, model_type)
+        self._init_model_settings(title, comments, model_type, element_type)
         self._init_strata_materials(soil)
         self._init_fill_materials(fill)
         self._init_ratchetting_material(ratchetting_material, ratchetting_threshold)
@@ -36,21 +135,24 @@ class Model(ABC):
     #===================================================================
     # PRIVATE METHODS
     #===================================================================
-    def _init_model_settings(self, title, comments, model_type):
+    def _init_model_settings(self, title, comments, model_type, element_type):
         """Initialize model settings.
 
         Parameters
         ----------
-                title : str
-            Model title.
-        comments : str
-            Model comments.
+        title : str, None
+            Model title in Plaxis.
+        comments : str, None
+            Model comments in Plaxis.
         model_type : str
             Model type: `axisymmetry` or `planestrain`.
+        element_type : str
+            Element type: '6-Noded' or '15-Noded'.
         """
         self._title = title
         self._comments = comments
         self._model_type = model_type
+        self._element_type = element_type
 
     def _init_strata_materials(self, soil):
         """Initializes the materials for the stratigraphy.
@@ -152,9 +254,9 @@ class Model(ABC):
         Parameters
         ----------
         locations : array-like
-            Location of output points in the foundation bottom, measured
-            as [0, 1] where 0 is the center of the foundation and 1 the
-            edge.
+            (nloc, 1) location of output points in the foundation
+            bottom, measured as [0, 1] where 0 is the center of the
+            foundation and 1 the edge.
         """
         self._ophases = {}
         self._test_log = {}
@@ -172,9 +274,11 @@ class Model(ABC):
         """General model settings.
         """
         self._s_i.new()
+        self._g_i.SoilContour.initializerectangular(0, -self._model_depth, self._model_width, 0)
         self._g_i.setproperties("Title",self._title,
                                 "Comments",self._comments,
-                                "ModelType",self._model_type)
+                                "ModelType",self._model_type,
+                                "ElementType",self._element_type)
 
     def _build_geometry(self):
         """Builds model in Plaxis
@@ -723,7 +827,7 @@ class Model(ABC):
     # PUBLIC METHODS
     #===================================================================
     def build(self):
-        """Builds the model in plaxis.
+        """Builds the model in Plaxis.
         """
         self._set_model()
         self._build_geometry()
@@ -735,7 +839,8 @@ class Model(ABC):
         self._calculate_initial_phases()
     
     def regen(self, s_i, g_i, g_o, test=False):
-        """Regenerate plaxis objects in a loaded test.
+        """Regenerates the model in Plaxis. Optinoally it recalculates
+        previous load tests.
 
         Parameters
         ----------
@@ -773,7 +878,7 @@ class Model(ABC):
     def save(self, filename):
         """Saves model to file. Plaxis objects cannot be stored, only
         input properties and results. When loaded, the model can
-        be regenerated with ``restore_plx``.
+        be regenerated with <regen> method.
 
         Parameters
         ----------
@@ -976,8 +1081,45 @@ class Model(ABC):
         self._results.reset_index(drop=True, inplace=True)
 
     def plot_test(self, testid, phase=None, location=None, 
-                  compression_positive=True, uplift_positive=True,
+                  compression_positive=True, pullout_positive=False,
                   reset_start=False, legend=False, figsize=(6, 4)):
+        """Plots test results.
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        phase : str, int, list, None, optional
+            Phase id or list of them. If None all phases are plotted.
+            By default None.
+        location : str, float, optional
+            Location. If None all locations are plotted. By default 
+            None.
+        compression_positive : bool, optional
+            Compresive force is plotted as positive. By default True.
+        pullout_positive : bool, optional
+            Pull out displacement is plotted as positive. By default
+            False.
+        reset_start : bool, optional
+            Resets the first point of the load-displacement curve to
+            (0, 0). By default False
+        legend : bool, optional
+            Shows legend. By default False
+        figsize : tuple, optional
+            Figure size. By default (6, 4).
+
+        Returns
+        -------
+        Figure
+            Figure with the test plot.
+
+        Raises
+        ------
+        RuntimeError
+            Test id not in restuls.
+        RuntimeError
+            Phase not in results.
+        """
         if testid not in self._results['test'].to_list():
             raise RuntimeError('Test <{}> not available in restuls.'.format(testid))
         idx = self._results['test'] == testid
@@ -1009,7 +1151,7 @@ class Model(ABC):
         
         if compression_positive:
             fsign = -1
-        if uplift_positive:
+        if not pullout_positive:
             dsign =- 1
         for loc in location:
             for phaseid in phase:

@@ -18,7 +18,14 @@ You can reach Pablo Barbieri at pbarbie2@uwo.ca.
 
 ## Change log
 
-- 202310-31 -- 0.0.1
+- 2023-10-31 -- 0.0.1:
+    - First release.
+- 2023-11-05 -- 0.0.2: 
+    - Added model_type to README. 
+    - Complete docstrings.
+    - Fixed compression positive, pull-out positive flags in test plot.
+    - 5-node elements supported.
+    - Model size set at creation in Plaxis.
 
 ## Getting started
 
@@ -26,7 +33,13 @@ You can reach Pablo Barbieri at pbarbie2@uwo.ca.
 
 ``ltest`` can either be used within the Plaxis [remote scripting Python wrap](https://communities.bentley.com/products/geotech-analysis/w/wiki/46005/using-plaxis-remote-scripting-with-the-python-wrapper) or in a regular Python environment. ``ltest`` requires [pandas](https://pandas.pydata.org/docs/index.html) which is not included by default in Plaxis Python environment. To install it, or any other package, follow the instructions listed on [Plaxis site](https://communities.bentley.com/products/geotech-analysis/w/wiki/51822/how-to-install-additional-python-modules-in-plaxis).
 
-To use ``ltest`` in a custom Python environment, the ``plxscripting`` package must be installed in that environment along all other required packages. ``plxscripting`` cannot be installed using conda or pip. Instead, it must be installed following the [these instructions](https://communities.bentley.com/products/geotech-analysis/w/wiki/51822/how-to-install-additional-python-modules-in-plaxis). Beware that **``plxscripting`` requires Python 3.7. It will crash with later versions**.
+To use ``ltest`` in a custom Python environment, the ``plxscripting`` package must be installed in that environment along all other required packages. ``plxscripting`` cannot be installed using conda or pip. Instead, it must be installed following the [these instructions](https://communities.bentley.com/products/geotech-analysis/w/wiki/51822/how-to-install-additional-python-modules-in-plaxis).
+
+<div class="alert alert-info">
+  
+Beware that ``plxscripting`` requires Python 3.7. **It will crash with later versions.**
+
+</div>
 
 ### Installation
 
@@ -54,7 +67,13 @@ s_o, g_o = new_server('localhost', localhostport_output, password=password)
 
 ### Create foundation model
 
-The geoemtry of the foundation is given by:
+<div class="alert alert-info">
+  
+The model units are **kN** and **m** by default.
+
+</div>
+
+The geometry of the foundation is given by:
 
 
 ```python
@@ -110,7 +129,7 @@ model.plot()
 
 
     
-![png](README_files/README_29_0.png)
+![png](README_files/README_31_0.png)
     
 
 
@@ -388,7 +407,7 @@ model.plot_test('test A', location=0, legend=True)
 
 
     
-![png](README_files/README_36_0.png)
+![png](README_files/README_38_0.png)
     
 
 
@@ -414,7 +433,7 @@ model.plot_test('compression', location=0, legend=True)
 
 
     
-![png](README_files/README_41_0.png)
+![png](README_files/README_43_0.png)
     
 
 
@@ -434,12 +453,33 @@ model.plot_test('pull out', location=0, legend=True)
 
 
     
-![png](README_files/README_43_0.png)
+![png](README_files/README_45_0.png)
     
 
 
 
 Test results are stored in the results dataframe and can be plotted using the `plot_test` method.
+
+### General model settings
+
+The `model_type` argument can be set to `'axisymmetry'` (default) or `'planestrain'`. Also, the title and comments of the model in Plaxis can be set with the `title` and `comments` arguments.
+
+
+```python
+model = ltest.PlateModel(s_i, g_i, g_o, b, d, soil, footing, column,
+                        model_type='planestrain', title='Plain strain',
+                        comments='This is a plain strain model example.')
+```
+
+### Element type
+
+The `element_type` argument controls the type of elements used in the model. It can be set to `'6-Noded'` or `'15-Noded'`. By default 15-noded elements are used.
+
+
+```python
+model = ltest.PlateModel(s_i, g_i, g_o, b, d, soil, footing, column,
+                        element_type='6-Noded')
+```
 
 ### Save/Load
 
@@ -477,7 +517,7 @@ model.plot()
 
 
     
-![png](README_files/README_52_0.png)
+![png](README_files/README_60_0.png)
     
 
 
@@ -539,7 +579,7 @@ model.plot()
 
 
     
-![png](README_files/README_60_0.png)
+![png](README_files/README_68_0.png)
     
 
 
@@ -580,7 +620,7 @@ model.plot()
 
 
     
-![png](README_files/README_63_0.png)
+![png](README_files/README_71_0.png)
     
 
 
@@ -629,7 +669,7 @@ model.plot_test('test A', location=0, legend=True)
 
 
     
-![png](README_files/README_65_0.png)
+![png](README_files/README_73_0.png)
     
 
 
@@ -643,7 +683,7 @@ model.plot()
 
 
     
-![png](README_files/README_66_0.png)
+![png](README_files/README_74_0.png)
     
 
 
@@ -669,7 +709,7 @@ model.plot_test('test A', location=0, legend=True)
 
 
     
-![png](README_files/README_68_0.png)
+![png](README_files/README_76_0.png)
     
 
 
@@ -683,7 +723,7 @@ model.plot()
 
 
     
-![png](README_files/README_69_0.png)
+![png](README_files/README_77_0.png)
     
 
 
@@ -760,7 +800,7 @@ model.plot()
 
 
     
-![png](README_files/README_74_0.png)
+![png](README_files/README_82_0.png)
     
 
 
@@ -822,7 +862,7 @@ model.plot()
 
 
     
-![png](README_files/README_78_0.png)
+![png](README_files/README_86_0.png)
     
 
 
@@ -841,7 +881,7 @@ model.plot()
 
 
     
-![png](README_files/README_80_0.png)
+![png](README_files/README_88_0.png)
     
 
 
@@ -861,7 +901,7 @@ model.plot()
 
 
     
-![png](README_files/README_82_0.png)
+![png](README_files/README_90_0.png)
     
 
 
@@ -880,7 +920,7 @@ model.plot()
 
 
     
-![png](README_files/README_84_0.png)
+![png](README_files/README_92_0.png)
     
 
 
@@ -925,7 +965,7 @@ model.plot()
 
 
     
-![png](README_files/README_87_0.png)
+![png](README_files/README_95_0.png)
     
 
 
@@ -976,7 +1016,7 @@ model.plot()
 
 
     
-![png](README_files/README_90_0.png)
+![png](README_files/README_98_0.png)
     
 
 
@@ -1027,7 +1067,7 @@ model.plot()
 
 
     
-![png](README_files/README_93_0.png)
+![png](README_files/README_101_0.png)
     
 
 

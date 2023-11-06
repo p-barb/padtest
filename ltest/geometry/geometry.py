@@ -13,6 +13,33 @@ class Geometry(ABC):
     """Base class for the foundation geometry. Set inputs that are not
     dependent on whether the foundation is modelled as a solid or a
     plate.
+    Parameters
+    ----------
+    dstrata : list, None
+        Width of soil layers [m].
+    wt : float, None
+        Water tabe depth [m]. By default None.
+    fill_angle : float
+        Fill angle [deg].
+    bfill : float
+        Distance between foundation edge and the start of the fill
+        slope [m]. By default 0.5.
+    nfill : int, None
+        Number of fill layers. By default None.
+    dfill : list, None
+        (nfill,) width of fill layers [m]. By default None.
+    dratchetting : float, None
+        Widht of soil under the foundation that is replaced when
+        ratchetting occurs [m].
+    model_widht : float, optional
+        User specified model width [m]. By default None.
+    model_depth : float, optional
+        User specified model depth [m]. By default None.
+
+    Methods
+    -------
+    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False)
+        Foundation plot.
     """
 
     def __init__(self, dstrata=None, wt=None, fill_angle=None, bfill=0.5,
