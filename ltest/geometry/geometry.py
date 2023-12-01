@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import copy
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon as PatchPolygon
 from matplotlib.collections import PatchCollection
@@ -38,7 +39,7 @@ class Geometry(ABC):
 
     Methods
     -------
-    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False)
+    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False, output_location=False)
         Foundation plot.
     """
 
@@ -134,6 +135,7 @@ class Geometry(ABC):
             self._dstrata = np.array([model_depth])
             self._zstrata = -np.cumsum(self._dstrata)
             self._model_depth = model_depth
+            self._ylim = np.array([-model_depth, 0])
             return
         
         if isinstance(dstrata, numbers.Number):
@@ -156,6 +158,7 @@ class Geometry(ABC):
         self._dstrata = dstrata
         self._nstrata = len(dstrata)
         self._model_depth = model_depth
+        self._ylim = np.array([-model_depth, 0])
         self._zstrata = -np.cumsum(dstrata)
 
     def _set_fill_parameters(self, fill_angle, nfill, dfill, bfill):
@@ -242,17 +245,24 @@ class Geometry(ABC):
         """
         default_model_width = np.max([1.5 * self._d, 2 * self._b])
         
-        min_model_width = 1.1 * self._b / 2
+        min_model_width = 1.1 * np.max([self._b - self._b2, self._b2]) #self._b / 2
         if self._fill_angle is not None:
-            min_model_width = np.max([self._b / 2 + self._bfill + self._d / np.tan(np.radians(self._fill_angle)) + 0.5,
+            min_model_width = np.max([np.max([self._b - self._b2, self._b2])  + self._bfill + self._d / np.tan(np.radians(self._fill_angle)) + 0.5,
                                       min_model_width])
             default_model_width = np.max([min_model_width, default_model_width])
         
         if model_width is None:
             model_width = default_model_width
-        elif model_width < min_model_width:
+        else:
+            model_width /= 2
+        if model_width < min_model_width:
             model_width = min_model_width
-        self._model_width = model_width
+        if self._symmetric:
+            self._model_width = model_width
+            self._xlim = np.array([0, model_width])
+        else:
+            self._model_width = 2 * model_width
+            self._xlim = np.array([-model_width, model_width])
     
     def _set_global_wt(self, wt):
         """Sets water table.
@@ -317,7 +327,18 @@ class Geometry(ABC):
             return 
         z = np.flip(np.unique(np.hstack([[0, -self._d], self._zexcavated, self._zfill])))
         for idx in range(len(z)-1):
-            vertex = self._get_fill_polygon_vertex(z[idx], z[idx + 1])
+            vertex = self._get_fill_polygon_vertex(z[idx], z[idx + 1], 1)
+            poly = Polygon(vertex)
+            self._polygons.append(poly)
+            poly_idx = len(self._polygons) -  1
+            fill_idx = poly.in_strata(self._zfill)
+            self._fill[fill_idx].append(poly_idx)
+            excavation_idx = poly.in_strata(self._zexcavated)
+            self._excavation[excavation_idx].append(poly_idx)
+        if self._symmetric:
+            return
+        for idx in range(len(z)-1):
+            vertex = self._get_fill_polygon_vertex(z[idx], z[idx + 1], -1)
             poly = Polygon(vertex)
             self._polygons.append(poly)
             poly_idx = len(self._polygons) -  1
@@ -340,59 +361,80 @@ class Geometry(ABC):
                       5:self._strata_case_5, 6:self._strata_case_6,
                       7:self._strata_case_7}
         for idx in range(len(z)-1):
-            poly = Polygon(vertexfunc[self._ftypeid](z[idx], z[idx + 1])) 
+            poly = Polygon(vertexfunc[self._ftypeid](z[idx], z[idx + 1], +1)) 
             self._polygons.append(poly)
             poly_idx = len(self._polygons) -  1
             strata_idx = poly.in_strata(self._zstrata)
-            self._strata[strata_idx].append(poly_idx)       
+            self._strata[strata_idx].append(poly_idx)
+        if self._symmetric:
+            return   
+        for idx in range(len(z)-1):
+            poly = Polygon(vertexfunc[self._ftypeid](z[idx], z[idx + 1], -1)) 
+            self._polygons.append(poly)
+            poly_idx = len(self._polygons) -  1
+            strata_idx = poly.in_strata(self._zstrata)
+            self._strata[strata_idx].append(poly_idx)
         
-    def _x_fill(self, z):
+    def _x_fill(self, z, xsign):
         """X coordiante of fill slope given the depth.
 
         Parameters
         ----------
         z : float
             Depth [m].
-
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right.
+        
         Returns
         -------
         float
             x-coordinate.
         """
-        x0 = self._b / 2 + self._bfill
-        return -(-z - self._d) / np.tan(np.radians(self._fill_angle)) + x0
-      
-    def _strata_case_1(self, ztop, zbottom):
+        if xsign > 0:
+            x0 = self._b - self._b2 + self._bfill
+            return -(-z - self._d) / np.tan(np.radians(self._fill_angle)) + x0
+        x0 = - self._b2 - self._bfill
+        return (-z - self._d) / np.tan(np.radians(self._fill_angle)) + x0
+          
+    def _strata_case_1(self, ztop, zbottom, xsign):
         """Strata for surface foundations without under-base or for
         buried plate foundation without ratchetting and fill.
 
         Parameters
         ----------
         ztop : float
-            depth at the top of the strata.
+            depth at the top of the strata [m].
         zbottom : float
-            Depth at the bottom of the strata. 
+            Depth at the bottom of the strata [m].
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right.
 
         Returns
         -------
         np.ndarray
             (4, 2) strata polygon coordinates.
         """
-        vertex = np.array([[0, ztop],
-                           [self._model_width, ztop],
-                           [self._model_width, zbottom],
-                           [0, zbottom]])
-        return vertex
-    
-    def _strata_case_2(self, ztop, zbottom):
+        if xsign > 0:
+            return np.array([[0, ztop],
+                             [self._xlim[1], ztop],
+                             [self._xlim[1], zbottom],
+                             [0, zbottom]])
+        return np.array([[0, ztop],
+                         [self._xlim[0], ztop],
+                         [self._xlim[0], zbottom],
+                         [0, zbottom]])
+         
+    def _strata_case_2(self, ztop, zbottom, xsign):
         """Strata for surface foundations  with ratchetting.
 
         Parameters
         ----------
         ztop : float
-            depth at the top of the strata.
+            depth at the top of the strata [m].
         zbottom : float
-            Depth at the bottom of the strata. 
+            Depth at the bottom of the strata [m].
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right. 
 
         Returns
         -------
@@ -400,184 +442,226 @@ class Geometry(ABC):
             (nvertex, 2) strata polygon coordinates.
         """
         vertex = []
+        if xsign > 0:
+            xmin = self._b - self._b2 + self._bfill
+            xmax = self._xlim[1]
+        else:
+            xmin = - self._b2 - self._bfill
+            xmax = self._xlim[0]
         if ztop > -self._dratchetting and zbottom >= -self._dratchetting:
-            vertex.append([self._b / 2, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width,  zbottom])
-            vertex.append([self._b / 2, zbottom])
+            vertex.append([xmin, ztop])
+            vertex.append([xmax, ztop])
+            vertex.append([xmax,  zbottom])
+            vertex.append([xmin, zbottom])
         elif ztop > -self._dratchetting and zbottom < -self._dratchetting:
-            vertex.append([self._b / 2, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width, zbottom])
+            vertex.append([xmin, ztop])
+            vertex.append([xmax, ztop])
+            vertex.append([xmax, zbottom])
             vertex.append([0, zbottom])
             vertex.append([0, -self._dratchetting])
-            vertex.append([self._b / 2, -self._dratchetting])
+            vertex.append([xmin, -self._dratchetting])
         elif ztop <= -self._dratchetting:
             vertex.append([0, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width, zbottom])
+            vertex.append([xmax, ztop])
+            vertex.append([xmax, zbottom])
             vertex.append([0, zbottom])
         return np.array(vertex)
     
-    def _strata_case_3(self, ztop, zbottom):
+    def _strata_case_3(self, ztop, zbottom, xsign):
         """Strata for buried solid foundations without under-base or
         fill.
 
         Parameters
         ----------
         ztop : float
-            depth at the top of the strata.
+            depth at the top of the strata [m].
         zbottom : float
-            Depth at the bottom of the strata. 
+            Depth at the bottom of the strata [m].
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right. 
 
         Returns
         -------
         np.ndarray
             (nvertex, 2) strata polygon coordinates.
         """
+        
+        if xsign > 0:
+            xcol = self._b1 / 2
+            xfoot = self._b - self._b2
+            xmodel = self._xlim[1]
+        else:
+            xcol = -self._b1 / 2
+            xfoot = - self._b2
+            xmodel = self._xlim[0]
+
         vertex = []
         if ztop > -self._d + self._d1:
-            vertex.append([self._b1 / 2, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width, zbottom])
+            vertex.append([xcol, ztop])
+            vertex.append([xmodel, ztop])
+            vertex.append([xmodel, zbottom])
             if zbottom >= - self._d + self._d1:
-                vertex.append([self._b1/2, zbottom])
+                vertex.append([xcol, zbottom])
             elif zbottom > -self._d:
-                vertex.append([self._b/2, zbottom])
-                vertex.append([self._b/2, -self._d + self._d1])
-                vertex.append([self._b1/2, -self._d + self._d1])
+                vertex.append([xfoot, zbottom])
+                vertex.append([xfoot, -self._d + self._d1])
+                vertex.append([xcol, -self._d + self._d1])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0, -self._d])
-                vertex.append([self._b/2, -self._d])
-                vertex.append([self._b/2, -self._d + self._d1])
-                vertex.append([self._b1/2, -self._d + self._d1])
+                vertex.append([xfoot, -self._d])
+                vertex.append([xfoot, -self._d + self._d1])
+                vertex.append([xcol, -self._d + self._d1])
         elif ztop > -self._d:
-            vertex.append([self._b / 2, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width, zbottom])
+            vertex.append([xfoot, ztop])
+            vertex.append([xmodel, ztop])
+            vertex.append([xmodel, zbottom])
             if zbottom >= self._d:
-                vertex.append([self._b/2, zbottom])
+                vertex.append([xfoot, zbottom])
             else:
                 vertex.append([0, zbottom])
                 vertex.append([0, -self._d])
-                vertex.append([self._b/2, -self._d])
+                vertex.append([xfoot, -self._d])
         else:
             vertex.append([0, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width, zbottom])
+            vertex.append([xmodel, ztop])
+            vertex.append([xmodel, zbottom])
             vertex.append([0, zbottom])
         return np.array(vertex)
     
-    def _strata_case_4(self, ztop, zbottom):
+    def _strata_case_4(self, ztop, zbottom, xsign):
         """Strata for buried plate foundations with under-base and no
         fill.
 
         Parameters
         ----------
         ztop : float
-            depth at the top of the strata.
+            depth at the top of the strata [m].
         zbottom : float
-            Depth at the bottom of the strata. 
+            Depth at the bottom of the strata [m].
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right.
 
         Returns
         -------
         np.ndarray
             (nvertex, 2) strata polygon coordinates.
         """
+        
+        if xsign > 0:
+            xfoot = self._b - self._b2
+            xmodel = self._xlim[1]
+        else:
+            xfoot = - self._b2
+            xmodel = self._xlim[0]
+        
         vertex = []
         if ztop > -self._d:
             vertex.append([0, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width, zbottom])
+            vertex.append([xmodel, ztop])
+            vertex.append([xmodel, zbottom])
             if zbottom >= -self._d:
                 vertex.append([0,  zbottom])
             elif zbottom >= -self._d - self._dratchetting:
-                vertex.append([self._b/2,  zbottom])
-                vertex.append([self._b/2,  -self._d])
+                vertex.append([xfoot,  zbottom])
+                vertex.append([xfoot,  -self._d])
                 vertex.append([0,  -self._d])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0,  -self._d + self._dratchetting])
-                vertex.append([self._b/2,  -self._d +  self._dratchetting])
-                vertex.append([self._b/2,  -self._d])
+                vertex.append([xfoot,  -self._d +  self._dratchetting])
+                vertex.append([xfoot,  -self._d])
                 vertex.append([0,  -self._d])
         elif ztop > -self._d - self._dratchetting:
-            vertex.append([self._b / 2, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xfoot, ztop])
+            vertex.append([xmodel, ztop])
+            vertex.append([xmodel,  zbottom])
             if zbottom > -self._d - self._dratchetting:
-                vertex.append([self._b / 2,  zbottom])
+                vertex.append([xfoot,  zbottom])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0,  -self._d - self._dratchetting])
-                vertex.append([self._b / 2,  -self._d - self._dratchetting])
+                vertex.append([xfoot,  -self._d - self._dratchetting])
         else:
             vertex.append([0, ztop])
-            vertex.append([self._model_width,  ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xmodel,  ztop])
+            vertex.append([xmodel,  zbottom])
             vertex.append([0,  zbottom])
         return np.array(vertex)
     
-    def _strata_case_5(self, ztop, zbottom):
+    def _strata_case_5(self, ztop, zbottom, xsign):
         """Strata for buried solid foundations with under-base and no
         fill.
 
         Parameters
         ----------
         ztop : float
-            depth at the top of the strata.
+            depth at the top of the strata [m].
         zbottom : float
-            Depth at the bottom of the strata. 
+            Depth at the bottom of the strata [m].
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right. 
 
         Returns
         -------
         np.ndarray
             (nvertex, 2) strata polygon coordinates.
         """
+        
+        if xsign > 0:
+            xcol = self._b1 / 2
+            xfoot = self._b - self._b2
+            xmodel = self._xlim[1]
+        else:
+            xcol = -self._b1 / 2
+            xfoot = - self._b2
+            xmodel = self._xlim[0]
+        
         vertex = []
         if ztop > -self._d + self._d1:
-            vertex.append([self._b1 / 2, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xcol, ztop])
+            vertex.append([xmodel, ztop])
+            vertex.append([xmodel,  zbottom])
             if zbottom >= -self._d + self._d1:
-                vertex.append([self._b1/2,  zbottom])
+                vertex.append([xcol,  zbottom])
             elif zbottom >= self._d + self._dratchetting:
-                vertex.append([self._b/2,  zbottom])
-                vertex.append([self._b/2,  -self._d + self._d1])
-                vertex.append([self._b1/2,  -self._d + self._d1])
+                vertex.append([xfoot,  zbottom])
+                vertex.append([xfoot,  -self._d + self._d1])
+                vertex.append([xcol,  -self._d + self._d1])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0,  -self._d - self._dratchetting])
-                vertex.append([self._b/2,  -self._d - self._dratchetting])
-                vertex.append([self._b/2,  -self._d + self._d1])
-                vertex.append([self._b1/2,  -self._d + self._d1])
+                vertex.append([xfoot,  -self._d - self._dratchetting])
+                vertex.append([xfoot,  -self._d + self._d1])
+                vertex.append([xcol,  -self._d + self._d1])
         elif ztop > -self._d - self._dratchetting:
             vertex.append([self._b / 2, ztop])
-            vertex.append([self._model_width, ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xmodel, ztop])
+            vertex.append([xmodel,  zbottom])
             if zbottom >= -self._d - self._dratchetting:
-                vertex.append([self._b/2,  zbottom])
+                vertex.append([xfoot,  zbottom])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0,  -self._d - self._dratchetting])
-                vertex.append([self._b/2,  -self._d - self._dratchetting])
+                vertex.append([xfoot,  -self._d - self._dratchetting])
         else:
             vertex.append([0, ztop])
-            vertex.append([self._model_width,  ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xmodel,  ztop])
+            vertex.append([xmodel,  zbottom])
             vertex.append([0,  zbottom])
         return np.array(vertex)
     
-    def _strata_case_6(self, ztop, zbottom):
+    def _strata_case_6(self, ztop, zbottom, xsign):
         """vertex for buried foundations with fill and no under-base.
 
         Parameters
         ----------
         ztop : float
-            depth at the top of the strata.
+            depth at the top of the strata [m].
         zbottom : float
-            Depth at the bottom of the strata. 
+            Depth at the bottom of the strata [m].
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right. 
 
         Returns
         -------
@@ -585,34 +669,43 @@ class Geometry(ABC):
             (nvertex, 2) vertex polygon coordinates.
         """
 
+        if xsign > 0:
+            xratch = self._b - self._b2 + self._bfill
+            xmodel = self._xlim[1]
+        else:
+            xratch = - self._b2 - self._bfill
+            xmodel = self._xlim[0]
+
         vertex = []
         if ztop > -self._d:
-            vertex.append([self._x_fill(ztop),  ztop])
-            vertex.append([self._model_width,  ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([self._x_fill(ztop, xsign),  ztop])
+            vertex.append([xmodel,  ztop])
+            vertex.append([xmodel,  zbottom])
             if zbottom >= -self._d:
-                vertex.append([self._x_fill(zbottom),  zbottom])
+                vertex.append([self._x_fill(zbottom, xsign),  zbottom])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0,  -self._d])
-                vertex.append([self._b /2 + self._bfill,  -self._d])
+                vertex.append([xratch,  -self._d])
         else:
             vertex.append([0, ztop])
-            vertex.append([self._model_width,  ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xmodel,  ztop])
+            vertex.append([xmodel,  zbottom])
             vertex.append([0,  zbottom])
 
         return np.array(vertex)
     
-    def _strata_case_7(self, ztop, zbottom):
+    def _strata_case_7(self, ztop, zbottom, xsign):
         """vertex for buried foundations with fill and under-base.
 
         Parameters
         ----------
         ztop : float
-            depth at the top of the strata.
+            depth at the top of the strata [m].
         zbottom : float
-            Depth at the bottom of the strata. 
+            Depth at the bottom of the strata [m].
+        xsign : float
+            Side of the foundation (<0) for left (>0) for right. 
 
         Returns
         -------
@@ -620,35 +713,42 @@ class Geometry(ABC):
             (nvertex, 2) vertex polygon coordinates.
         """
 
+        if xsign > 0:
+            xratch = self._b - self._b2 + self._bfill
+            xmodel = self._xlim[1]
+        else:
+            xratch = - self._b2 - self._bfill
+            xmodel = self._xlim[0]
+
         vertex = []
         if ztop > -self._d:
-            vertex.append([self._x_fill(ztop),  ztop])
-            vertex.append([self._model_width,  ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([self._x_fill(ztop, xsign),  ztop])
+            vertex.append([xmodel,  ztop])
+            vertex.append([xmodel,  zbottom])
             if zbottom >= -self._d:
-                vertex.append([self._x_fill(zbottom),  zbottom])
+                vertex.append([self._x_fill(zbottom,  xsign),  zbottom])
             elif zbottom >= -self._d - self._dratchetting:
-                vertex.append([self._b / 2 + self._bfill,  zbottom])
-                vertex.append([self._b / 2 + self._bfill,  -self._d])
+                vertex.append([xratch,  zbottom])
+                vertex.append([xratch,  -self._d])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0,  -self._d - self._dratchetting])
-                vertex.append([self._b /2 + self._bfill,  -self._d - self._dratchetting])
-                vertex.append([self._b /2 + self._bfill,  -self._d])
+                vertex.append([xratch,  -self._d - self._dratchetting])
+                vertex.append([xratch,  -self._d])
         elif ztop > -self._d - self._dratchetting:
-            vertex.append([self._b / 2 + self._bfill,  ztop])
-            vertex.append([self._model_width,  ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xratch,  ztop])
+            vertex.append([xmodel,  ztop])
+            vertex.append([xmodel,  zbottom])
             if zbottom >= -self._d - self._dratchetting:
-                vertex.append([self._b / 2 + self._bfill,  zbottom])
+                vertex.append([xratch,  zbottom])
             else:
                 vertex.append([0,  zbottom])
                 vertex.append([0,  -self._d - self._dratchetting])
-                vertex.append([self._b /2 + self._bfill,  -self._d - self._dratchetting])
+                vertex.append([xratch,  -self._d - self._dratchetting])
         else:
             vertex.append([0, ztop])
-            vertex.append([self._model_width,  ztop])
-            vertex.append([self._model_width,  zbottom])
+            vertex.append([xmodel,  ztop])
+            vertex.append([xmodel,  zbottom])
             vertex.append([0,  zbottom])
         return np.array(vertex)
 
@@ -661,11 +761,15 @@ class Geometry(ABC):
         z = z[z >= -self._d - self._dratchetting]
         z = z[z <= -self._d]
         z = np.flip(np.unique(z))
+        xmin = 0
+        xmax = self._b - self._b2 + self._bfill
+        if not self._symmetric:
+            xmin = - self._b2 - self._bfill
         for idx in range(len(z)-1):
-            vertex = [[0,  z[idx]],
-                      [self._b / 2 + self._bfill,  z[idx]],
-                      [self._b / 2 + self._bfill,  z[idx + 1]],
-                      [0,  z[idx + 1]]]
+            vertex = [[xmin,  z[idx]],
+                      [xmax,  z[idx]],
+                      [xmax,  z[idx + 1]],
+                      [xmin,  z[idx + 1]]]
             poly = Polygon(vertex)
             self._polygons.append(poly)
             poly_idx = len(self._polygons) -  1
@@ -714,8 +818,8 @@ class Geometry(ABC):
         fig, ax = plt.subplots(1, 1, figsize=(figsize, figsize * self._model_depth/self._model_width))
         p = PatchCollection(patches, alpha=0.7, facecolor=colors, lw=lw, edgecolor='k')
         ax.add_collection(p)
-        ax.set_xlim([0, 1.1 * self._model_width])
-        ax.set_ylim([-self._model_depth, 0.1 * self._model_depth])
+        ax.set_xlim(1.1 * self._xlim)
+        ax.set_ylim(1.1 * self._ylim)
         ax.grid(alpha=0.4)
         plt.close(fig)
         return fig
@@ -723,8 +827,9 @@ class Geometry(ABC):
     #===================================================================
     # PUBLIC METHODS
     #===================================================================
-    def plot(self, figsize=2.5, foundation=True, fill=True, soil=True,
-             excavation=False, ratchetting=True, wt=True, interface=False):
+    def plot(self, figsize=4, foundation=True, fill=True, soil=True,
+             excavation=False, ratchetting=True, wt=True, interface=False,
+             output_location=False):
         """Foundation plot.
 
         Parameters
@@ -748,6 +853,8 @@ class Geometry(ABC):
         interface : bool, optional
             Shows interface between the foundation and soil. By default
             False.
+        output_location : bool, optional
+            Show output locations. By default False.
 
         Returns
         -------
@@ -790,24 +897,38 @@ class Geometry(ABC):
         if len(patches) > 0:
             p = PatchCollection(patches, alpha=.4, facecolor=colors, lw=1, edgecolor='k')
             ax.add_collection(p)
-        
+
         # plate foundation    
         if foundation and self._foundation_type=='plate':
-            ax.plot(self._foundation[:, 0], self._foundation[:, 1],'-',
-                    color='grey', lw=10, zorder=2)
+            ax.plot(self._foundation[:, 0], self._foundation[:, 1],'-', color='grey', lw=10, zorder=2)
 
         # interfaces
-        if interface and self._interface is not None:
+        if interface:
             for vertex in self._interface_vertex:
-                ax.plot(vertex[:, 0], vertex[:, 1], '--', color='red', lw=3, zorder=3)
+                ax.plot(vertex[1][:, 0], vertex[1][:, 1], '--', color='red', lw=3, zorder=3)
 
         # water table
         if self._global_wt is not None and wt:
-            ax.plot([0, self._model_width], [-self._global_wt, -self._global_wt],
-                    '-b', lw=3, zorder=4)
+            ax.plot(self._xlim, [-self._global_wt, -self._global_wt], '-b', lw=3, zorder=4)
 
-        ax.set_xlim([0, 1.1 * self._model_width])
-        ax.set_ylim([-self._model_depth, 0.1 * self._model_depth])
+        # output locations
+        if output_location and hasattr(self, '_output_location_xcoord'):
+            for xcoord in self._output_location_xcoord:
+                ax.plot(xcoord, -self._d, 'ok', ms=6)
+            if self._d1 is None:
+                ax.plot(0, 0, 'ok', ms=6)
+            elif self._d - self._d1 > 0:
+                ax.plot(0, 0, 'ok', ms=6)
+            else:
+                ax.plot(0, self._d - self._d1, 'ok', ms=6)
+
+        ax.set_xlim(1.1 * self._xlim)
+
+        ylim = copy.deepcopy(1.1 * self._ylim)
+        if ylim[1]==0:
+            ylim[1] = 0.5
+        ax.set_ylim(ylim)
+
         ax.grid(alpha=0.4)
         plt.close(fig)
         return fig

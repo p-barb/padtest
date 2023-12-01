@@ -43,6 +43,10 @@ class SoilMaterial():
             material['ky'] = 0
         if 'Rinter' not in material:
             material['Rinter'] = 1
+        if "RayleighAlpha" not in material:
+            material['RayleighAlpha'] = 0
+        if "RayleighBeta"not in material:
+            material['RayleighBeta'] = 0
         
         try:
             material = g_i.soilmat("MaterialName",label,
@@ -54,7 +58,9 @@ class SoilMaterial():
                                    "gammaUnsat", material['gammaUnsat'],
                                    'perm_primary_horizontal_axis', material['kx'],
                                    'perm_vertical_axis', material['ky'],
-                                   'Rinter', material['Rinter'])
+                                   'Rinter', material['Rinter'],
+                                   'RayleighAlpha', material['RayleighAlpha'],
+                                   'RayleighBeta', material['RayleighBeta'])
         except:
             msg = 'Unable to create linear elastic material <{}>.'.format(label)
             raise RuntimeError(msg)
@@ -93,6 +99,10 @@ class SoilMaterial():
             material['OCR'] = 1
         if 'POP' not in material:
             material['POP'] = 0
+        if "RayleighAlpha" not in material:
+            material['RayleighAlpha'] = 0
+        if "RayleighBeta"not in material:
+            material['RayleighBeta'] = 0
         try:
             material = g_i.soilmat("MaterialName",label,
                                    "SoilModel", 2,
@@ -108,7 +118,9 @@ class SoilMaterial():
                                    'POP',material['POP'],
                                    'perm_primary_horizontal_axis', material['kx'],
                                    'perm_vertical_axis', material['ky'],
-                                   'Rinter', material['Rinter'])
+                                   'Rinter', material['Rinter'],
+                                   'RayleighAlpha', material['RayleighAlpha'],
+                                   'RayleighBeta', material['RayleighBeta'])
         except:
             msg = 'Unable to create Mohr-Coulomb material <{}>.'.format(label)
             raise RuntimeError(msg)
@@ -149,6 +161,10 @@ class SoilMaterial():
             material['OCR'] = 1
         if 'POP' not in material:
             material['POP'] = 0
+        if "RayleighAlpha" not in material:
+            material['RayleighAlpha'] = 0
+        if "RayleighBeta"not in material:
+            material['RayleighBeta'] = 0
         try:
             material = g_i.soilmat("MaterialName",label, 
                                    "SoilModel", 3,
@@ -169,7 +185,9 @@ class SoilMaterial():
                                    'POP',material['POP'],
                                    'perm_primary_horizontal_axis', material['kx'],
                                    'perm_vertical_axis', material['ky'],
-                                   'Rinter', material['Rinter'])
+                                   'Rinter', material['Rinter'],
+                                   'RayleighAlpha', material['RayleighAlpha'],
+                                   'RayleighBeta', material['RayleighBeta'])
         except:
             msg = 'Unable to create hardening soil material <{}>.'.format(label)
             raise RuntimeError(msg)

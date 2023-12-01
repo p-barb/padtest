@@ -71,17 +71,23 @@ class PlateMaterial():
             Plaxis object of the plate material.
         """
         g_i.gotosoil()
+        if "RayleighAlpha" not in material:
+            material['RayleighAlpha'] = 0
+        if "RayleighBeta"not in material:
+            material['RayleighBeta'] = 0
         try:
             material = g_i.platemat("MaterialName", label,
-                                "MaterialNumber", 0,
-                                "Elasticity", 0,
-                                "IsIsotropic", True,
-                                "EA", material['EA'],
-                                "EA2", material['EA'],
-                                "EI", material['EI'],
-                                "nu", material['nu'],
-                                "d", material['d'],
-                                "Gref", material['Gref'])
+                                    "MaterialNumber", 0,
+                                    "Elasticity", 0,
+                                    "IsIsotropic", True,
+                                    "EA", material['EA'],
+                                    "EA2", material['EA'],
+                                    "EI", material['EI'],
+                                    "nu", material['nu'],
+                                    "d", material['d'],
+                                    "Gref", material['Gref'],
+                                    'RayleighAlpha', material['RayleighAlpha'],
+                                    'RayleighBeta', material['RayleighBeta'])
         except:
             msg = 'Unable to create plate material <{}>.'.format(label)
             raise RuntimeError(msg)

@@ -50,6 +50,23 @@ class Model(ABC):
     excavation : bool
         If True in models with fill, the excavation and fill
         processes are included in the initial phases.
+    deformation_boundary_condition : dict, None, optional
+        Deformation boundary conditions of the model. If None the
+        default setting is adopted. Dictionary with keys `XMin`,
+        `XMax`, `YMin` and `YMax`, with supported values
+        'Free',  'Normally fixed',  'Horizontally fixed',
+        'Vertically fixed' and 'Fully fixed'. By default None.
+    dynamic_boundary_condtions : dict, None, optional
+        Dynamic boundary conditions of the model used in dynamic load
+        tests. If None the default setting is adopted. Dictionary
+        with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported
+        values 'None' and 'Viscous'. By default None.
+    shake_boundary_condtions : dict, None, optional
+        Dynamic boundary conditions of the model used in base shake
+        tests. If None the default setting is adopted. Dictionary
+        with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported
+        values 'None', 'Viscous', 'Free-field' and 'Compliant base'.
+        By default None.
 
     Methods
     -------
@@ -64,19 +81,34 @@ class Model(ABC):
         be regenerated with <regen> method.
     load(filename)
         Loads saved test.
-    failure_test(testid, test, max_load=np.inf, start_load=50, load_factor=2, load_increment=0)
+    failure_test(testid, load, max_load=[np.inf, np.inf, np.inf], load_factor=2, load_increment=[0, 0, 0], qsurf=None, start_from='construction', delete_fail=True)
         Test the foundation until the model does not converge.
-    load_test(testid, load, delete_phases=True)
+    load_test(testid, load, start_from='construction', qsurf=None, delete_fail=True)
         Conducts a load test in the model.
-    delete_test( testid, delete_phases=True) 
+    safety_test(testid, start_from, test='incremental', SumMsf=None, Msf=0.1, qsurf=None, delete_fail=True)
+        Conducts a safety test on the model.
+    dynamic_test(testid, time, load, start_from='construction', nsubstep=10, qsurf=None, delete_fail=True)
+        Apply a dynamic load to the foundation.
+    shake_test(testid, time, acceleration, start_from='construction', qsurf=None, nsubstep=10, delete_fail=True)
+        Apply a displacement time history at the model base.
+    delete_test( testid, delete_fail=True) 
         Deletes a test from the model.
-    plot_test(testid, phase=None, location=None, compression_positive=True, pullout_positive=True, reset_start=False, legend=False, figsize=(6, 4)) 
+    plot_test(testid, force=None, displacement=None, phase=None, location=None, compression_positive=True, pullout_positive=False, reset_start=False, legend=False, xlim=None, ylim=None, figsize=(4, 3))
         Plots test results.
+    plot_safety_test(testid, location=None, pullout_positive=False, reset_start=False, legend=False, figsize=(6, 4))
+        Plots safety test.
+    plot_dynamic_test(testid, displacement=None, force=None, location=None, compression_positive=True, pullout_positive=False, xlim=None, ylim=None, legend=False, figsize=(8, 2))
+        Plot dynamic test resutls versus time.
+    plot_shake_test(self, testid, displacement=None, acceleration=None, location=None, pullout_positive=False, xlim=None, ylim=None, legend=False, figsize=(8, 2))
+        Plot shake test results versus time.
     """
 
     def __init__(self, s_i, g_i, g_o, model_type, element_type, title,
                  comments, soil, fill, ratchetting_material,
-                 ratchetting_threshold, mesh_density, locations, excavation):
+                 ratchetting_threshold, mesh_density, locations, excavation,
+                 deformation_boundary_condition=None,
+                 dynamic_boundary_condtions=None, 
+                 shake_boundary_condtions=None, boundary_interface=False):
         """Init method.
 
         Parameters
@@ -114,7 +146,28 @@ class Model(ABC):
             foundation and 1 the edge.
         excavation : bool
             If True in models with fill, the excavation and fill
-            processes are included in the initial phases.        
+            processes are included in the initial phases.
+        deformation_boundary_condition : dict, None, optional
+            Deformation boundary conditions of the model. If None the
+            default setting is adopted. Dictionary with keys `XMin`,
+            `XMax`, `YMin` and `YMax`, with supported values
+            'Free',  'Normally fixed',  'Horizontally fixed',
+            'Vertically fixed' and 'Fully fixed'. By default None.
+        dynamic_boundary_condtions : dict, None, optional
+            Dynamic boundary conditions of the model used in dynamic load
+            tests. If None the default setting is adopted. Dictionary
+            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported
+            values 'None' and 'Viscous'. By default None.
+        shake_boundary_condtions : dict, None, optional
+            Dynamic boundary conditions of the model used in base shake
+            tests. If None the default setting is adopted. Dictionary
+            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported
+            values 'None', 'Viscous', 'Free-field' and 'Compliant base'.
+            By default None.
+        boundary_interface : bool, optional
+            Include boundary interfaces needed for a base shake test.
+            This requires a much denser mesh and more computationally
+            demanding models. By default False.
         """
         self._s_i = s_i
         self._g_i = g_i
@@ -130,11 +183,12 @@ class Model(ABC):
         self._init_ratchetting_material(ratchetting_material, ratchetting_threshold)
         self._init_mesh(mesh_density)
         self._init_output(locations)
+        self._init_boundary_conditions(deformation_boundary_condition, dynamic_boundary_condtions, shake_boundary_condtions, boundary_interface)
         self._build_excavation = excavation
     
     #===================================================================
     # PRIVATE METHODS
-    #===================================================================
+    #===================================================================   
     def _init_model_settings(self, title, comments, model_type, element_type):
         """Initialize model settings.
 
@@ -262,19 +316,122 @@ class Model(ABC):
         self._test_log = {}
         results_df = pd.DataFrame(columns=['test', 'phase', 'previous', 'plx id',
                                            'previous plx id', 'location', 'step',
-                                           'load start', 'load end', 'load',
-                                           'uy', 'sumMstage', 'fy', 'qy', 'uy',
-                                           'ratchetting'])
+                                           'time', 'sumMstage', 'SumMsf', 'uy',
+                                           'ux', 'Fy', 'Fx', 'M', 'qy0', 'qy1',
+                                           'qx', 'agx', 'agy',
+                                           'Fy target', 'Fx target',
+                                           'M target', 'ratchetting'])
         self._results = results_df
         self._ophases = {}
-        self._ouput_location = locations
-        self._ouput_point = {}
+        locations = np.array(locations)
+        if self._b2 == 0:
+            locations = locations[locations>=0]
+        elif self._b2 == self._b:
+            locations = locations[locations<=0]
+        self._output_location = locations
+        self._output_location_xcoord = (self._b * (self._output_location>0) - self._b2) * np.abs(self._output_location)
+        self._output_point = {}
+
+    def _init_boundary_conditions(self, deformation_boundary_condition,
+                                  dynamic_boundary_condtions,
+                                  shake_boundary_condtions, boundary_interface):
+        """Initializes the boundary conditions.
+
+        Parameters
+        ----------
+        deformation_boundary_condition : dict, None
+            Deformation boundary conditions of the model. If None the
+            default setting is adopted. Dictionary with keys `XMin`,
+            `XMax`, `YMin` and `YMax`, with supported values
+            'Free',  'Normally fixed',  'Horizontally fixed',
+            'Vertically fixed' and 'Fully fixed'. 
+        dynamic_boundary_condtions : dict, None
+            Dynamic boundary conditions of the model used in dynamic load
+            tests. If None the default setting is adopted. Dictionary
+            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported
+            values 'None' and 'Viscous'.
+        shake_boundary_condtions : dict, None
+            Dynamic boundary conditions of the model used in base shake
+            tests. If None the default setting is adopted. Dictionary
+            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported
+            values 'None', 'Viscous', 'Free-field' and 'Compliant base'.
+        boundary_interface : bool
+            Include boundary interfaces needed for a base shake test.
+            This requires a much denser mesh and more computationally
+            demanding models.
+
+        Raises
+        ------
+        RuntimeError
+            Wrong deformation boundary id.
+        RuntimeError
+            Unsuported deformation boundary condition.
+        RuntimeError
+            Wrong dynamic boundary id.
+        RuntimeError
+            Unsuported dynamic boundary condition.
+        RuntimeError
+            Wrong shake boundary id.
+        RuntimeError
+            Unsuported shake boundary condition.
+        """
+        # Deformation
+        self._deformation_bc = copy.deepcopy(self._DEFAULT_DEFORMATION_BC)
+        if isinstance(deformation_boundary_condition, dict):
+            supported = ["Free",  "Normally fixed",  "Horizontally fixed", "Vertically fixed", "Fully fixed"]
+            for boundary in deformation_boundary_condition:
+                if boundary not in self._deformation_bc:
+                    msg = ("Boundary <{}> not supported in deformation "
+                           "boundary conditions. Supported values are: "
+                           "'XMin', 'XMax', 'YMin' and 'YMax'.")
+                    msg = msg.format(boundary)
+                    raise RuntimeError(msg)
+                if deformation_boundary_condition[boundary] not in supported:
+                    msg = ("Deformation boundary condition <{}> not supported. "
+                           "Suported values are: {}.")
+                    msg = msg.format(deformation_boundary_condition[boundary], ','.join(supported))
+                self._deformation_bc[boundary] = deformation_boundary_condition[boundary]
+        
+        # Dynamic
+        self._dynamic_bc = copy.deepcopy(self._DEFAULT_DYNAMIC_BC)
+        if isinstance(dynamic_boundary_condtions, dict):
+            supported = ["None",  "Viscous"]
+            for boundary in dynamic_boundary_condtions:
+                if boundary not in self._dynamic_bc:
+                    msg = ("Boundary <{}> not supported in dynamic "
+                           "boundary conditions. Supported values are: "
+                           "'XMin', 'XMax', 'YMin' and 'YMax'.")
+                    msg = msg.format(boundary)
+                    raise RuntimeError(msg)
+                if dynamic_boundary_condtions[boundary] not in supported:
+                    msg = ("Dynamic boundary condition <{}> not supported. "
+                           "Suported values are: {}.")
+                    msg = msg.format(dynamic_boundary_condtions[boundary], ','.join(supported))
+                self._dynamic_bc[boundary] = dynamic_boundary_condtions[boundary]
+
+        # Shake
+        self._shake_bc = copy.deepcopy(self._DEFAULT_SHAKE_BC)
+        if isinstance(shake_boundary_condtions, dict):
+            supported = ["None",  "Viscous", "Free-field"]
+            for boundary in shake_boundary_condtions:
+                if boundary not in self._shake_bc:
+                    msg = ("Boundary <{}> not supported in shake "
+                           "boundary conditions. Supported values are: "
+                           "'XMin', 'XMax', 'YMin' and 'YMax'.")
+                    msg = msg.format(boundary)
+                    raise RuntimeError(msg)
+                if shake_boundary_condtions[boundary] not in supported:
+                    msg = ("Shake boundary condition <{}> not supported. "
+                           "Suported values are: {}.")
+                    msg = msg.format(shake_boundary_condtions[boundary], ','.join(supported))
+                self._shake_bc[boundary] = shake_boundary_condtions[boundary]
+        self._boundary_interface_flag = boundary_interface
 
     def _set_model(self):
         """General model settings.
         """
         self._s_i.new()
-        self._g_i.SoilContour.initializerectangular(0, -self._model_depth, self._model_width, 0)
+        self._g_i.SoilContour.initializerectangular(self._xlim[0], self._ylim[0], self._xlim[1], self._ylim[1])
         self._g_i.setproperties("Title",self._title,
                                 "Comments",self._comments,
                                 "ModelType",self._model_type,
@@ -308,8 +465,18 @@ class Model(ABC):
             self._footing_plx = self._g_i.plate(*[list(v) for v in self._footing])
         self._interface = []
         for vertex in self._interface_vertex:
-            self._interface.append(self._g_i.neginterface(list(vertex[0]), list(vertex[1])))
+            if vertex[0] == 'positive':
+                self._interface.append(self._g_i.posinterface(list(vertex[1][0]), list(vertex[1][1])))
+            if vertex[0] == 'negative':
+                self._interface.append(self._g_i.neginterface(list(vertex[1][0]), list(vertex[1][1])))
+        if self._boundary_interface_flag:
+            self._boundary_interface = []
+            self._boundary_interface.append(self._g_i.neginterface((self._xlim[1], self._ylim[1]), (self._xlim[1], self._ylim[0])))
+            self._boundary_interface.append(self._g_i.neginterface((self._xlim[1], self._ylim[0]), (self._xlim[0], self._ylim[0])))
+            self._boundary_interface.append(self._g_i.neginterface((self._xlim[0], self._ylim[0]), (self._xlim[0], self._ylim[1]))) 
 
+            self._acceleration = self._g_i.linedispl((self._xlim[0], self._ylim[0]), (self._xlim[1], self._ylim[0]))
+    
     def _build_materials(self):
         """Creates soil and plate materials in the model.
         """
@@ -319,10 +486,14 @@ class Model(ABC):
             self._plate_material_plx[matid] = PlateMaterial.set(self._g_i, matid, self._plate_material[matid])
 
     @abstractmethod
-    def _set_load(self):
+    def _build_load(self):
         return NotImplementedError
     
-    def _set_mesh(self):
+    @abstractmethod
+    def _build_surface_load(self):
+        return NotImplementedError
+    
+    def _build_mesh(self):
         """Mesh the model.
         """
         self._g_i.gotomesh()
@@ -350,6 +521,7 @@ class Model(ABC):
         # Initial phase
         self._iphases['Initial Phase'] = self._g_i.InitialPhase
         self._g_i.Model.CurrentPhase = self._g_i.InitialPhase
+        self._set_deformation_boundary_conditions()
 
         for poly in self._structure_polygons:
             self._g_i.activate(poly, self._g_i.Model.CurrentPhase)
@@ -413,6 +585,7 @@ class Model(ABC):
         # Initial phase
         self._iphases['Initial Phase'] = self._g_i.InitialPhase
         self._g_i.Model.CurrentPhase = self._g_i.InitialPhase
+        self._set_deformation_boundary_conditions()
 
         for poly in self._structure_polygons:
             self._g_i.activate(poly, self._g_i.Model.CurrentPhase)
@@ -441,8 +614,7 @@ class Model(ABC):
         self._iphases['construction'] = self._g_i.phase(self._iphases['Initial Phase'])
         self._iphases['construction'].Identification = "construction"
         self._g_i.Model.CurrentPhase = self._iphases['construction']
-        self._g_i.set(self._g_i.Model.CurrentPhase.
-                      MaxStepsStored, 1000)
+        self._g_i.set(self._g_i.Model.CurrentPhase.MaxStepsStored, 1000)
 
     def _set_soil_material(self, g_i, soil_idx, phase_idx, material):
         """Assings a soil material to a polygon in a given phase. g_i
@@ -500,33 +672,34 @@ class Model(ABC):
 
         self._ophases[phaseid] = self._g_o.phases[-1]
         nstep = len(list(self._ophases[phaseid].Steps.value))
-        Uy = np.zeros((len(self._ouput_location) + 1, nstep))
-        sumMstage = np.zeros(nstep)
-        Fy = np.zeros(nstep)
-        qy = np.zeros(nstep)
-        steps = np.linspace(1, nstep, nstep)
-        load_start = 0
-        load_end = 0
-
-
-        sumMstage, Uy = self._extract_initial_phase_results(phaseid, sumMstage, Uy)
+        
+        sumMstage, Uy, Ux = self._extract_initial_phase_results(phaseid, nstep)
         
         # ad results to dataframe
-        for locidx, loc in enumerate(self._ouput_point):
+        for locidx, loc in enumerate(self._output_point):
             df = pd.DataFrame({'test':[None] * nstep,
                                'phase':[self._iphases[phase].Identification.value] * nstep,
-                               'previous':[None] * nstep,
+                               'previous':[None] * (nstep),
                                'plx id':[self._iphases[phase].Name.value] * nstep,
                                'previous plx id':[None] * nstep,
                                'location': [loc] * nstep,
-                               'step': steps,
-                               'load start':[load_start] * nstep,
-                               'load end':[load_end] * nstep,
-                               'load':[0] * nstep,
+                               'step': np.linspace(1, nstep, nstep),
+                               'time': [None] * nstep,
                                'sumMstage':sumMstage, 
-                               'fy': Fy,
-                               'qy': qy,
+                               'SumMsf': [None] * nstep,
                                'uy': Uy[locidx, :],
+                               'ux': Ux[locidx, :],
+                               'Fy': [0] * nstep,
+                               'Fx': [0] * nstep,
+                               'M': [0] * nstep,
+                               'qy0': [0] * nstep,
+                               'qy1': [0] * nstep,
+                               'qx': [0] * nstep,
+                               'agx':[0] * nstep,
+                               'agy':[0] * nstep,
+                               'Fy target': [0] * nstep,
+                               'Fx target':[0] * nstep,
+                               'M target': [0] * nstep,                            
                                'ratchetting': [False] * nstep})
             if len(self._results) == 0:
                 self._results = df
@@ -555,7 +728,219 @@ class Model(ABC):
             (nstep, nloc) displacement at the output locations.
         """
         return NotImplementedError
-               
+
+    def _load_format(self, load):
+        """Format input load.
+
+        Parameters
+        ----------
+        load : array-like, numeric
+            (3,) array-like with (Fy, Fx, M) applied to the foundaiton.
+            Numeric value is assumed as Fy, returning (Fy, 0, 0).
+            Symmetric foundations only allow for numeric values.
+
+        Returns
+        -------
+        np.ndarray
+            (3,)  (Fy, Fx, M) applied to the foundaiton.
+
+        Raises
+        ------
+        RuntimeError
+            Non-numeric load value in symmetric foundation.
+        """
+        if self._symmetric and not isinstance(load, numbers.Number):
+            if load[1] != 0  and load[2] != 0:
+                msg = 'Symmetric models only allow for vertical loads.'
+                raise RuntimeError(msg)
+            return np.array(load)
+        if isinstance(load, numbers.Number):
+            return np.array([load, 0, 0])
+        return load
+
+    def _get_phase_load(self, phaseid, when, target=False):
+        """Retrieves the start or end load of a calcualted phase from
+        the results.
+
+        Parameters
+        ----------
+        phaseid : str
+            Phase id
+        when : str
+            'start' or 'end'.
+        target : bool, optinal
+            Get target load values, instead of applied load inferred
+            from Plaxis output. By default False.  
+
+        Returns
+        -------
+        np.ndarray
+            (3,) load applied at the end of the phase (Fy, Fx, M).
+        """
+        idx = self._results['phase'] == phaseid
+        locs = self._results.loc[idx, 'location'].unique()
+        idx = idx & (self._results['location'] == locs[0])
+
+        if when=='end':
+            idx = np.max(self._results.loc[idx].index.to_numpy())
+        elif when=='start':
+            idx = np.min(self._results.loc[idx].index.to_numpy())
+        
+        if target:
+            load = [self._results.loc[idx, 'Fy target'],
+                    self._results.loc[idx, 'Fx target'],
+                    self._results.loc[idx, 'M target']]
+        else:
+            load = [self._results.loc[idx, 'Fy'],
+                    self._results.loc[idx, 'Fx'],
+                    self._results.loc[idx, 'M']]
+        return np.array(load)
+
+    def _set_deformation_boundary_conditions(self):
+        """Sets deformation conditions in the current phase.
+        """
+        self._g_i.set(self._g_i.Deformations.BoundaryXMin, self._g_i.Model.CurrentPhase,  self._deformation_bc['XMin'])
+        self._g_i.set(self._g_i.Deformations.BoundaryXMax, self._g_i.Model.CurrentPhase,  self._deformation_bc['XMax'])
+        self._g_i.set(self._g_i.Deformations.BoundaryYMin, self._g_i.Model.CurrentPhase,  self._deformation_bc['YMin'])
+        self._g_i.set(self._g_i.Deformations.BoundaryYMax, self._g_i.Model.CurrentPhase,  self._deformation_bc['YMax'])
+
+    def _set_dynamic_test_phase(self, testid, time, start_phaseid, nsubstep, shake):
+        """Set up a dynamic design phase in the model
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        time : np-array
+            (nt,) time array.
+        start_phaseid : str
+            Id of the test start phase.
+        nsubstep : int
+            Substests in each time step.
+        shake : bool
+            True if base shake test.
+        """
+        self._iphases[testid] = self._g_i.phase(self._iphases[start_phaseid])
+        self._iphases[testid].Identification = testid
+        self._g_i.Model.CurrentPhase = self._iphases[testid]
+        self._g_i.set(self._g_i.Model.CurrentPhase.DeformCalcType, "Dynamic")
+        self._g_i.set(self._g_i.Model.CurrentPhase.Deform.TimeIntervalSeconds, time[-1])
+        self._g_i.set(self._g_i.Model.CurrentPhase.Deform.UseDefaultIterationParams, False)
+        self._g_i.set(self._g_i.Model.CurrentPhase.Deform.TimeStepDetermType, "Manual")
+        self._g_i.set(self._g_i.Model.CurrentPhase.Deform.MaxSteps, len(time))
+        self._g_i.set(self._g_i.Model.CurrentPhase.Deform.SubSteps, nsubstep)
+        self._g_i.set(self._g_i.Model.CurrentPhase.MaxStepsStored, len(time))
+
+        if shake:
+            self._g_i.set(self._g_i.Dynamics.BoundaryXMin, self._g_i.Model.CurrentPhase,  self._shake_bc['XMin'])
+            self._g_i.set(self._g_i.Dynamics.BoundaryXMax, self._g_i.Model.CurrentPhase,  self._shake_bc['XMax'])
+            self._g_i.set(self._g_i.Dynamics.BoundaryYMax, self._g_i.Model.CurrentPhase,  self._shake_bc['YMax'])
+            self._g_i.set(self._g_i.Dynamics.BoundaryYMin, self._g_i.Model.CurrentPhase,  self._shake_bc['YMin'])
+        else:
+            self._g_i.set(self._g_i.Dynamics.BoundaryXMin, self._g_i.Model.CurrentPhase,  self._dynamic_bc['XMin'])
+            self._g_i.set(self._g_i.Dynamics.BoundaryXMax, self._g_i.Model.CurrentPhase,  self._dynamic_bc['XMax'])
+            self._g_i.set(self._g_i.Dynamics.BoundaryYMax, self._g_i.Model.CurrentPhase,  self._dynamic_bc['YMax'])
+            self._g_i.set(self._g_i.Dynamics.BoundaryYMin, self._g_i.Model.CurrentPhase,  self._dynamic_bc['YMin'])
+        
+    def _get_start_phase(self, start):
+        """Get the phase id to be used as the start conditions for
+        a new load test.
+
+        Parameters
+        ----------
+        start : str, tuple
+            'construction', 'excavation', Plaxis phase id or test id
+            used as the start conditions for a new test. If a test with
+            multiple stages is requested, the last test phase is
+            selected. Specific test stages are selected by providing a
+            tuple (test id, stage number), where the phase number is an
+            integer starting from 0. Failure and safety tests cannot be
+            used start configurations.
+
+        Returns
+        -------
+        str
+            Phase id.
+
+        Raises
+        ------
+        RuntimeError
+            Start phase or test not available.
+        RuntimeError
+            Failure or safety test requested as start configurations.
+        RuntimeError
+            Start test not available.
+        RuntimeError
+            Failure or safety test requested as start configurations.
+        RuntimeError
+            Wrong stage input type. 
+        RuntimeError
+            Stage not available in test.
+        RuntimeError
+            Wrong input format.
+        """
+        if isinstance(start, str):
+            if start in self._iphases and start not in self._test_log:
+                return start
+            if start in self._test_log:
+                if self._test_log[start] in ['failure', 'safety incremental', 'safety target']:
+                    raise RuntimeError('Failure and safety tests cannot be used as start configurations.')
+                phaseid = self._test_log[start]['phase'][-1]
+                return phaseid
+            else:
+                raise RuntimeError('Requested start phase or test <{}> not available.'.format(start))
+        elif isinstance(start, tuple):
+            testid = start[0]
+            phaseid = start[1]
+            if testid not in self._test_log:
+                raise RuntimeError('Requested start test <{}> not available.'.format(testid))
+            if self._test_log[testid] in ['failure', 'safety incremental', 'safety target']:
+                raise RuntimeError('Failure and safety tests cannot be used as start configurations.')
+            if not isinstance(phaseid, int):
+                raise RuntimeError('A stage within a test must be specified by its number as an integer.')
+            phaseid = "{}_stage_{:.0f}".format(testid, phaseid)
+            if phaseid not in self._test_log[testid]['phase']:
+                raise RuntimeError('Requested start stage <{}> not available in test <{}>.'.format(phaseid, testid))
+            return phaseid
+        msg = "Test start phase must be specified as a test id string, or a tuple (test id, stage number)."
+        raise RuntimeError(msg)
+
+    def _calculate_surface_load(self, testid, qsurf, start_phaseid, delete_phases): 
+        """Calcualtes the surface load stage.
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        qsurf : numeric, None
+            Surface load.
+        start_phaseid : str
+            Id of the test start phase.
+        delete_phases : bool, optional
+            Deletes test phases from model if there is a calculation
+            error, by default True.
+
+        Returns
+        -------
+        str
+            Id of the test start phase.
+        """
+        if qsurf is None:
+            return start_phaseid
+        phaseid = testid + '_qsurf'
+        self._test_log[testid]['phase'].append(phaseid)
+        self._iphases[phaseid] = self._g_i.phase(self._iphases[start_phaseid])
+        self._iphases[phaseid].Identification = phaseid
+
+        self._g_i.Model.CurrentPhase = self._iphases[phaseid]
+        self._g_i.set(self._g_i.Model.CurrentPhase.MaxStepsStored, 1000)
+        self._set_surface_load(qsurf)
+        status = self._g_i.calculate(self._g_i.Model.CurrentPhase)
+        self._check_phase_status(status, testid, phaseid, delete_phases)
+        self._set_phase_results(testid, phaseid, start_phaseid, [0, 0, 0])
+        
+        return phaseid
+
     def _calculate_load_phase(self, testid, phaseid, prevphaseid, load, ratchetting):
         """Computes a phase in a load test.
 
@@ -566,7 +951,7 @@ class Model(ABC):
         phaseid : str
             Phase id
         prevphaseid : str
-            If of the previous phase.
+            Id of the previous phase.
         load : numeric
             Load value at the end of the phase [kN].
         ratchetting : bool
@@ -586,17 +971,49 @@ class Model(ABC):
         self._g_i.set(self._g_i.Model.CurrentPhase.MaxStepsStored, 1000)
         self._update_ratchetting_material(testid, ratchetting, phaseid, prevphaseid)
         
-        if self._foundation_type == 'solid':
-            self._g_i.activate(self._g_i.LineLoad_1_1, self._g_i.Model.CurrentPhase)
-            self._g_i.set(self._g_i.LineLoad_1_1.qy_start, self._g_i.Model.CurrentPhase, load / self._b1)
-        else:
-            self._g_i.activate(self._g_i.PointLoad_1_1, self._g_i.Model.CurrentPhase)
-            self._g_i.set(self._g_i.PointLoad_1_1.Fy, self._g_i.Model.CurrentPhase, load)
-            # self._g_i.activate(self['load'][0], self._g_i.Model.CurrentPhase)
-            # self._g_i.set(self['load'][1].Fy, self._g_i.Model.CurrentPhase, load)
+        self._set_load(load)
         status = self._g_i.calculate(self._g_i.Model.CurrentPhase)
         return status
+
+    @abstractmethod
+    def _set_dynamic_load(self, time, load):
+        """Sets dynamic load."""
+        return NotImplementedError
     
+    @abstractmethod
+    def _calculate_dynamic_load_phase(self, time, load):
+        """Calcualtes a dynamic load phase."""
+        return NotImplementedError
+    
+    @abstractmethod
+    def _set_dynamic_load_result(self, testid, time, load):
+        """Adds dynamic load values to results dataframe."""
+        return NotImplementedError
+
+    @abstractmethod
+    def _set_load(self, load):
+        """Sets load value in the current phase.
+
+        Parameters
+        ----------
+        load : float, array-like
+            (3,) Fy, Fx and M [kN]. If float, the value is assuemd to be
+            Fy and Fx and M are set to 0.
+        """
+        return NotImplementedError
+    
+    @abstractmethod
+    def _set_surface_load(self, qsurf):
+        """Activates and sets a value to the surface load in the
+        curernt phase. 
+
+        Parameters
+        ----------
+        qsurf : numeric
+            Surface load.
+        """
+        return NotImplementedError
+
     def _update_ratchetting_material(self, testid, ratchetting, phaseid, prevphaseid):
         """Sets the ratchetting material under the base if ratchetting
         occured in the previous phase.
@@ -611,7 +1028,7 @@ class Model(ABC):
         phaseid : str
             Phase id
         prevphaseid : str
-            If of the previous phase.
+            Id of the previous phase.
         """
         if not ratchetting:
             return
@@ -682,105 +1099,20 @@ class Model(ABC):
             self._results.loc[idx, 'ratchetting'] = True
         return ratchetting
 
-    def _set_phase_results(self, testid, load_value, phaseid, prevphaseid):
+    @abstractmethod
+    def _set_phase_results(self, testid, phaseid, prevphaseid, load):
         """Adds phase results to the results dataframe.
 
         Parameters
         ----------
         testid : str
             Test id.
-        load_value : numeric
-            Load value at the end of the phase [kN].
         phaseid : str
             Phase id
         prevphaseid : str
-            If of the previous phase.
-        ratchetting : bool
-            Flag indicating that ratchetting has alredy occured in any
-            previous phase.
-        """
-        iphase = self._iphases[phaseid]
-        previphase = self._iphases[prevphaseid]
-        ophase = self._ophases[phaseid]
-
-        nstep = len(list(ophase.Steps.value))
-        Uy = np.zeros((len(self._ouput_location) + 1, nstep + 1))
-        sumMstage = np.zeros(nstep + 1)
-        Fy = np.zeros(nstep + 1)
-        steps = np.linspace(0, nstep, nstep + 1)
-        
-        # start with last step from previous phase
-        idx1 = (self._results['phase'] == prevphaseid)
-        f0 = self._results.loc[idx1].take([-1])['fy'].to_list()[0]
-        Fy[0] = f0
-        for locidx, node in enumerate(self._ouput_point.keys()):
-            idx2 = idx1 & (self._results['location'] == node)
-            U0 = self._results.loc[idx2].take([-1])['uy'].to_list()[0]
-            Uy[locidx, 0] = U0
-
-        # get current phase results
-        sumMstage, Fy, qy, Uy, load_start, load_end = self._extract_phase_results(iphase, previphase, ophase, sumMstage, Fy, Uy)
-        
-        # ad results to dataframe
-        for locidx, loc in enumerate(self._ouput_point):
-            df = pd.DataFrame({'test':[testid] * (nstep + 1),
-                               'phase':[iphase.Identification.value] * (nstep + 1),
-                               'previous':[previphase.Identification.value] * (nstep + 1),
-                               'plx id':[iphase.Name.value] * (nstep + 1),
-                               'previous plx id':[previphase.Name.value] * (nstep + 1),
-                               'location': [loc] * (nstep + 1),
-                               'step': steps,
-                               'load start':[load_start] * (nstep + 1),
-                               'load end':[load_end] * (nstep + 1),
-                               'load':[load_value] * (nstep + 1),
-                               'sumMstage':sumMstage, 
-                               'fy': Fy,
-                               'qy': qy,
-                               'uy': Uy[locidx, :],
-                               'ratchetting': [False] * (nstep + 1)})
-            if len(self._results) == 0:
-                self._results = df
-            else:
-                self._results = pd.concat([self._results, df])
-            self._results.reset_index(inplace=True, drop=True)
-
-    @abstractmethod
-    def _extract_phase_results(self, iphase, previphase, ophase, sumMstage, Fy, Uy):
-        """Extracts results form the output of the initial phases calculation.
-
-        Parameters
-        ----------
-        g_i : PlxProxyGlobalObject
-            Global object of the current open Plaxis model in Input.
-        g_o : PlxProxyGlobalObject
-            Global object of the current open Plaxis model in Output.
-        iphase : PlxProxyIPObject
-            Plaxis object in the input interface for the current phase.
-        previphase : PlxProxyIPObject
-            Plaxis object in the input interface for the previous phase.
-        ophase : PlxProxyIPObject
-            Plaxis object in the output interface for the previous phase.
-        sumMstage : np.ndarray
-            (nstep + 1, 1) sumMstage of the phase.
-        Fy : np.ndarray
-            (nstep + 1, 1) load applied to the foundaiton.
-        Uy : np.ndarray
-            (nstep + 1, nloc) displacement at the output locations.
-
-        Returns
-        -------
-        np.ndarray
-            (nstep + 1, 1) sumMstage of the phase.
-        np.ndarray
-            (nstep + 1, 1) Fy of the phase.
-        np.ndarray
-            (nstep + 1, 1) qy of the phase.
-        np.ndarray
-            (nstep + 1, nloc) displacement at the output locations.
-        float
-            Load at the start of the phase.
-        float
-            Load at the end of the phase.
+            Id of the previous phase.
+        load : np.ndarray
+            (3,) load applied at the end of the phase (Fy, Fx, M).
         """
         return NotImplementedError
 
@@ -832,8 +1164,9 @@ class Model(ABC):
         self._set_model()
         self._build_geometry()
         self._build_materials()
-        self._set_load()
-        self._set_mesh()
+        self._build_load()
+        self._build_surface_load()
+        self._build_mesh()
         self._build_initial_phases()
         self._set_output_precalc()
         self._calculate_initial_phases()
@@ -867,13 +1200,22 @@ class Model(ABC):
         self._results.reset_index(drop=True, inplace=True)
         test_log = copy.deepcopy(self._test_log)
         self._test_log = {}
-        for test in test_log:
+        for testid, test in test_log.items():
             if test['type'] == 'load':
-                self.load_test(test['id'], test['load'])
-            else:
+                self.load_test(test['id'], test['load'], start_from=test['start phaseid'], qsurf=test['qsurf'])
+            elif test['type'] == 'failure':
                 self.failure_test(test['id'], test['load'],
                                   max_load=test['max_load'], start_load=test['start_load'],
-                                  load_factor=test['load_factor'], load_increment=test['load_increment'])
+                                  load_factor=test['load_factor'], load_increment=test['load_increment'],
+                                  start_from=test['start phaseid'], qsurf=test['qsurf'])
+            elif test['type'] == 'safety incremental':
+                self.safety_test(test['id'], test['start phaseid'], test='incremental', Msf=test['Msf'], qsurf=test['qsurf'])
+            elif test['type'] == 'safety target':
+                self.safety_test(test['id'], test['start phaseid'], test='target', SumMsf=test['SumMsf'], qsurf=test['qsurf'])
+            elif test['type'] == 'dynamic':
+                self.dynamic_test(test['id'], test['time'], test['load'], start_from=test['start phaseid'], qsurf=test['qsurf'], nsubstep=test['nsubstep'])
+            elif test['type'] == 'shake':
+                self.shake_test(test['id'], test['time'], test['load'], start_from=test['start phaseid'], qsurf=test['qsurf'], nsubstep=test['nsubstep'])
 
     def save(self, filename):
         """Saves model to file. Plaxis objects cannot be stored, only
@@ -910,7 +1252,7 @@ class Model(ABC):
         self._interface = None
         self._load = None
         self._mesh = None
-        self._ouput_point = {}
+        self._output_point = {}
         with open(filename, 'wb') as handle:
             pickle.dump(self, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
@@ -933,9 +1275,73 @@ class Model(ABC):
             if not isinstance(model, Model):
                 raise RuntimeError('File <{}> does not contain a load test.'.format(filename))
             return model
+
+    def load_test(self, testid, load, start_from='construction', qsurf=None, 
+                  delete_fail=True):
+        """Conducts a load test in the model.
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        load : numeric, array-like
+            (nl, ncomp) Loads applied in each phase of the test [kN].
+            Each load can be an array-like with (Fy, Fx, M) applied to
+            the foundaiton or a numeric value wich is assue as Fy, with
+            Fx and M being zero. Symmetric foundations only allow for
+            vertical loading, thus the load must be a (n1, 1) array or
+            a numeric value. For a single load phase with the 3 load
+            components, the load should be specified as [[Fy, Fx, M]].
+        start_from : str, tuple, optional
+            'construction', 'excavation', Plaxis phase id or test id
+            used as the start conditions for a new test. If a test with
+            multiple stages is requested, the last test phase is
+            selected. Specific test stages are selected by providing a
+            tuple (test id, stage number), where the phase number is an
+            integer starting from 0. Failure and safety tests cannot be
+            used start configurations. By default 'construction'.
+        qsurf : numeric, None, optional
+            Vertical surface load. By default None.
+        delete_fail : bool, optional
+            Deletes test phases from model if there is a calculation
+            error, by default True.
+
+        Raises
+        ------
+        RuntimeError
+            Duplicated test id.
+        """
     
-    def failure_test(self, testid, test, max_load=np.inf,
-                     start_load=50, load_factor=2, load_increment=0):
+        if isinstance(load, numbers.Number):
+            load = [load]
+        load = [self._load_format(l) for l in load]
+        
+        start_phaseid = self._get_start_phase(start_from)
+        if testid in self._test_log.keys():
+            raise RuntimeError('Duplicated test id <{}>.'.format(testid))
+        self._test_log[testid] = {}
+        self._test_log[testid]['id'] = testid
+        self._test_log[testid]['type'] = 'load'
+        self._test_log[testid]['load'] = load
+        self._test_log[testid]['phase'] = []
+        self._test_log[testid]['qsurf'] = qsurf
+        self._test_log[testid]['start phaseid'] = copy.deepcopy(start_phaseid)
+        
+        start_phaseid = self._calculate_surface_load(testid, qsurf, start_phaseid, delete_fail)
+        
+        test_phases = [testid + '_stage_{:.0f}'.format(idx) for idx in range(len(load))]
+        previous_phase = [start_phaseid] + test_phases[:-1]
+        ratchetting = False
+        for load_value, phaseid, prevphaseid in zip(load, test_phases, previous_phase):
+            status = self._calculate_load_phase(testid, phaseid, prevphaseid,
+                                                load_value, ratchetting)
+            self._check_phase_status(status, testid, phaseid, delete_fail)
+            self._set_phase_results(testid, phaseid, prevphaseid, load_value)
+            ratchetting = self._check_ratchetting(testid, phaseid, ratchetting)
+    
+    def failure_test(self, testid, load, max_load=[np.inf, np.inf, np.inf],
+                     load_factor=2, load_increment=[0, 0, 0], qsurf=None,
+                     start_from='construction', delete_fail=True):
         """Test the foundation until the model does not converge. A
         first trial is done using the start_load value. If lack of
         convergence is not achieved, the load is incremented as: 
@@ -946,102 +1352,337 @@ class Model(ABC):
         ----------
         testid : str
             Test id.
-        test : str
-            Test type: 'compression' or 'pull out'.
-        max_load : numeric, optional
-            Maximum load to be analyzed (in absolute value) [kN].
-            By default np.inf
-        start_load : numeric, optional
-            Initial load applied to the model (in absolute value) [kN].
-            By default 50
+        load : numeric, array-like, optional
+            (3,) Initial load applied to the model (Fy, Fx, M). Numeric
+            input is assue as Fy , with Fx and M being zeros. Symmetric
+            foundations only allow for vertical loading.
+        max_load : numeric, array-like, optional
+            (3,) maximum load to be applied to the model (Fy, Fx, M) in
+            absolute value. Numeric input is assue as Fy , with Fx and M
+            being infinity. By default [inf, inf, inf].
         load_factor : numeric, optional
             Multiplicative factor applied to the previous load when
             iteration is required. By default 2.
-        load_increment : numeric, optional
-            Load increment applied to the previous load when iteration
-            is required. By default 0.
+        load_increment : array-like, optional
+            (3,) load increment applied to the previous load when
+            iteration is required (Fy, Fx, M). By default [0, 0, 0].
+        qsurf : numeric, None, optional
+            Vertical surface load. By default None.
+        start_from : str, tuple, optional
+            'construction', 'excavation', Plaxis phase id or test id
+            used as the start conditions for a new test. If a test with
+            multiple stages is requested, the last test phase is
+            selected. Specific test stages are selected by providing a
+            tuple (test id, stage number), where the phase number is an
+            integer starting from 0. Failure and safety tests cannot be
+            used start configurations. By default 'construction'.
+        delete_fail : bool, optional
+            Deletes surface load phase from model if there is a
+            calculation error, by default True.
 
         Raises
         ------
         RuntimeError
             Duplicated test id.
-        RuntimeError
-            Invalid test type.
         """
+        start_phaseid = self._get_start_phase(start_from)
+        load = self._load_format(load)
+        load_increment = self._load_format(load_increment)
         if testid in self._test_log.keys():
             raise RuntimeError('Duplicated test id <{}>.'.format(testid))
         self._test_log[testid] = {}
         self._test_log[testid]['id'] = testid
         self._test_log[testid]['type'] = 'failure'
-        self._test_log[testid]['load'] = test
+        self._test_log[testid]['load'] = copy.deepcopy(load)
+        self._test_log[testid]['load_factor'] = load_factor
+        self._test_log[testid]['load_increment'] = copy.deepcopy(load_increment)
         self._test_log[testid]['phase'] = []
+        self._test_log[testid]['start phaseid'] = copy.deepcopy(start_phaseid)
         self._test_log[testid]['max_load'] = max_load
-        self._test_log[testid]['start_load'] = start_load
-        self._test_log[testid]['load_factor'] = load_factor
-        self._test_log[testid]['load_factor'] = load_factor
+        self._test_log[testid]['qsurf'] = qsurf
+        
 
-        if test not in ('compression', 'pull out'):
-            msg = "Test type can either be <'compression'> or <'pull out'>."
-            raise RuntimeError(msg)
-        if test == 'compression':
-            load = -np.abs(start_load)
-        else:
-            load = np.abs(start_load)
+        start_phaseid = self._calculate_surface_load(testid, qsurf, start_phaseid, delete_fail)
+
         phaseid = testid
-        previous_phase = self._start_phase
         status = 'OK'
-        while status == 'OK' and np.abs(load) <= max_load:
-            status = self._calculate_load_phase(testid, phaseid, previous_phase, load, False)
-            load = load_factor * load + np.sign(load) * load_increment
-            if status == 'OK':
-                for phase in self._g_i.phases:
-                    if phase.Identification.value == phaseid:
-                        self._g_i.delete(phase)
-                _ = self._iphases.pop(phaseid)
-                self._test_log[testid]['phase'] = []
+        status = self._calculate_load_phase(testid, phaseid, start_phaseid, load, False)
+        while status == 'OK' and not any(np.greater_equal(np.abs(load), max_load)):
+            for phase in self._g_i.phases:
+                if phase.Identification.value == phaseid:
+                    self._g_i.delete(phase)
+            _ = self._iphases.pop(phaseid)
+            self._test_log[testid]['phase'] = []
+            load = load_factor * load + load_increment
+            status = self._calculate_load_phase(testid, phaseid, start_phaseid, load, False)
         self._g_i.view(self._g_i.Model.CurrentPhase)
         self._ophases[phaseid] = self._g_o.phases[-1]
-        self._set_phase_results(testid, load, phaseid, previous_phase)
+        self._set_phase_results(testid, phaseid, start_phaseid, load)
 
-    def load_test(self, testid, load, delete_phases=True):
-        """Conducts a load test in the model.
+    def safety_test(self, testid, start_from, test='incremental', SumMsf=None,
+                    Msf=0.1, qsurf=None, delete_fail=True):
+        """Conducts a safety test on the model.
 
         Parameters
         ----------
         testid : str
             Test id.
-        load : numeric, array-like
-            (nl,) Loads applied in each phase of the test [kN].
-        delete_phases : bool, optional
+        start_from : str, tuple
+            'construction', Plaxis phase id or test id used as the start
+            conditions for a new test. If a test with multiple stages is
+            requested, the last test phase is selected. Specific test
+            stages are selected by providing a tuple (test id, stage number),
+            where the phase number is an integer starting from 0.
+            Failure and safety tests cannot be used start
+            configurations.
+        test : str, optional
+            Safety test type: 'incremental' or 'target'. By default
+            'incremental'.
+        SumMsf : float, optional
+            Strength reduction factor target value in a target test. By
+            default None.
+        Msf : float, optional
+            Strength reduction factor ncrement in an incremental test.
+            By default 0.1.
+        qsurf : numeric, None, optional
+            Vertical surface load. By default None.
+        delete_fail : bool, optional
+            Deletes surface load phase from model if there is a
+            calculation error, by default True.
+
+        Raises
+        ------
+        RuntimeError
+            Duplicated test id
+        RuntimeError
+            Unsuported test type.
+        RuntimeError
+            SumMsf wrong type.
+        RuntimeError
+            SumMsf wrong type.
+        """
+        start_phaseid = self._get_start_phase(start_from)
+        if testid in self._test_log.keys():
+            raise RuntimeError('Duplicated test id <{}>.'.format(testid))
+        if test not in ['incremental', 'target']:
+            raise RuntimeError("Supported test types are 'incremental' and 'target'.")
+        self._test_log[testid] = {}
+        self._test_log[testid]['id'] = testid
+        self._test_log[testid]['type'] = 'safety ' + test
+        if test == 'target':
+            if not isinstance(SumMsf, numbers.Number):
+                raise RuntimeError('A numeric value must be provided for the target Msf <SumMsf>.')
+            self._test_log[testid]['SumMsf'] = SumMsf
+        else:
+            if not isinstance(Msf, numbers.Number):
+                raise RuntimeError('A numeric value must be provided for the Msf increase <Msf>.')
+            self._test_log[testid]['Msf'] = Msf
+        self._test_log[testid]['phase'] = []
+        self._test_log[testid]['start phaseid'] = copy.deepcopy(start_phaseid)
+        self._test_log[testid]['qsurf'] = qsurf
+        
+
+        start_phaseid = self._calculate_surface_load(testid, qsurf, start_phaseid, delete_fail)
+        self._iphases[testid] = self._g_i.phase(self._iphases[start_phaseid])
+        self._iphases[testid].Identification = testid
+
+        self._g_i.Model.CurrentPhase = self._iphases[testid]
+        self._g_i.set(self._g_i.Model.CurrentPhase.DeformCalcType, "Safety")
+        self._g_i.set(self._g_i.Model.CurrentPhase.MaxStepsStored, 1000)
+        if test == 'target':
+            self._g_i.set(self._g_i.Model.CurrentPhase.Deform.LoadingType, "Target SumMsf")
+            self._g_i.set(self._g_i.Model.CurrentPhase.Deform.Loading.SumMsf, SumMsf)
+        else:
+            self._g_i.set(self._g_i.Model.CurrentPhase.Deform.LoadingType, "Incremental multipliers")
+            self._g_i.set(self._g_i.Model.CurrentPhase.Deform.Loading.Msf, Msf)
+        _ = self._g_i.calculate(self._g_i.Model.CurrentPhase)
+        self._g_i.view(self._g_i.Model.CurrentPhase)
+        self._ophases[testid] = self._g_o.phases[-1]
+        self._set_phase_results(testid, testid, start_phaseid, self._get_phase_load(start_phaseid, 'end', target=False))
+
+    def dynamic_test(self, testid, time, load, start_from='construction',
+                     nsubstep=10, qsurf=None, delete_fail=True):
+        """Apply a dynamic load to the foundation.
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        time : array-like
+            (nt,) time array.
+        load : array-like
+            (ncomp, nt) force array (Fy, Fx) for solid models or
+            (Fx, Fy, M) for plate models.. If only Fy is provided, the
+            other components are assumed as 0.
+        start_from : str, tuple, optional
+            'construction', 'excavation', Plaxis phase id or test id
+            used as the start conditions for a new test. If a test with
+            multiple stages is requested, the last test phase is
+            selected. Specific test stages are selected by providing a
+            tuple (test id, stage number), where the phase number is an
+            integer starting from 0. Failure and safety tests cannot be
+            used start configurations. By default 'construction'.
+        nsubstep : int, optional
+            Substests in each time step, by default 10.
+        qsurf : numeric, None, optional
+            Vertical surface load. By default None.
+        delete_fail : bool, optional
             Deletes test phases from model if there is a calculation
             error, by default True.
 
         Raises
         ------
         RuntimeError
-            Test id alredy in model.
+            Duplicated test id.
         """
-   
+        start_phaseid = self._get_start_phase(start_from)
+        time, input_load, load = self._set_dynamic_load(time, load)
+        
         if testid in self._test_log.keys():
             raise RuntimeError('Duplicated test id <{}>.'.format(testid))
         self._test_log[testid] = {}
         self._test_log[testid]['id'] = testid
-        self._test_log[testid]['type'] = 'load'
-        self._test_log[testid]['load'] = load
+        self._test_log[testid]['type'] = 'dynamic'
+        self._test_log[testid]['time'] = time
+        self._test_log[testid]['load'] = input_load
+        self._test_log[testid]['nsubstep'] = nsubstep
         self._test_log[testid]['phase'] = []
+        self._test_log[testid]['start phaseid'] = copy.deepcopy(start_phaseid)
+        self._test_log[testid]['qsurf'] = qsurf
+
+        start_phaseid = self._calculate_surface_load(testid, qsurf, start_phaseid, delete_fail)
         
-        if isinstance(load, numbers.Number):
-            load = [load]
-        test_phases = [testid + '_stage_{:.0f}'.format(idx) for idx in range(len(load))]
-        previous_phase = [self._start_phase] + test_phases[:-1]
-        ratchetting = False
-        for load_value, phaseid, prevphaseid in zip(load, test_phases, previous_phase):
-            status = self._calculate_load_phase(testid, phaseid, prevphaseid,
-                                                load_value, ratchetting)
-            self._check_phase_status(status, testid, phaseid, delete_phases)
-            self._set_phase_results(testid, load_value, phaseid, prevphaseid)
-            ratchetting = self._check_ratchetting(testid, phaseid, ratchetting)
-    
+        self._set_dynamic_test_phase(testid, time, start_phaseid, nsubstep, False)
+
+        status = self._calculate_dynamic_load_phase(time, load)
+        self._check_phase_status(status, testid, testid, delete_fail)
+        self._set_phase_results(testid, testid, start_phaseid, [0, 0, 0])
+        self._set_dynamic_load_result(testid, time, load)
+
+    def shake_test(self, testid, time, acceleration, start_from='construction',
+                   qsurf=None, nsubstep=10, delete_fail=True):
+        """Apply a displacement time history at the model base.
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        time : array-like
+            (nt,) time array.
+        acceleration : array-like
+            (ncomp, nt) displacement time history (ux, uy). If a 1D
+            array (nt,) is provided it is adopted as ux and is assumed
+            that uy = 0.
+        start_from : str, tuple, optional
+            'construction', 'excavation', Plaxis phase id or test id
+            used as the start conditions for a new test. If a test with
+            multiple stages is requested, the last test phase is
+            selected. Specific test stages are selected by providing a
+            tuple (test id, stage number), where the phase number is an
+            integer starting from 0. Failure and safety tests cannot be
+            used start configurations. By default 'construction'.
+        nsubstep : int, optional
+            Substests in each time step, by default 10.
+        qsurf : numeric, None, optional
+            Vertical surface load. By default None.
+        delete_fail : bool, optional
+            Deletes test phases from model if there is a calculation
+            error, by default True.
+
+        Raises
+        ------
+        RuntimeError
+            Model lacks boundary interfaces.
+        RuntimeError
+            Duplicated test id.
+        RuntimeError
+            Time is not 1-dimensional.
+        RuntimeError
+            More than 10,000 time steps.
+        RuntimeError
+            Length of base displacement array does not match the time
+            array.
+        """
+        if not self._boundary_interface_flag:
+            msg = ("Boundary interfaces must be included in the model, set "
+                   "the <boundary_interface> parameter to True at the model creation.")
+            raise RuntimeError(msg)
+        
+        if testid in self._test_log.keys():
+            raise RuntimeError('Duplicated test id <{}>.'.format(testid))
+        
+        time = np.array(time)
+        if time.ndim != 1:
+            raise RuntimeError('Time must be defined by a 1-dimensional array.')
+        if len(time) > 10000:
+            raise RuntimeError('Number of time steps must be <=10,000.')
+        
+        acceleration = np.array(acceleration)
+        if acceleration.ndim == 1:
+            acceleration = np.vstack([acceleration, np.zeros_like(acceleration)])
+        if acceleration.shape[1] != len(time):
+            msg = 'Base acceleration and time arrays must have the same length.'
+            raise RuntimeError(msg)
+
+        start_phaseid = self._get_start_phase(start_from)
+        self._test_log[testid] = {}
+        self._test_log[testid]['id'] = testid
+        self._test_log[testid]['type'] = 'shake'
+        self._test_log[testid]['time'] = time
+        self._test_log[testid]['load'] = acceleration
+        self._test_log[testid]['nsubstep'] = nsubstep
+        self._test_log[testid]['phase'] = []
+        self._test_log[testid]['start phaseid'] = copy.deepcopy(start_phaseid)
+        self._test_log[testid]['qsurf'] = qsurf
+
+        start_phaseid = self._calculate_surface_load(testid, qsurf, start_phaseid, delete_fail)
+        
+        self._set_dynamic_test_phase(testid, time, start_phaseid, nsubstep, True)
+        
+        accel_x = self._g_i.displmultiplier()
+        self._g_i.set(accel_x.Signal, "Table")
+        self._g_i.set(accel_x.DataType, "Accelerations")
+        for idx, (t, accel) in enumerate(zip(time, acceleration[0])):
+            accel_x.Table.add()
+            self._g_i.set(accel_x.Table[idx].Time, t)
+            self._g_i.set(accel_x.Table[idx].Multiplier, accel)
+        
+        accel_y = self._g_i.displmultiplier()
+        self._g_i.set(accel_y.Signal, "Table")
+        self._g_i.set(accel_y.DataType, "Accelerations")
+        for idx, (t, accel) in enumerate(zip(time, acceleration[1])):
+            accel_y.Table.add()
+            self._g_i.set(accel_y.Table[idx].Time, t)
+            self._g_i.set(accel_y.Table[idx].Multiplier, accel)
+
+        self._g_i.activate(self._g_i.DynLineDisplacement_1_1, self._g_i.Model.CurrentPhase)
+       
+        self._g_i.set(self._g_i.DynLineDisplacement_1_1.Multiplierx, self._g_i.Model.CurrentPhase, accel_x)
+        self._g_i.set(self._g_i.DynLineDisplacement_1_1.Multipliery, self._g_i.Model.CurrentPhase, accel_y)
+        self._g_i.set(self._g_i.LineDisplacement_1_1.Displacement_x, self._g_i.Model.CurrentPhase, "Prescribed")
+        self._g_i.set(self._g_i.LineDisplacement_1_1.Displacement_y, self._g_i.Model.CurrentPhase, "Prescribed")
+        self._g_i.set(self._g_i.LineDisplacement_1_1.ux_start, self._g_i.Model.CurrentPhase, 1)
+        self._g_i.set(self._g_i.LineDisplacement_1_1.uy_start, self._g_i.Model.CurrentPhase, 1)
+        
+        if not self._symmetric:
+            self._g_i.activate(self._g_i.DynLineDisplacement_1_2, self._g_i.Model.CurrentPhase)
+            self._g_i.set(self._g_i.DynLineDisplacement_1_2.Multiplierx, self._g_i.Model.CurrentPhase, accel_x)
+            self._g_i.set(self._g_i.DynLineDisplacement_1_2.Multipliery, self._g_i.Model.CurrentPhase, accel_y)
+            self._g_i.set(self._g_i.LineDisplacement_1_2.Displacement_x, self._g_i.Model.CurrentPhase, "Prescribed")
+            self._g_i.set(self._g_i.LineDisplacement_1_2.Displacement_y, self._g_i.Model.CurrentPhase, "Prescribed")
+            self._g_i.set(self._g_i.LineDisplacement_1_2.ux_start, self._g_i.Model.CurrentPhase, 1)
+            self._g_i.set(self._g_i.LineDisplacement_1_2.uy_start, self._g_i.Model.CurrentPhase, 1)
+
+        status = self._g_i.calculate(self._g_i.Model.CurrentPhase)
+        self._check_phase_status(status, testid, testid, delete_fail)
+        self._set_phase_results(testid, testid, start_phaseid, [0, 0, 0])
+        idx = (self._results['test'] == testid)
+        for loc in self._output_point.keys():
+            idx2 = idx & (self._results['location']==loc)
+            result_time = self._results.loc[idx2, 'time'].to_numpy(dtype='float64')
+            self._results.loc[idx2, 'agx'] = np.interp(result_time, time, acceleration[0])
+            self._results.loc[idx2, 'agy'] = np.interp(result_time, time, acceleration[1])
+
     def delete_test(self, testid, delete_phases=True):
         """Deletes a test from the model.
 
@@ -1070,7 +1711,7 @@ class Model(ABC):
                         self._g_i.delete(phase)
                 for phase in self._g_o.phases:
                     if phase.Identification.value == phaseid:
-                        self._g_i.delete(phase)
+                        self._g_o.delete(phase)
             test_phases.reverse()
         for phaseid in test_phases:
             if phaseid in self._iphases:
@@ -1080,15 +1721,23 @@ class Model(ABC):
         self._results = self._results[self._results['test']!=testid]
         self._results.reset_index(drop=True, inplace=True)
 
-    def plot_test(self, testid, phase=None, location=None, 
+    def plot_test(self, testid, force=None, displacement=None,
+                  phase=None, location=None, 
                   compression_positive=True, pullout_positive=False,
-                  reset_start=False, legend=False, figsize=(6, 4)):
+                  reset_start=False, legend=False, xlim=None, ylim=None,
+                  figsize=(4, 3)):
         """Plots test results.
 
         Parameters
         ----------
         testid : str
             Test id.
+        force : str, list, None, optional
+            Force components to plot: 'Fy', 'Fx', 'M'. If None, default
+            settings based on foundation type are adopted.
+        displacement : str, list, None, optional
+            Displacement components to plot: 'ux', 'uy'. If None,
+            default settings based on foundation type are adopted.
         phase : str, int, list, None, optional
             Phase id or list of them. If None all phases are plotted.
             By default None.
@@ -1105,8 +1754,18 @@ class Model(ABC):
             (0, 0). By default False
         legend : bool, optional
             Shows legend. By default False
+        xlim : array-like, dict, None, optional
+            If (2,) array then it is applied as the x axis limits to 
+            all plots. Dictiornay with keys 'ux' and 'uy' with
+            the desired limits for each displacement component. By
+            default None.
+        ylim : array-like, dict, None, optional
+            If (2,) array then it is applied as the y axis limits to 
+            all plots. Dictiornay with keys 'Fx', 'Fy' and 'M' with
+            the desired limits for each force component. By default
+            None.
         figsize : tuple, optional
-            Figure size. By default (6, 4).
+            Figure size of a single plot. By default (4, 3).
 
         Returns
         -------
@@ -1116,13 +1775,69 @@ class Model(ABC):
         Raises
         ------
         RuntimeError
+            Invalid force component.
+        RuntimeError
+            Invalid displacement component.
+        RuntimeError
             Test id not in restuls.
         RuntimeError
             Phase not in results.
         """
+        if force is None and self._symmetric:
+            force = 'Fy'
+        elif force is None:
+            force = ['Fy', 'Fx', 'M']
+        if isinstance(force, str):
+            force = [force]
+        for f in force:
+            if f not in ['Fx', 'Fy', 'M']:
+                msg = ("Invalid force component <{}>. Supported values are "
+                    "'Fy', 'Fx' and 'M'.")
+                msg = msg.format(f)
+                raise RuntimeError(msg)
+        nf = len(force)
+
+        if displacement is None and self._symmetric:
+            displacement = 'uy'
+        elif displacement is None:
+            displacement = ['uy', 'ux']
+        if isinstance(displacement, str):
+            displacement = [displacement]
+        for d in displacement:
+            if d not in ['ux', 'uy']:
+                msg = "Invalid displacement component <{}>. Supported values are 'ux' and 'uy'."
+                msg = msg.format(d)
+                raise RuntimeError(msg)
+        nd = len(displacement)
+
+        if self._model_type == 'planestrain':
+            ylabel = {'Fx':'H [kN/m]', 'Fy': 'V [kN/m]', 'M':'M [kN/m/m]'}
+        else:
+            ylabel = {'Fx':'H [kN]', 'Fy': 'V [kN]', 'M':'M [kN/m]'}
+        xlabel = {'ux': 'ux [cm]', 'uy': 'uy [cm]'}
+
+        x_lim = {'ux':None, 'uy':None}
+        if isinstance(xlim, dict):
+            for key in x_lim:
+                if key in xlim:
+                    x_lim[key] = xlim[key]
+        else:
+            for key in x_lim:
+                x_lim[key] = xlim
+
+        y_lim = {'Fx':None, 'Fy':None, 'M':None}
+        if isinstance(ylim, dict):
+            for key in y_lim:
+                if key in ylim:
+                    y_lim[key] = ylim[key]
+        else:
+            for key in y_lim:
+                y_lim[key] = ylim
+
         if testid not in self._results['test'].to_list():
             raise RuntimeError('Test <{}> not available in restuls.'.format(testid))
         idx = self._results['test'] == testid
+
         if phase is None:
             phase = self._results[idx]['phase'].unique()
         elif isinstance(phase, (str, numbers.Number)):
@@ -1143,29 +1858,401 @@ class Model(ABC):
             location = self._results[idx]['location'].unique()
         elif isinstance(location, (str, numbers.Number)):
             location = [location]
-            
-        fig, ax = plt.subplots(1, 1, figsize=figsize)
-        
-        fsign = 1
-        dsign = 1
-        
+
+        fsign = {'Fy':1, 'Fx':1, 'M':1}
+        dsign = {'uy':1, 'ux':1}
+
         if compression_positive:
-            fsign = -1
+            fsign['Fy'] = -1
         if not pullout_positive:
-            dsign =- 1
-        for loc in location:
-            for phaseid in phase:
-                idx2 = idx & (self._results['phase']==phaseid) * (self._results['location']==loc)
+            dsign['uy'] =- 1
+
+        fig, axes = plt.subplots(nf, nd, figsize=(figsize[0] * nd, figsize[1] * nf))
+        if nd ==1 and nf == 1:
+            axes = np.array([[axes]])
+        elif nd == 1:
+            axes = np.array([axes]).T
+        elif nf == 1:
+            axes = np.array([axes])
+        for idxf, f in enumerate(force):
+            for idxd, d in enumerate(displacement): 
+                ax = axes[idxf, idxd]
+                for loc in location:
+                    for phaseid in phase:
+                        idx2 = idx & (self._results['phase']==phaseid) * (self._results['location']==loc)
+                        u0 = 0
+                        if reset_start:
+                            u0 = self._results.loc[idx2, d].to_numpy()[0]
+                        ax.plot(dsign[d] * (self._results.loc[idx2, d] - u0)  *100,
+                                fsign[f] * self._results.loc[idx2, f],
+                                label='{} - {}'.format(loc, phaseid))
+                ax.set_xlim(x_lim[d])
+                ax.set_ylim(y_lim[f])
+                ax.grid(alpha=0.2)
+                if legend:
+                    ax.legend()
+                axes[-1, idxd].set_xlabel(xlabel[d])
+            axes[idxf, 0].set_ylabel(ylabel[f])
+        plt.tight_layout()
+        plt.close(fig)
+        return fig
+    
+    def plot_safety_test(self, testid,  displacement=None, location=None, pullout_positive=False,
+                         reset_start=False, legend=False,  xlim=None, ylim=None, figsize=(6, 4)):
+        """Plots safety test
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        displacement : str, list, None, optional
+            Displacement components to plot: 'ux', 'uy'. If None,
+            default settings based on foundation type is adopted.
+        location : str, float, optional
+            Location. If None all locations are plotted. By default 
+            None.
+        pullout_positive : bool, optional
+            Pull out displacement is plotted as positive. By default
+            False.
+        reset_start : bool, optional
+            Resets the first point of the load-displacement curve to
+            (0, 0). By default False
+        legend : bool, optional
+            Shows legend. By default False
+        xlim : array-like
+            Limit of the vertical axis of the plot.
+        ylim : array-like, dict, None, optional
+            If (2,) array then it is applied as the y axis limits to 
+            all plots. Dictiornay with keys 'ux' and 'uy' with
+            the desired limits for each displacement component. By
+            default None.
+        figsize : tuple, optional
+            Figure size. By default (6, 4).
+
+        Returns
+        -------
+        Figure
+            Figure with the safety test plot.
+
+        Raises
+        ------
+        RuntimeError
+            Invalid displacement component.
+        RuntimeError
+            Test id not in restuls.
+        RuntimeError
+            Non safety test.
+        """
+        if displacement is None and self._symmetric:
+            displacement = 'uy'
+        elif displacement is None:
+            displacement = ['uy', 'ux']
+        if isinstance(displacement, str):
+            displacement = [displacement]
+        for d in displacement:
+            if d not in ['ux', 'uy']:
+                msg = "Invalid displacement component <{}>. Supported values are 'ux' and 'uy'."
+                msg = msg.format(d)
+                raise RuntimeError(msg)
+        nd = len(displacement)
+
+        ylabel = {'ux': 'ux [cm]', 'uy': 'uy [cm]'}
+
+        y_lim = {'ux':None, 'uy':None}
+        if isinstance(xlim, dict):
+            for key in y_lim:
+                if key in xlim:
+                    y_lim[key] = ylim[key]
+        else:
+            for key in y_lim:
+                y_lim[key] = ylim
+
+        if testid not in self._results['test'].to_list():
+            raise RuntimeError('Test <{}> not available in restuls.'.format(testid))
+        if self._test_log[testid]['type'] not in ['safety incremental', 'safety target']:
+            raise RuntimeError('Only safety tests can be plotted.')
+        
+        idx = self._results['test'] == testid
+
+        if location is None:
+            location = self._results[idx]['location'].unique()
+        elif isinstance(location, (str, numbers.Number)):
+            location = [location]
+
+        dsign = {'uy':1, 'ux':1}
+        if pullout_positive:
+            dsign['uy'] =- 1
+
+        fig, axes = plt.subplots(1, nd, figsize=(figsize[0], figsize[1] * nd))
+        if nd==1:
+            axes = [axes]
+        
+        for idxd, d in enumerate(displacement): 
+            ax = axes[idxd]
+            for loc in location:
+                idx2 = (self._results['test']==testid) * (self._results['location']==loc)
                 u0 = 0
                 if reset_start:
-                    u0 = self._results.loc[idx2, 'uy'].to_numpy()[0]
-                ax.plot(dsign * (self._results.loc[idx2, 'uy'] - u0)  *100,
-                        fsign * self._results.loc[idx2, 'fy'],
-                        label='{} - {}'.format(loc, phaseid))
-        if legend:
-            ax.legend()
-        ax.set_ylabel('Axial force [kN]')
-        ax.set_xlabel('Vertical displacement [cm]')
-        ax.grid(alpha=0.2)
+                    u0 = self._results.loc[idx2, d].to_numpy()[0]
+                ax.plot(self._results.loc[idx2, 'SumMsf'], 
+                        dsign[d] * (self._results.loc[idx2, d] - u0) * 100,
+                        label='{}'.format(loc))
+            if legend:
+                ax.legend()
+            ax.set_xlabel(r"$\sum$Msf [ ]")
+            ax.set_ylabel(ylabel[d])
+            ax.set_xlim(xlim)
+            ax.set_ylim(y_lim[d])
+            ax.grid(alpha=0.2)
+        plt.tight_layout()
+        plt.close(fig)
+        return fig
+
+    def plot_dynamic_test(self, testid, displacement=None, force=None,
+                          location=None, compression_positive=True,
+                          pullout_positive=False, xlim=None, ylim=None,
+                          legend=False, figsize=(8, 2)):
+        """Plot dynamic test resutls versus time.
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        displacement : str, list, None, optional
+            Displacement components to plot: 'ux', 'uy'. If None,
+            default settings based on foundation type are adopted.
+        force : str, list, None, optional
+            Force components to plot: 'Fy', 'Fx', 'M'. If None, default
+            settings based on foundation type are adopted.
+        location : str, float, optional
+            Location. If None all locations are plotted. By default 
+            None.
+        compression_positive : bool, optional
+            Compresive force is plotted as positive. By default True.
+        pullout_positive : bool, optional
+            Pull out displacement is plotted as positive. By default
+            False.
+        xlim : array-like, None, optional
+            (2,) limits of x axis. By default None.
+        ylim : array-like, dict, None, optional
+            If (2,) array then it is applied as the y axis limits to 
+            all plots. Dictiornay with keys 'ux', 'uy', 'Fx', 'Fy' and
+            'M' with the desired limits for each variable. By default
+            None.
+        legend : bool, optional
+            Shows legend. By default False
+        figsize : tuple, optional
+            Figure size of a single plot. By default (8, 2).
+
+        Returns
+        -------
+        Figure
+            Figure with the test plot.
+
+        Raises
+        ------
+        RuntimeError
+            Invalid displacement component.
+        RuntimeError
+            Invalid force component.
+        """
+
+        if displacement is None and self._symmetric:
+            displacement = 'uy'
+        elif displacement is None:
+            displacement = ['uy', 'ux']
+        if isinstance(displacement, str):
+            displacement = [displacement]
+        for d in displacement:
+            if d not in ['ux', 'uy']:
+                msg = "Invalid displacement component <{}>. Supported values are 'ux' and 'uy'."
+                msg = msg.format(d)
+                raise RuntimeError(msg)
+        nd = len(displacement)
+
+        if force is None and self._symmetric:
+            force = 'Fy'
+        elif force is None and self._foundation_type == 'plate':
+            force = ['Fy', 'Fx', 'M']
+        elif force is None:
+            force = ['Fy', 'Fx']
+        if isinstance(force, str):
+            force = [force]
+        if self._foundation_type == 'plate':
+            valid_forces = ['Fy', 'Fx', 'M']
+        else:
+            valid_forces = ['Fy', 'Fx']
+        for f in force:
+            if f not in valid_forces:
+                msg = "Invalid force component <{}>. Supported values are {}."
+                msg = msg.format(f, ', '.join(valid_forces))
+                raise RuntimeError(msg)
+        nf = len(force)        
+
+        idx = self._results['test'] == testid
+        if location is None:
+            location = self._results[idx]['location'].unique()
+        elif isinstance(location, (str, numbers.Number)):
+            location = [location]
+
+
+        if self._model_type == 'planestrain':
+            axis_label = {'Fx':'H [kN/m]', 'Fy': 'V [kN/m]', 'M':'M [kN/m/m]'}
+        else:
+            axis_label = {'Fx':'H [kN]', 'Fy': 'V [kN]', 'M':'M [kN/m]'}
+        axis_label = {**axis_label, **{'ux': 'ux [cm]', 'uy': 'uy [cm]'}}
+        scale_factor = {'ux':100, 'uy':100, 'Fx':1, 'Fy':1, 'M':1}
+        sign = {'ux':1, 'uy':1, 'Fx':1, 'Fy':1, 'M':1}
+        if not pullout_positive:
+            sign['uy'] = -1
+        if compression_positive:
+            sign['Fy'] = -1
+            
+        y_lim = {'ux':None, 'uy':None, 'Fx':None, 'Fy':None, 'M':None}
+        if isinstance(ylim, dict):
+            for key in y_lim:
+                if key in ylim:
+                    y_lim[key] = ylim[key]
+        else:
+            for key in y_lim:
+                y_lim[key] = ylim
+        
+        
+        fig, axes = plt.subplots(nd + nf, 1, figsize=(figsize[0], figsize[1] * (nd + nf)))
+        for var, ax in zip(displacement + force, axes):
+            if var in valid_forces:
+                idx2 = idx & (self._results['location']=='top')
+                ax.plot(self._results.loc[idx2, 'time'],
+                        self._results.loc[idx2, var] * scale_factor[var] * sign[var])
+            else:
+                for loc in location:
+                    idx2 = idx & (self._results['location']==loc)
+                    ax.plot(self._results.loc[idx2, 'time'],
+                            self._results.loc[idx2, var] * scale_factor[var] * sign[var],
+                            label=loc)
+                if legend:
+                    ax.legend()
+            ax.set_xlim(xlim)
+            ax.set_ylim(y_lim[var])
+            ax.set_ylabel(axis_label[var])
+            ax.grid(alpha=0.2)
+        axes[-1].set_xlabel('time [s]')
+        plt.tight_layout()
+        plt.close(fig)
+        return fig
+
+    def plot_shake_test(self, testid, displacement=None, acceleration=None,
+                          location=None, pullout_positive=False,
+                          xlim=None, ylim=None, legend=False, figsize=(8, 2)):
+        """Plot shake test results versus time.
+
+        Parameters
+        ----------
+        testid : str
+            Test id.
+        displacement : str, list, None, optional
+            Displacement components to plot: 'ux', 'uy'. If None,
+            default settings based on foundation type is adopted.
+        acceleration : str, list, None, optional
+            Base acceleration components to plot: 'agx', 'agy'. If None
+            both are plotted. By default None.
+        location : str, float, optional
+            Location. If None all locations are plotted. By default 
+            None.
+        pullout_positive : bool, optional
+            Pull out displacement is plotted as positive. By default
+            False.
+        xlim : array-like, None, optional
+            (2,) limits of x axis. By default None.
+        ylim : array-like, dict, None, optional
+            If (2,) array then it is applied as the y axis limits to 
+            all plots. Dictiornay with keys 'ux', 'uy', 'agx' and 'agy'
+            with the desired limits for each variable. By default
+            None.
+        legend : bool, optional
+            Shows legend. By default False
+        figsize : tuple, optional
+            Figure size of a single plot. By default (4, 3).
+
+        Returns
+        -------
+        Figure
+            Figure with the test plot.
+
+        Raises
+        ------
+        RuntimeError
+            Invalid displacement component.
+        RuntimeError
+            Invalid bace acceleration component.
+        """
+
+        if displacement is None and self._symmetric:
+            displacement = 'uy'
+        elif displacement is None:
+            displacement = ['uy', 'ux']
+        if isinstance(displacement, str):
+            displacement = [displacement]
+        for d in displacement:
+            if d not in ['ux', 'uy']:
+                msg = "Invalid displacement component <{}>. Supported values are 'ux' and 'uy'."
+                msg = msg.format(d)
+                raise RuntimeError(msg)
+        nd = len(displacement)
+
+        if acceleration is None :
+            acceleration = ['agx', 'agy']
+        if isinstance(acceleration, str):
+            acceleration = [acceleration]
+        for a in acceleration:
+            if a not in ['agx', 'agy']:
+                msg = "Invalid base acceleration component <{}>. Supported values are 'agx' and 'agy'."
+                msg = msg.format(a)
+                raise RuntimeError(msg)
+        na = len(acceleration)
+
+        idx = self._results['test'] == testid
+        if location is None:
+            location = self._results[idx]['location'].unique()
+        elif isinstance(location, (str, numbers.Number)):
+            location = [location]
+
+        axis_label = {'ux': 'ux [cm]', 'uy': 'uy [cm]', 
+                    'agx': "base horizontal\nacceleration [m/s/s]",
+                    'agy': "base vertical\nacceleration [m/s/s]"}
+        scale_factor = {'ux':100, 'uy':100, 'agx':1, 'agy':1}
+        sign = {'ux':1, 'uy':1, 'agx':1, 'agy':1}
+        if not pullout_positive:
+            sign['uy'] = -1
+
+        y_lim = {'ux':None, 'uy':None, 'agx':None, 'agy':None}
+        if isinstance(ylim, dict):
+            for key in y_lim:
+                if key in ylim:
+                    y_lim[key] = ylim[key]
+        else:
+            for key in y_lim:
+                y_lim[key] = ylim
+
+        fig, axes = plt.subplots(nd + na, 1, figsize=(figsize[0], figsize[1] * (nd + na)))
+        for var, ax in zip(displacement + acceleration, axes):
+            if var in ['agx', 'agy']:
+                idx2 = idx & (self._results['location']=='top')
+                ax.plot(self._results.loc[idx2, 'time'],
+                        self._results.loc[idx2, var] * scale_factor[var] * sign[var])
+            else:
+                for loc in location:
+                    idx2 = idx & (self._results['location']==loc)
+                    ax.plot(self._results.loc[idx2, 'time'],
+                            self._results.loc[idx2, var] * scale_factor[var] * sign[var],
+                            label=loc)
+                if legend:
+                    ax.legend()
+            ax.set_xlim(xlim)
+            ax.set_ylim(y_lim[var])
+            ax.set_ylabel(axis_label[var])
+            ax.grid(alpha=0.2)
+        axes[-1].set_xlabel('time [s]')
+        plt.tight_layout()
         plt.close(fig)
         return fig
