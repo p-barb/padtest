@@ -640,7 +640,7 @@ model4 = ltest.Solid(s_i, g_i, g_o, b, d, b1, d1, soil, concrete, model_type='pl
 
 The resulting models look like:
 
-<img src="images/models.png" alt="Model types." width="700">
+<img src="docs/images/models.png" alt="Model types." width="700">
 
 Both symmetric and non-symmetric model can be [plane-strain or axisymmetric in Plaxis](#General-model-settings). A symmetric plane-strain model represents a strip foundation with centered column. A symmetric axisymmetric model represents a circular foundation also with a centered column. Non-symmetric plane-strain model represents a strip foundation, with the advantage that [the column does not need to be centered](#Column-offset) in the foundation and that not only vertical, but also [horizontal and moment loads](#Load-test) can be applied to the foundation. A non-symmetric axisymmetric model represents a ring foundation, for example under a tank or silo. As with the plane-strain case, not only vertical, but horizontal and moment loads can be applied and the column does not need to be centered.
 
