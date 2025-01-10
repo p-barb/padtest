@@ -1,7 +1,7 @@
 # This CITATION.cff file was generated with cffinit.
 # Visit https://bit.ly/cffinit to generate yours today!
 
-cff-version: 1.0.2
+cff-version: 1.0.3
 title: padtest
 message: >-
   If you use this software, please cite it using the
@@ -27,5 +27,5 @@ keywords:
   - pad foundation
   - load test
 license: MIT
-version: 1.0.2
-date-released: '2024-04-26'
+version: 1.0.3
+date-released: '2025-01-11'

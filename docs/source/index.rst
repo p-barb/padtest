@@ -25,19 +25,20 @@ dynamic vertical, horizontal or flexural loads in
 Plaxis version
 --------------
 
-Current padtest version (1.0.2) works with Plaxis version 2024.1. Plaxis
+Current padtest version (1.0.3) works with Plaxis version 2024.1. Plaxis
 scripting commands are updated between verions, making the current
 release of padtest incompatible with them. Previous releases were
 programed for:
 
  - Plaxis 2023.2 - padtest 1.0.1
+ - Plaxis 2024.1 - padtest 1.0.2
 
 Acknowledgment
 --------------
 
 :code:`padtest` is developed by Pablo Barbieri (pbarbie2@uwo.ca). Please, cite this repository as: 
 
-*Barbieri, P. (2024). padtest (Version 1.0.2) [Computer software]. https://github.com/p-barb/padtest*
+*Barbieri, P. (2025). padtest (Version 1.0.3) [Computer software]. https://github.com/p-barb/padtest*
 
 
 License
