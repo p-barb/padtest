@@ -83,7 +83,7 @@
   <h1>Source code for padtest.geometry.interface</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Interfaces.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">from</span> <span class="nn">padtest.material.soil</span> <span class="kn">import</span> <span class="n">SoilMaterial</span>
+<span class="kn">from</span> <span class="nn">padtest.material.soil</span> <span class="kn">import</span> <span class="n">SoilMaterialSelector</span>
 
 
 <div class="viewcode-block" id="ModelInterfaces"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.ModelInterfaces">[docs]</a><span class="k">class</span> <span class="nc">ModelInterfaces</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
@@ -100,7 +100,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    apply_settings(settings) :</span>
 <span class="sd">        Applies user settings to interfaces.</span>
-<span class="sd">    build_material(g_i, intidx) :</span>
+<span class="sd">    build_material(g_i, intidx)</span>
 <span class="sd">        Builds interface mateirals.</span>
 <span class="sd">    build_geometry(g_i, plxid) :</span>
 <span class="sd">        Adds interfaces to the model.</span>
@@ -111,7 +111,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interfaces</span><span class="p">,</span> <span class="n">symmetric</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `ModelInterfaces`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -223,7 +223,7 @@
 <span class="sd">        Applies user settings to interface.</span>
 <span class="sd">    set_vertex(interface_type, vertex) :</span>
 <span class="sd">        Set vertex geometry.</span>
-<span class="sd">    build_material(g_i, intidx) :</span>
+<span class="sd">    build_material(g_i, intidx)</span>
 <span class="sd">        Builds interface mateiral.</span>
 <span class="sd">    build_geometry(g_i, plxid) :</span>
 <span class="sd">        Adds interface to the model.</span>
@@ -234,7 +234,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `Interface`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -299,7 +299,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_material</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_plxmaterialid</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;interface_</span><span class="si">{</span><span class="n">intidx</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_material_plx</span> <span class="o">=</span> <span class="n">SoilMaterial</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plxmaterialid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_material</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_material</span><span class="p">[</span><span class="s1">&#39;Identification&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plxmaterialid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_material_plx</span> <span class="o">=</span> <span class="n">SoilMaterialSelector</span><span class="o">.</span><span class="n">create_material</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_material</span><span class="p">)</span></div>
         
 <div class="viewcode-block" id="Interface.build_geometry"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface.build_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">build_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">plxid</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds interface to the model.</span>

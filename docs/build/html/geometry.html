@@ -133,7 +133,7 @@
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -143,16 +143,15 @@
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1"># deg</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
 
-
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
-<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 60cm thickness and 24kN/m3 unit weight</span>
-<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
 <span class="c1"># elastic material for concrete with equivalent stiffness than the column and footing</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
@@ -189,7 +188,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -201,8 +200,8 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
@@ -248,7 +247,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -260,8 +259,8 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
@@ -287,9 +286,9 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
-<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 60cm thickness and 24kN/m3 unit weight</span>
-<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
 <span class="c1"># build model</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">Plate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">)</span>
@@ -320,7 +319,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -331,7 +330,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
 
 <span class="c1"># Create with f&#39;c=30MPa concrete slab with a 60cm thickness and 24kN/m3 unit weight</span>
-<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="n">column</span> <span class="o">=</span> <span class="kc">None</span>
 
 <span class="c1"># Create model</span>
@@ -362,7 +361,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -374,8 +373,8 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
@@ -433,23 +432,23 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="n">b1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># Foundation column width</span>
 <span class="n">d1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># Foundation width</span>
 
-<span class="c1"># Mohr-Coulomb top soil material</span>
+<span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">top_layer</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">top_layer</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">top_layer</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span> <span class="c1"># kN</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># kPa</span>
-<span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1"># deg</span>
+<span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1"># deg</span>
 <span class="n">top_layer</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
 
 <span class="c1"># Mohr-Coulomb second soil material</span>
 <span class="n">mid_layer</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">mid_layer</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">mid_layer</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">mid_layer</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">mid_layer</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">mid_layer</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">mid_layer</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -459,10 +458,10 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="n">mid_layer</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1"># deg</span>
 <span class="n">mid_layer</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
 
-<span class="c1"># Mohr-Coulomb second soil material</span>
+<span class="c1"># Mohr-Coulomb third soil material</span>
 <span class="n">bottom_layer</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">bottom_layer</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">bottom_layer</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">bottom_layer</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">bottom_layer</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">bottom_layer</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">bottom_layer</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -473,9 +472,9 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="n">bottom_layer</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
 
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
-<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 60cm thickness and 24kN/m3 unit weight</span>
-<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
 <span class="c1"># build model</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">SPlate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span>
@@ -509,7 +508,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="c1"># Mohr-Coulomb top soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -522,7 +521,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="c1"># Mohr-Coulomb second soil material</span>
 <span class="n">fill</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">fill</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">fill</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">fill</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">fill</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">fill</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">fill</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -534,9 +533,9 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 
 
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
-<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 60cm thickness and 24kN/m3 unit weight</span>
-<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
 <span class="c1"># build model</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">Plate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">fill</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
@@ -627,7 +626,7 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -638,9 +637,9 @@ but also <a class="reference internal" href="test.html#Load-test"><span class="s
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
 
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
-<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 60cm thickness and 24kN/m3 unit weight</span>
-<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
 
 <span class="c1"># initialize model</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">Plate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -678,7 +677,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -690,8 +689,8 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
@@ -718,7 +717,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 <h2>Interfaces<a class="headerlink" href="#Interfaces" title="Permalink to this heading"></a></h2>
 <p>Interfaces can be included between the footing and the soil by setting the <code class="docutils literal notranslate"><span class="pre">interface</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The interface strength is controlled by the <code class="docutils literal notranslate"><span class="pre">'Rinter'</span></code> parameter of the adjacent soil or by assigning them a <a class="reference internal" href="materials.html#Soil-materials"><span class="std std-ref">soil material</span></a>. Interfaces can be shown in the model plot by setting the <code class="docutils literal notranslate"><span class="pre">interface</span></code> parameter to <code class="docutils literal notranslate"><span class="pre">True</span></code>. The interfaces are shown as red lines in the foundation perimeter.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># Foundation depth</span>
@@ -729,7 +728,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -738,13 +737,14 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># kPa</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1"># deg</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;InterfaceStrengthDetermination&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Manual&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># interface strength</span>
 
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
@@ -760,7 +760,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -769,7 +769,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 </div>
 <p>Individual interfaces can be activated or deactivated using a dictionary with keys <code class="docutils literal notranslate"><span class="pre">'column'</span></code>, <code class="docutils literal notranslate"><span class="pre">'top'</span></code>, <code class="docutils literal notranslate"><span class="pre">'latera'</span></code> and <code class="docutils literal notranslate"><span class="pre">'bottom'</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># build model</span>
@@ -782,7 +782,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -791,13 +791,13 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 </div>
 <p><a class="reference internal" href="materials.html#Soil-materials"><span class="std std-ref">Soil materials</span></a> can be assigned to each interface:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mohr-Coulomb material for the interface</span>
 <span class="n">interface</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">interface</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">interface</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">interface</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -818,7 +818,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -830,7 +830,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 <h2>Model size<a class="headerlink" href="#Model-size" title="Permalink to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">model_width</span></code> and <code class="docutils literal notranslate"><span class="pre">model_depth</span></code> parameters control the extent of the model.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="mi">3</span> <span class="c1"># Foundation depth</span>
@@ -841,7 +841,7 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -854,8 +854,8 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 <span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
@@ -871,19 +871,11 @@ at the bottom of the foundation are <code class="docutils literal notranslate"><
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <img alt="_images/geometry_50_0.png" src="_images/geometry_50_0.png" />
-</div>
-</div>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
-</pre></div>
 </div>
 </div>
 </section>

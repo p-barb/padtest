@@ -82,14 +82,76 @@
              
   <h1>Source code for padtest.material.soil</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">types</span>
 
-<div class="viewcode-block" id="SoilMaterial"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.SoilMaterial">[docs]</a><span class="k">class</span> <span class="nc">SoilMaterial</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface  that creates a soil material in Plaxis from</span>
-<span class="sd">    the contents of a dictionary.</span>
+<div class="viewcode-block" id="BaseSoilMaterial"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.BaseSoilMaterial">[docs]</a><span class="k">class</span> <span class="nc">BaseSoilMaterial</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for soil materials.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Plaxis soil material model. E.g.: 2 for Mohr-Coulomb</span>
+    <span class="n">_soil_model</span> <span class="o">=</span> <span class="ne">NotImplementedError</span>   
     
+    <span class="c1"># Plaxis soil material name. E.g.: 2 &#39;Mohr-Coulomb&#39;</span>
+    <span class="n">_soil_name</span> <span class="o">=</span> <span class="ne">NotImplementedError</span>
+
+    <span class="c1"># Accepted acronyms for the material, lowercase, without spaces or</span>
+    <span class="c1"># hyphens. E.g: &#39;mc&#39;, &#39;mohrcoulomb&#39;.</span>
+    <span class="n">_acronyms</span> <span class="o">=</span> <span class="ne">NotImplementedError</span>
+    
+    <span class="c1"># Dictionary with the supported parameter names, E.g.: </span>
+    <span class="c1"># {&#39;PermHorizontalPrimary&#39;:[&#39;kx&#39;, &#39;PermHorizontalPrimary&#39;]}</span>
+    <span class="n">_parameter_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Identification&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;MaterialName&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s1">&#39;Identification&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;SoilModel&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;Colour&#39;</span><span class="p">:[</span><span class="s1">&#39;colour&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">],</span>
+                      <span class="s2">&quot;DrainageType&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="p">,</span>
+                      <span class="s1">&#39;commments&#39;</span><span class="p">:[</span><span class="s1">&#39;commments&#39;</span><span class="p">],</span>
+                      <span class="s2">&quot;gammaSat&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;gammasat&#39;</span><span class="p">],</span>
+                      <span class="s2">&quot;gammaUnsat&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;gammaunsat&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;einit&#39;</span><span class="p">:[</span><span class="s1">&#39;einit&#39;</span><span class="p">,</span> <span class="s1">&#39;e0&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;ERef&#39;</span><span class="p">:[</span><span class="s1">&#39;ERef&#39;</span><span class="p">],</span>
+                      <span class="s2">&quot;E50ref&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;E50ref&quot;</span><span class="p">],</span>
+                      <span class="s1">&#39;EoedRef&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;EoedRef&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;EurRef&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;EurRef&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;powerm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;powerm&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;G0Ref&#39;</span><span class="p">:[</span><span class="s1">&#39;G0Ref&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;gamma07&#39;</span><span class="p">:[</span><span class="s1">&#39;gamma07&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;pRef&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;pRef&#39;</span><span class="p">],</span>
+                      <span class="s2">&quot;nu&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="s1">&#39;poisson&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;cref&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">,</span> <span class="s1">&#39;suref&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;phi&#39;</span><span class="p">:[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;psi&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;cInc&#39;</span><span class="p">:[</span><span class="s1">&#39;cinc&#39;</span><span class="p">,</span> <span class="s1">&#39;suinc&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;VerticalRef&#39;</span><span class="p">:[</span><span class="s1">&#39;VerticalRef&#39;</span><span class="p">,</span> <span class="s1">&#39;gammaref&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;UseDefaults&#39;</span><span class="p">:[</span><span class="s1">&#39;UseDefaults&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;K0nc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;K0nc&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;RF&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;RF&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;PermHorizontalPrimary&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;PermHorizontalPrimary&#39;</span><span class="p">,</span> <span class="s1">&#39;perm_primary_horizontal_axis&#39;</span><span class="p">,</span> <span class="s1">&#39;kx&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;PermVertical&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;perm_vertical_axis&#39;</span><span class="p">,</span> <span class="s1">&#39;PermVertical&#39;</span><span class="p">,</span> <span class="s1">&#39;ky&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">:[</span><span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">,</span> <span class="s1">&#39;RayleighMethod&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;RayleighBeta&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;TargetDamping1&#39;</span><span class="p">:[</span><span class="s1">&#39;TargetDamping1&#39;</span><span class="p">,</span> <span class="s1">&#39;xi1&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;TargetDamping2&#39;</span><span class="p">:[</span><span class="s1">&#39;TargetDamping2&#39;</span><span class="p">,</span> <span class="s1">&#39;xi2&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;TargetFrequency1&#39;</span><span class="p">:[</span><span class="s1">&#39;TargetFrequency1&#39;</span><span class="p">,</span> <span class="s1">&#39;f1&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;TargetFrequency2&#39;</span><span class="p">:[</span><span class="s1">&#39;TargetFrequency2&#39;</span><span class="p">,</span> <span class="s1">&#39;f2&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;TensionCutOff&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TensionCutOff&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;TensileStrength&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;TensileStrength&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;GapClosure&#39;</span><span class="p">:[</span><span class="s1">&#39;GapClosure&#39;</span><span class="p">,</span> <span class="s1">&#39;considergapclosure&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;InterfaceStrengthDetermination&#39;</span><span class="p">:[</span><span class="s1">&#39;InterfaceStrengthDetermination&#39;</span><span class="p">,</span> <span class="s1">&#39;strengthdetermination&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;Rinter&#39;</span><span class="p">:[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;RinterResidual&#39;</span><span class="p">:[</span><span class="s1">&#39;RinterResidual&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;InterfaceStiffnessDetermination&#39;</span><span class="p">:[</span><span class="s1">&#39;InterfaceStiffnessDetermination&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;knInter&#39;</span><span class="p">:[</span><span class="s1">&#39;knInter&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;ksInter&#39;</span><span class="p">:[</span><span class="s1">&#39;ksInter&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;K0Determination&#39;</span><span class="p">:[</span><span class="s1">&#39;K0Determination&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;K0PrimaryIsK0Secondary&#39;</span><span class="p">:[</span><span class="s1">&#39;K0PrimaryIsK0Secondary&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;K0Primary&#39;</span><span class="p">:[</span><span class="s1">&#39;K0Primary&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;K0Secondary&#39;</span><span class="p">:[</span><span class="s1">&#39;K0Secondary&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;OCR&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;ocr&#39;</span><span class="p">,</span> <span class="s1">&#39;overconsolidation ratio&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;POP&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;pop&#39;</span><span class="p">],}</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `BaseSoilMaterial`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
     
@@ -97,220 +159,178 @@
     <span class="c1"># PRIVATE METHODS</span>
     <span class="c1">#===================================================================</span>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_set_elastic</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an elastic soil material in the model.</span>
+    <span class="k">def</span> <span class="nf">_create_material</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds material to the model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        g_i : PlxProxyGlobalObject</span>
 <span class="sd">            Global object of the current open Plaxis model in Input.</span>
-<span class="sd">        label : str</span>
-<span class="sd">            Material label.</span>
-<span class="sd">        material : dict</span>
-<span class="sd">            Dictionary with material properties</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary with soil material parameters.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        CombinedClass</span>
 <span class="sd">            Plaxis object of the soil material.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Failed material creation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_soil_model</span>
+        <span class="n">formated_material</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_check_parameters</span><span class="p">(</span><span class="n">material</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">g_i</span><span class="o">.</span><span class="n">soilmat</span><span class="p">(</span><span class="o">*</span><span class="n">formated_material</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Unable to create &lt;</span><span class="si">{}</span><span class="s1">&gt; material &lt;</span><span class="si">{}</span><span class="s1">&gt;. Check error message in Plaxis command line history for details.&#39;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">_soil_name</span><span class="p">,</span> <span class="n">formated_material</span><span class="p">[</span><span class="s1">&#39;Identification&#39;</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>  
+    <span class="k">def</span> <span class="nf">_check_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates user provided soil material paramteres.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        material : dict</span>
+<span class="sd">            User provided dictionary with soil material parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary with soil material parameters with interal Plaxis</span>
+<span class="sd">            keys.</span>
 <span class="sd">        </span>
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        RuntimeError</span>
-<span class="sd">            Failed to create the soil material.</span>
+<span class="sd">            Unknown material parameter.</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Duplicated material parameter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">if</span> <span class="s1">&#39;kx&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s1">&#39;ky&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s1">&#39;Rinter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighAlpha&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighBeta&quot;</span><span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">material</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">soilmat</span><span class="p">(</span><span class="s2">&quot;MaterialName&quot;</span><span class="p">,</span><span class="n">label</span><span class="p">,</span>
-                                   <span class="s2">&quot;SoilModel&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
-                                   <span class="s2">&quot;DrainageType&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">],</span>
-                                   <span class="s2">&quot;Eref&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">],</span>
-                                   <span class="s2">&quot;nu&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">],</span>
-                                   <span class="s2">&quot;gammaSat&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">],</span>
-                                   <span class="s2">&quot;gammaUnsat&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;perm_primary_horizontal_axis&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;perm_vertical_axis&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;Rinter&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;RayleighBeta&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">])</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Unable to create linear elastic material &lt;</span><span class="si">{}</span><span class="s1">&gt;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">material</span>
+        <span class="n">formated_material</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
+            <span class="n">sanitized_param</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sanitized_name</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">plx_key</span><span class="p">,</span> <span class="n">supported</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_parameter_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">supported</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_sanitized_name</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">supported</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">sanitized_param</span> <span class="ow">in</span> <span class="n">supported</span><span class="p">:</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">break</span>
+            
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unknown material parameter &lt;</span><span class="si">{}</span><span class="s2">&gt; in &lt;</span><span class="si">{}</span><span class="s2">&gt;  for &lt;</span><span class="si">{}</span><span class="s2">&gt;.&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">formated_material</span><span class="p">[</span><span class="s1">&#39;Identification&#39;</span><span class="p">],</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_soil_name</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">plx_key</span> <span class="ow">in</span> <span class="n">formated_material</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Duplicated soil material parameter &lt;</span><span class="si">{}</span><span class="s2">&gt; as &lt;</span><span class="si">{}</span><span class="s2">&gt; in &lt;</span><span class="si">{}</span><span class="s2">&gt;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">plx_key</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">formated_material</span><span class="p">[</span><span class="s1">&#39;Identification&#39;</span><span class="p">])</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">formated_material</span><span class="p">[</span><span class="n">plx_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">material</span><span class="p">[</span><span class="n">parameter</span><span class="p">]</span>
 
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_set_mc</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a Mohr-Coulomb soil material in the model.</span>
+        <span class="k">return</span> <span class="n">formated_material</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        g_i : PlxProxyGlobalObject</span>
-<span class="sd">            Global object of the current open Plaxis model in Input.</span>
-<span class="sd">        label : str</span>
-<span class="sd">            Material label.</span>
-<span class="sd">        material : dict</span>
-<span class="sd">            Dictionary with material properties</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        CombinedClass</span>
-<span class="sd">            Plaxis object of the soil material.</span>
-<span class="sd">        </span>
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        RuntimeError</span>
-<span class="sd">            Failed to create the soil material.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;kx&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s1">&#39;ky&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s1">&#39;Rinter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="s1">&#39;OCR&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;OCR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="s1">&#39;POP&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;POP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighAlpha&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighBeta&quot;</span><span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">material</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">soilmat</span><span class="p">(</span><span class="s2">&quot;MaterialName&quot;</span><span class="p">,</span><span class="n">label</span><span class="p">,</span>
-                                   <span class="s2">&quot;SoilModel&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span>
-                                   <span class="s2">&quot;DrainageType&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="p">,</span>
-                                   <span class="s2">&quot;Eref&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">],</span>
-                                   <span class="s2">&quot;nu&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;cref&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;phi&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;psi&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">],</span>
-                                   <span class="s2">&quot;gammaSat&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">],</span>
-                                   <span class="s2">&quot;gammaUnsat&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;OCR&#39;</span><span class="p">,</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;OCR&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;POP&#39;</span><span class="p">,</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;POP&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;perm_primary_horizontal_axis&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;perm_vertical_axis&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;Rinter&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;RayleighBeta&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">])</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Unable to create Mohr-Coulomb material &lt;</span><span class="si">{}</span><span class="s1">&gt;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">material</span>
-    
-    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_set_hs</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a hardening soil material in the model.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_sanitized_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sanitized version (lower case, no spaces or</span>
+<span class="sd">        hyphens) of a parameter name.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        g_i : PlxProxyGlobalObject</span>
-<span class="sd">            Global object of the current open Plaxis model in Input.</span>
-<span class="sd">        label : str</span>
-<span class="sd">            Material label.</span>
-<span class="sd">        material : dict</span>
-<span class="sd">            Dictionary with material properties</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Parameter name.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        CombinedClass</span>
-<span class="sd">            Plaxis object of the soil material.</span>
-<span class="sd">        </span>
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        RuntimeError</span>
-<span class="sd">            Failed to create the soil material.</span>
+<span class="sd">        str</span>
+<span class="sd">            Sanitized parameter name.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;kx&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s1">&#39;ky&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s1">&#39;Rinter&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="s1">&#39;K0nc&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;K0nc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]))</span>
-        <span class="k">if</span> <span class="s1">&#39;OCR&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;OCR&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="k">if</span> <span class="s1">&#39;POP&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;POP&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighAlpha&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighBeta&quot;</span><span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">material</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">soilmat</span><span class="p">(</span><span class="s2">&quot;MaterialName&quot;</span><span class="p">,</span><span class="n">label</span><span class="p">,</span> 
-                                   <span class="s2">&quot;SoilModel&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span>
-                                   <span class="s2">&quot;DrainageType&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="p">,</span>
-                                   <span class="s2">&quot;gammaSat&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">],</span>
-                                   <span class="s2">&quot;gammaUnsat&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;einit&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;E50ref&#39;</span><span class="p">,</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;E50ref&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;EoedRef&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eoedref&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;EurRef&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Euref&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;powerm&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;powerm&#39;</span><span class="p">],</span> 
-                                   <span class="s1">&#39;cref&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;phi&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;psi&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">],</span> 
-                                   <span class="s1">&#39;K0nc&#39;</span><span class="p">,</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;K0nc&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;OCR&#39;</span><span class="p">,</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;OCR&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;POP&#39;</span><span class="p">,</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;POP&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;perm_primary_horizontal_axis&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;perm_vertical_axis&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;Rinter&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">],</span>
-                                   <span class="s1">&#39;RayleighBeta&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">])</span>
-        <span class="k">except</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Unable to create hardening soil material &lt;</span><span class="si">{}</span><span class="s1">&gt;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">material</span>
+        <span class="n">sanitized</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">]:</span>
+             <span class="n">sanitized</span> <span class="o">=</span> <span class="n">sanitized</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sanitized</span></div>
+        
+
+<div class="viewcode-block" id="Elastic"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.Elastic">[docs]</a><span class="k">class</span> <span class="nc">Elastic</span><span class="p">(</span><span class="n">BaseSoilMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Linear elastic soil material.&quot;&quot;&quot;</span>
+    <span class="n">_soil_model</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">_soil_name</span> <span class="o">=</span> <span class="s1">&#39;Linear Elastic&#39;</span>
+    <span class="n">_acronyms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;linearelastic&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="MohrCoulomb"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.MohrCoulomb">[docs]</a><span class="k">class</span> <span class="nc">MohrCoulomb</span><span class="p">(</span><span class="n">BaseSoilMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mohr-Coulomb soil material.&quot;&quot;&quot;</span>
+    <span class="n">_soil_model</span> <span class="o">=</span> <span class="mi">2</span>   
+    <span class="n">_soil_name</span> <span class="o">=</span> <span class="s1">&#39;Mohr-Coulomb&#39;</span>
+    <span class="n">_acronyms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mohrcoulomb&#39;</span><span class="p">,</span> <span class="s1">&#39;mc&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="HardeningStrain"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.HardeningStrain">[docs]</a><span class="k">class</span> <span class="nc">HardeningStrain</span><span class="p">(</span><span class="n">BaseSoilMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hardening-Strain soil material.&quot;&quot;&quot;</span>
+    <span class="n">_soil_model</span> <span class="o">=</span> <span class="mi">3</span>   
+    <span class="n">_soil_name</span> <span class="o">=</span> <span class="s1">&#39;Hardening-Strain&#39;</span>
+    <span class="n">_acronyms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hardeningstrain&#39;</span><span class="p">,</span> <span class="s1">&#39;hs&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="HSSmall"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.HSSmall">[docs]</a><span class="k">class</span> <span class="nc">HSSmall</span><span class="p">(</span><span class="n">BaseSoilMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Hardening-Strain with small strain stiffness soil material.&quot;&quot;&quot;</span>
+    <span class="n">_soil_model</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">_soil_name</span> <span class="o">=</span> <span class="s1">&#39;Hardening-Strain samll&#39;</span>
+    <span class="n">_acronyms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;hardeningstrainsmall&#39;</span><span class="p">,</span> <span class="s1">&#39;hssmall&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="SoilMaterialSelector"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.SoilMaterialSelector">[docs]</a><span class="k">class</span> <span class="nc">SoilMaterialSelector</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Soil materila selector&quot;&quot;&quot;</span>
+
+    <span class="n">_materials</span> <span class="o">=</span> <span class="p">[</span><span class="n">Elastic</span><span class="p">,</span> <span class="n">MohrCoulomb</span><span class="p">,</span> <span class="n">HardeningStrain</span><span class="p">,</span> <span class="n">HSSmall</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `SoilMaterialSelector`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
     
     <span class="c1">#===================================================================</span>
     <span class="c1"># PUBLIC METHODS</span>
     <span class="c1">#===================================================================</span>
-<div class="viewcode-block" id="SoilMaterial.set"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.SoilMaterial.set">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create soil materials in the model.</span>
+<div class="viewcode-block" id="SoilMaterialSelector.create_material"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.soil.SoilMaterialSelector.create_material">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_material</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a new material in the model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        g_i : PlxProxyGlobalObject</span>
 <span class="sd">            Global object of the current open Plaxis model in Input.</span>
-<span class="sd">        label : str</span>
-<span class="sd">            Material label.</span>
 <span class="sd">        material : dict</span>
-<span class="sd">            Dictionary with material properties</span>
+<span class="sd">            Dictionary with soil material properties.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        CombinedClass</span>
 <span class="sd">            Plaxis object of the soil material.</span>
 
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        RuntimeError</span>
-<span class="sd">            Unsuported soil model.</span>
+<span class="sd">            Missing soil model id.</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Soil model not supported.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">g_i</span><span class="o">.</span><span class="n">gotosoil</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;SoilModel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;elastic&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_set_elastic</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;SoilModel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mohr-coulomb&#39;</span><span class="p">,</span> <span class="s1">&#39;mohr coulomb&#39;</span><span class="p">,</span> <span class="s1">&#39;mc&#39;</span><span class="p">,</span> <span class="s1">&#39;mohrcoulomb&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_set_mc</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">material</span><span class="p">[</span><span class="s2">&quot;SoilModel&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;hardening-soil&#39;</span><span class="p">,</span> <span class="s1">&#39;hardening soil&#39;</span><span class="p">,</span> <span class="s1">&#39;hs&#39;</span><span class="p">,</span> <span class="s1">&#39;hardeningsoil&#39;</span><span class="p">]:</span>
-            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_set_hs</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Unsuported soil model &lt;</span><span class="si">{}</span><span class="s1">&gt;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">material</span><span class="p">[</span><span class="s2">&quot;SoilModel&quot;</span><span class="p">]))</span></div></div>
+        <span class="k">if</span> <span class="s2">&quot;SoilModel&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Soil material model must be provided under the &lt;SoilModel&gt; key. Supported soil material models are: </span><span class="si">{}</span><span class="s1">.&#39;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">mat</span><span class="o">.</span><span class="n">_soil_name</span> <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_materials</span><span class="p">]))</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">material_class</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_materials</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">material_class</span><span class="o">.</span><span class="n">_sanitized_name</span><span class="p">(</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">])</span> <span class="ow">in</span> <span class="n">material_class</span><span class="o">.</span><span class="n">_acronyms</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">material_class</span><span class="o">.</span><span class="n">_create_material</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="n">material</span><span class="p">)</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Soil material model &lt;</span><span class="si">{}</span><span class="s1">&gt; not supported. Supported soil material models are: </span><span class="si">{}</span><span class="s1">.&#39;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">],</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">mat</span><span class="o">.</span><span class="n">_soil_name</span> <span class="k">for</span> <span class="n">mat</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_materials</span><span class="p">]))</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div></div>
+
+
 </pre></div>
 
            </div>

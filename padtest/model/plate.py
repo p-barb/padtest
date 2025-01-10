@@ -490,9 +490,6 @@ class SymmetricPlateModel(SG, PlateModel, Model):
         Include boundary interfaces needed for a base shake test.
         This requires a much denser mesh and more computationally
         demanding models. By default False.
-    license : str, optional
-            Plaxis lincese: 'advanced' or 'ultimate'. By default
-            'ultimate'.
     
     Methods
     -------
@@ -554,8 +551,7 @@ class SymmetricPlateModel(SG, PlateModel, Model):
                  locations=[0, 0.25, 0.5, 0.75, 1], build=True, excavation=True,
                  deformation_boundary_condition=None,
                  dynamic_boundary_condtions=None, 
-                 shake_boundary_condtions=None, boundary_interface=False,
-                 license='ultimate'):
+                 shake_boundary_condtions=None, boundary_interface=False):
         """Initialize a new instance of `SymmetricPlateModel`.
 
         Parameters
@@ -660,9 +656,6 @@ class SymmetricPlateModel(SG, PlateModel, Model):
             Include boundary interfaces needed for a base shake test.
             This requires a much denser mesh and more computationally
             demanding models. By default False.
-        license : str
-            Plaxis lincese: 'advanced' or 'ultimate'. By default
-            'ultimate'.
         """
         
         SG.__init__(self, b, d, dstrata=dstrata, wt=wt,
@@ -678,7 +671,7 @@ class SymmetricPlateModel(SG, PlateModel, Model):
                        deformation_boundary_condition=deformation_boundary_condition,
                        dynamic_boundary_condtions=dynamic_boundary_condtions,
                        shake_boundary_condtions=shake_boundary_condtions,
-                       boundary_interface=boundary_interface, license=license)
+                       boundary_interface=boundary_interface)
         self._init_foundation_material(footing, column)
         if build:
             self.build()
@@ -793,9 +786,6 @@ class NonSymmetricPlateModel(NSG, PlateModel, Model):
         Include boundary interfaces needed for a base shake test.
         This requires a much denser mesh and more computationally
         demanding models. By default False.
-    license : str, optional
-        Plaxis lincese: 'advanced' or 'ultimate'. By default
-        'ultimate'.
     
     Methods
     -------
@@ -858,7 +848,7 @@ class NonSymmetricPlateModel(NSG, PlateModel, Model):
                  build=True, excavation=True,
                  deformation_boundary_condition=None,
                  dynamic_boundary_condtions=None, shake_boundary_condtions=None,
-                 boundary_interface=False, license='ultimate'):
+                 boundary_interface=False):
         """Initialize a new instance of `NonSymmetricPlateModel`.
 
         Parameters
@@ -967,9 +957,6 @@ class NonSymmetricPlateModel(NSG, PlateModel, Model):
             Include boundary interfaces needed for a base shake test.
             This requires a much denser mesh and more computationally
             demanding models. By default False.
-        license : str, optional
-            Plaxis lincese: 'advanced' or 'ultimate'. By default
-            'ultimate'.
         """
         
         NSG.__init__(self, b, d, b2=b2, dstrata=dstrata, wt=wt,
@@ -985,7 +972,7 @@ class NonSymmetricPlateModel(NSG, PlateModel, Model):
                        deformation_boundary_condition=deformation_boundary_condition,
                        dynamic_boundary_condtions=dynamic_boundary_condtions,
                        shake_boundary_condtions=shake_boundary_condtions,
-                       boundary_interface=boundary_interface, license=license)
+                       boundary_interface=boundary_interface)
         self._init_foundation_material(footing, column)
         if build:
             self.build()

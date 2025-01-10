@@ -62,9 +62,17 @@
 <li class="toctree-l3"><a class="reference internal" href="#Linear-elastic">Linear elastic</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Mohr-Coulomb">Mohr-Coulomb</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Hardening-soil">Hardening soil</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#HS-small">HS-small</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Dynamic-properties">Dynamic properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Interface-properties">Interface properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Initial-stress-conditions">Initial stress conditions</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#Plate-materials">Plate materials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Plate-materials">Plate materials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Dynamic properties</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Plate-stiffness-calculation">Plate stiffness calculation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="test.html">Foundation tests</a></li>
@@ -99,6 +107,7 @@
 <h1>Materials<a class="headerlink" href="#Materials" title="Permalink to this heading"></a></h1>
 <section id="Soil-materials">
 <h2>Soil materials<a class="headerlink" href="#Soil-materials" title="Permalink to this heading"></a></h2>
+<p>Soil material properties are specified using a dictionary, with the variable name used by Plaxis to designate the property as the dictionary key. The key recognition is case insensitive and disregards both spaces and hyphens. The properties that can be set depend on the material and drainage type. The supported material types are: <code class="docutils literal notranslate"><span class="pre">'linear</span> <span class="pre">elastic</span></code>’, <code class="docutils literal notranslate"><span class="pre">'mohr</span> <span class="pre">coulomb'</span></code>, ‘<code class="docutils literal notranslate"><span class="pre">hardening</span> <span class="pre">strain</span></code>’ and <code class="docutils literal notranslate"><span class="pre">'hs</span> <span class="pre">small'</span></code>.</p>
 <section id="Linear-elastic">
 <h3>Linear elastic<a class="headerlink" href="#Linear-elastic" title="Permalink to this heading"></a></h3>
 <p>Linear elastic soil materials are specified by a dictionary whit the following fields:</p>
@@ -107,25 +116,12 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
-<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">728e3</span> <span class="c1"># kPa</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1"># Poisson</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
-</pre></div>
-</div>
-</div>
-<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># interface strength, default value 1</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="c1"># [m/day] Permeability in the horizontal direction, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.04</span> <span class="c1"># [m/day] Permeability in the vertical direction, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
 </pre></div>
 </div>
 </div>
@@ -134,13 +130,13 @@
 <h3>Mohr-Coulomb<a class="headerlink" href="#Mohr-Coulomb" title="Permalink to this heading"></a></h3>
 <p>Mohr-Coulomb soil materials are specified by a dictionary whit the following fields:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -152,88 +148,137 @@
 </pre></div>
 </div>
 </div>
-<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
-<div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
-</pre></div>
-</div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># interface strength, default value 1</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;K0nc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="c1"># default value sin(45 - phi / 2)</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="c1"># [m/day] Permeability in the horizontal direction, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.04</span> <span class="c1"># [m/day] Permeability in the vertical direction, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
-</pre></div>
-</div>
-</div>
 </section>
 <section id="Hardening-soil">
 <h3>Hardening soil<a class="headerlink" href="#Hardening-soil" title="Permalink to this heading"></a></h3>
 <p>Hardening soil materials are specified by a dictionary whit the following fields:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hardening soil&#39;</span>
-<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;E50ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eoedref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Euref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2e5</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;E50ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span> <span class="c1">#kPa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eoedref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span> <span class="c1">#kPa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Euref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2e5</span> <span class="c1">#kPa</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;powerm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#kPa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1">#deg</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1">#deg</span>
 <span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
 </pre></div>
 </div>
 </div>
-<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
+</section>
+<section id="HS-small">
+<h3>HS-small<a class="headerlink" href="#HS-small" title="Permalink to this heading"></a></h3>
+<p>Hardening soil materials are specified by a dictionary whit the following fields:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># interface strength, default value 1</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;K0nc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="c1"># default value sin(45 - phi / 2)</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="c1"># [m/day] Permeability in the horizontal direction, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.04</span> <span class="c1"># [m/day] Permeability in the vertical direction, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
-<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hs-small&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;E50ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span> <span class="c1"># Kpa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eoedref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span> <span class="c1"># Kpa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Euref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2e5</span> <span class="c1"># Kpa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;powerm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># Kpa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span> <span class="c1"># deg</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># deg</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
 </pre></div>
 </div>
 </div>
+</section>
+<section id="Dynamic-properties">
+<h3>Dynamic properties<a class="headerlink" href="#Dynamic-properties" title="Permalink to this heading"></a></h3>
+<p>Dynamic material properties can be set under an <em>ultimate</em> Plaxis license, otherwise an error will be raised. The input method for the dynamic properties is controlled through the <code class="docutils literal notranslate"><span class="pre">'RayleighDampingInputMethod'</span></code> flag. By default the flag is set to <code class="docutils literal notranslate"><span class="pre">'SDOF</span> <span class="pre">equivalent'</span></code>. The alternatives are:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Direct&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.20</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SDOF equivalent&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;xi1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;xi2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.08</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1"># Hz</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;f2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span> <span class="c1"># Hz</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Interface-properties">
+<h3>Interface properties<a class="headerlink" href="#Interface-properties" title="Permalink to this heading"></a></h3>
+<p>The interface stiffness is set with the <code class="docutils literal notranslate"><span class="pre">'InterfaceStiffnessDetermination'</span></code>, <code class="docutils literal notranslate"><span class="pre">'knInter'</span></code> and <code class="docutils literal notranslate"><span class="pre">'ksInter'</span></code> properties. The interface strength is controlled through the <code class="docutils literal notranslate"><span class="pre">'InterfaceStrengthDetermination'</span></code>, <code class="docutils literal notranslate"><span class="pre">'Rinter'</span></code>, <code class="docutils literal notranslate"><span class="pre">'RinterResidual'</span></code> and <code class="docutils literal notranslate"><span class="pre">'GapClosure'</span></code> properties. Not all of these properties are available at the same time, depending on values of <code class="docutils literal notranslate"><span class="pre">'InterfaceStiffnessDetermination'</span></code> and <code class="docutils literal notranslate"><span class="pre">'InterfaceStrengthDetermination'</span></code>.</p>
+</section>
+<section id="Initial-stress-conditions">
+<h3>Initial stress conditions<a class="headerlink" href="#Initial-stress-conditions" title="Permalink to this heading"></a></h3>
+<p>Initial stress conditions are controlled through the <code class="docutils literal notranslate"><span class="pre">'K0Determination'</span></code>, <code class="docutils literal notranslate"><span class="pre">'K0PrimaryIsK0Secondary'</span></code>, <code class="docutils literal notranslate"><span class="pre">'K0Primary'</span></code> and <code class="docutils literal notranslate"><span class="pre">'K0Secondary'</span></code>. For some maateirlas <code class="docutils literal notranslate"><span class="pre">'OCR'</span></code> and <code class="docutils literal notranslate"><span class="pre">'POP'</span></code> are also available.</p>
 </section>
 </section>
 <section id="Plate-materials">
 <h2>Plate materials<a class="headerlink" href="#Plate-materials" title="Permalink to this heading"></a></h2>
-<p>Plate materials are specified by a dictionary whit the following fields:</p>
+<p>Plate material properties are specified using a dictionary, with the variable name used by Plaxis to designate the property as the dictionary key. The key recognition is case insensitive and disregards both spaces and hyphens. The properties that can be set depend on the material type. The supported material types are: <code class="docutils literal notranslate"><span class="pre">'Elastic'</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Elastoplastic'</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;Elastoplastic</span> <span class="pre">(M-kappa)'</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plate_material</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;MaterialType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Elastic&#39;</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.73e6</span> <span class="c1"># KPa m</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;EI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">12</span> <span class="o">*</span> <span class="mf">7.73e6</span> <span class="c1"># KPa m</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="c1"># m</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span>
+</pre></div>
+</div>
+</div>
+<section id="id1">
+<h3>Dynamic properties<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<p>Dynamic material properties can be set under an <em>ultimate</em> Plaxis license, otherwise an error will be raised. The input method for the dynamic properties is controlled through the <code class="docutils literal notranslate"><span class="pre">'RayleighDampingInputMethod'</span></code> flag. By default the flag is set to <code class="docutils literal notranslate"><span class="pre">'SDOF</span> <span class="pre">equivalent'</span></code>. The alternatives are:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plate_material</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span>
-<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.73e6</span> <span class="c1"># KPa m</span>
-<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;EI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">12</span> <span class="o">*</span> <span class="mf">7.73e6</span> <span class="c1"># KPa m</span>
-<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="c1"># m</span>
-<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;Gref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.73e6</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.4</span><span class="p">))</span> <span class="c1"># KPa</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Direct&#39;</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.20</span>
 </pre></div>
 </div>
 </div>
-<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
-<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SDOF equivalent&#39;</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;xi1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;xi2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.08</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;f1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="c1"># Hz</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;f2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2</span> <span class="c1"># Hz</span>
 </pre></div>
 </div>
 </div>
-<p>Plates material are specified per m of cross-section width. Therefore, the stiffness parameters must comply with the following relations. The equivalent thickness <code class="docutils literal notranslate"><span class="pre">d</span></code> is related to the axial and flexural stiffness by:</p>
+</section>
+<section id="Plate-stiffness-calculation">
+<h3>Plate stiffness calculation<a class="headerlink" href="#Plate-stiffness-calculation" title="Permalink to this heading"></a></h3>
+<p>Plates material are specified per m of cross-section width. Therefore, the stiffness parameters must comply with the following relations. The equivalent thickness <span class="math notranslate nohighlight">\(d\)</span> is related to the axial and flexural stiffness by:</p>
 <div class="math notranslate nohighlight">
 \[d=\sqrt{12 \frac{EI}{EA}}\]</div>
 <p>The reference shear modulus:</p>
@@ -248,7 +293,7 @@
 \[EI = E \ \frac{d^3 \ 1m}{12}\]</div>
 <div class="math notranslate nohighlight">
 \[w = \gamma \ d \ 1m\]</div>
-<p>The default value for the Poisson modulus can be modified when calling the function:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">padtest.concrete</span></code> method computes the plate material stiffness properties from the tihckness and compressive strength:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
@@ -257,7 +302,7 @@
 <span class="n">fc</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1"># MPa</span>
 <span class="n">gamma</span> <span class="o">=</span> <span class="mi">24</span> <span class="c1">#kN/m3</span>
 <span class="n">d</span> <span class="o">=</span> <span class="mf">0.4</span>
-<span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">poisson</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">poisson</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -267,17 +312,38 @@
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;fc&#39;: 30,
- &#39;E&#39;: 25742960.202742808,
+{&#39;MaterialType&#39;: &#39;Elastic&#39;,
+ &#39;Isotropic&#39;: True,
  &#39;nu&#39;: 0.3,
- &#39;EA&#39;: 10297184.081097124,
+ &#39;EA1&#39;: 10297184.081097124,
  &#39;EI&#39;: 137295.78774796167,
- &#39;d&#39;: 0.4,
- &#39;Gref&#39;: 9901138.539516464,
- &#39;gamma&#39;: 24,
  &#39;w&#39;: 9.600000000000001}
 </pre></div></div>
 </div>
+<p>Or from the plate thickness and Young’s modulus:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="n">gamma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">young_modulus</span><span class="o">=</span><span class="mf">30e5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;MaterialType&#39;: &#39;Elastic&#39;,
+ &#39;Isotropic&#39;: True,
+ &#39;nu&#39;: 0.4,
+ &#39;EA1&#39;: 1200000.0,
+ &#39;EI&#39;: 16000.000000000005,
+ &#39;w&#39;: 9.600000000000001}
+</pre></div></div>
+</div>
+</section>
 </section>
 </section>
 

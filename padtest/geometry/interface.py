@@ -17,7 +17,7 @@ class ModelInterfaces(dict):
     -------
     apply_settings(settings) :
         Applies user settings to interfaces.
-    build_material(g_i, intidx, license) :
+    build_material(g_i, intidx)
         Builds interface mateirals.
     build_geometry(g_i, plxid) :
         Adds interfaces to the model.
@@ -81,18 +81,16 @@ class ModelInterfaces(dict):
                 if key in self:
                     self[key].apply_settings(settings[key])
     
-    def build_material(self, g_i, license):
+    def build_material(self, g_i):
         """Builds interface mateirals.
 
         Parameters
         ----------
         g_i : PlxProxyGlobalObject
             Global object of the current open Plaxis model in Input.
-        license : str
-            Plaxis lincese: 'advanced' or 'ultimate'.
         """
         for intidx, intid in enumerate(self):
-            self[intid].build_material(g_i, intidx, license)
+            self[intid].build_material(g_i, intidx)
 
     def build_geometry(self, g_i):
         """Adds interfaces to the model.
@@ -142,7 +140,7 @@ class Interface():
         Applies user settings to interface.
     set_vertex(interface_type, vertex) :
         Set vertex geometry.
-    build_material(g_i, intidx, license) :
+    build_material(g_i, intidx)
         Builds interface mateiral.
     build_geometry(g_i, plxid) :
         Adds interface to the model.
@@ -205,7 +203,7 @@ class Interface():
         self._interface_type = interface_type
         self._vertex = vertex
 
-    def build_material(self, g_i, intidx, license):
+    def build_material(self, g_i, intidx):
         """Builds interface mateiral.
 
         Parameters
@@ -214,14 +212,12 @@ class Interface():
             Global object of the current open Plaxis model in Input.
         intidx : int
             Interface number.
-        license : str
-            Plaxis lincese: 'advanced' or 'ultimate'.
         """
         if self._material is None:
             return
         self._plxmaterialid = f'interface_{intidx}'
         self._material['Identification'] = self._plxmaterialid
-        self._material_plx = SoilMaterialSelector.create_material(g_i, self._material, license)
+        self._material_plx = SoilMaterialSelector.create_material(g_i, self._material)
         
     def build_geometry(self, g_i, plxid):
         """Adds interface to the model.

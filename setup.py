@@ -7,7 +7,7 @@ import setuptools
 
 setuptools.setup(
     name="padtest",
-    version="1.0.2",
+    version="1.0.3",
     author="Pablo Barbieri",
     author_email="pbarbie2@uwo.ca",
     license='MIT',

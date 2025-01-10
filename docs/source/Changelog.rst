@@ -36,4 +36,13 @@ Changelog
 # 2025-10-01 -- 1.0.2:
     * Updated to be compatible with Plaxis 2024.1.
     * Consideration of Plaxis license type.  
-    * Removed old coumantion from github README.
+    * Removed old documentation from github README.
+
+
+# 2025-11-01 -- 1.0.3:
+    * Removed Plaxis license type.
+    * Simplified material creation. No longer validates input parameters,\
+      instead relies on Plaxis errors. Removed default values defined \
+      in code since they are not transparent to the user when they are \
+      different from Plaxis.
+

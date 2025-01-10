@@ -96,16 +96,18 @@
 the contents of a dictionary.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="padtest.material.plate.PlateMaterial.concrete">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">young_modulus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poisson</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/material/plate.html#PlateMaterial.concrete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.plate.PlateMaterial.concrete" title="Permalink to this definition"></a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">concrete</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">young_modulus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">poisson</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/material/plate.html#PlateMaterial.concrete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.plate.PlateMaterial.concrete" title="Permalink to this definition"></a></dt>
 <dd><p>Creates a dictionary with the required plate properties based
 on the concrete type.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fc</strong> (<em>float</em>) – Design compressive strenght of concrete [MPa].</p></li>
 <li><p><strong>gamma</strong> (<em>float</em>) – Unit weight [kN/m3].</p></li>
 <li><p><strong>d</strong> (<em>float</em>) – Thickness of the slab [m].</p></li>
 <li><p><strong>young_modulus</strong> (<em>float</em><em>, </em><em>optional</em>) – Young modulus [kPa], by default None.</p></li>
+<li><p><strong>fc</strong> (<em>float</em><em>, </em><em>optional</em>) – Compressive strenght of concrete [MPa]. Used to estimate the
+Young modulus when not provided as
+E[kPa] = 4700 sqrt(fc[MPa]) 10^3.</p></li>
 <li><p><strong>poisson</strong> (<em>float</em><em>, </em><em>optional</em>) – Poisson coeffcient, by default 0.4.</p></li>
 </ul>
 </dd>
@@ -116,19 +118,21 @@ material.</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>dict</p>
 </dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>RuntimeError</strong> – Neither E or fc specified.</p>
+</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="padtest.material.plate.PlateMaterial.set">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/material/plate.html#PlateMaterial.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.plate.PlateMaterial.set" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="padtest.material.plate.PlateMaterial.create_material">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/material/plate.html#PlateMaterial.create_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.plate.PlateMaterial.create_material" title="Permalink to this definition"></a></dt>
 <dd><p>Creates an elastic plate  material in the model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p></li>
-<li><p><strong>label</strong> (<em>str</em>) – Material label.</p></li>
-<li><p><strong>material</strong> (<em>dict</em>) – Dictionary with material properties</p></li>
+<li><p><strong>material</strong> (<em>dict</em>) – Dictionary with material properties.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -146,21 +150,54 @@ material.</p>
 <section id="module-padtest.material.soil">
 <span id="padtest-material-soil-module"></span><h2>padtest.material.soil module<a class="headerlink" href="#module-padtest.material.soil" title="Permalink to this heading"></a></h2>
 <dl class="py class">
-<dt class="sig sig-object py" id="padtest.material.soil.SoilMaterial">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.material.soil.</span></span><span class="sig-name descname"><span class="pre">SoilMaterial</span></span><a class="reference internal" href="_modules/padtest/material/soil.html#SoilMaterial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.SoilMaterial" title="Permalink to this definition"></a></dt>
+<dt class="sig sig-object py" id="padtest.material.soil.BaseSoilMaterial">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.material.soil.</span></span><span class="sig-name descname"><span class="pre">BaseSoilMaterial</span></span><a class="reference internal" href="_modules/padtest/material/soil.html#BaseSoilMaterial"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.BaseSoilMaterial" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Interface  that creates a soil material in Plaxis from
-the contents of a dictionary.</p>
+<p>Base class for soil materials.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.material.soil.Elastic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.material.soil.</span></span><span class="sig-name descname"><span class="pre">Elastic</span></span><a class="reference internal" href="_modules/padtest/material/soil.html#Elastic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.Elastic" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.material.soil.BaseSoilMaterial" title="padtest.material.soil.BaseSoilMaterial"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilMaterial</span></code></a></p>
+<p>Linear elastic soil material.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.material.soil.HSSmall">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.material.soil.</span></span><span class="sig-name descname"><span class="pre">HSSmall</span></span><a class="reference internal" href="_modules/padtest/material/soil.html#HSSmall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.HSSmall" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.material.soil.BaseSoilMaterial" title="padtest.material.soil.BaseSoilMaterial"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilMaterial</span></code></a></p>
+<p>Hardening-Strain with small strain stiffness soil material.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.material.soil.HardeningStrain">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.material.soil.</span></span><span class="sig-name descname"><span class="pre">HardeningStrain</span></span><a class="reference internal" href="_modules/padtest/material/soil.html#HardeningStrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.HardeningStrain" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.material.soil.BaseSoilMaterial" title="padtest.material.soil.BaseSoilMaterial"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilMaterial</span></code></a></p>
+<p>Hardening-Strain soil material.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.material.soil.MohrCoulomb">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.material.soil.</span></span><span class="sig-name descname"><span class="pre">MohrCoulomb</span></span><a class="reference internal" href="_modules/padtest/material/soil.html#MohrCoulomb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.MohrCoulomb" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.material.soil.BaseSoilMaterial" title="padtest.material.soil.BaseSoilMaterial"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseSoilMaterial</span></code></a></p>
+<p>Mohr-Coulomb soil material.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.material.soil.SoilMaterialSelector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.material.soil.</span></span><span class="sig-name descname"><span class="pre">SoilMaterialSelector</span></span><a class="reference internal" href="_modules/padtest/material/soil.html#SoilMaterialSelector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.SoilMaterialSelector" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Soil materila selector</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="padtest.material.soil.SoilMaterial.set">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/material/soil.html#SoilMaterial.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.SoilMaterial.set" title="Permalink to this definition"></a></dt>
-<dd><p>Create soil materials in the model.</p>
+<dt class="sig sig-object py" id="padtest.material.soil.SoilMaterialSelector.create_material">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">material</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/material/soil.html#SoilMaterialSelector.create_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.material.soil.SoilMaterialSelector.create_material" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a new material in the model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p></li>
-<li><p><strong>label</strong> (<em>str</em>) – Material label.</p></li>
-<li><p><strong>material</strong> (<em>dict</em>) – Dictionary with material properties</p></li>
+<li><p><strong>material</strong> (<em>dict</em>) – Dictionary with soil material properties.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -170,7 +207,10 @@ the contents of a dictionary.</p>
 <dd class="field-odd"><p>CombinedClass</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>RuntimeError</strong> – Unsuported soil model.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>RuntimeError</strong> – Missing soil model id.</p></li>
+<li><p><strong>RuntimeError</strong> – Soil model not supported.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

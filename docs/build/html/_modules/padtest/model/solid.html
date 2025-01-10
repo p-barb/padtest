@@ -97,7 +97,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `SolidModel`.&quot;&quot;&quot;</span>
         <span class="k">pass</span>
         
     <span class="c1">#===================================================================</span>
@@ -112,7 +112,8 @@
 <span class="sd">            Dictionary with the properties of the material used in </span>
 <span class="sd">            the foundation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_soil_material</span><span class="p">[</span><span class="s1">&#39;concrete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soil_material</span><span class="p">[</span><span class="s1">&#39;concrete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">concrete</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soil_material</span><span class="p">[</span><span class="s1">&#39;concrete&#39;</span><span class="p">][</span><span class="s1">&#39;Identification&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;concrete&#39;</span>
 
     <span class="k">def</span> <span class="nf">_build_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds the foundation load to the model.</span>
@@ -622,7 +623,7 @@
                  <span class="n">deformation_boundary_condition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">dynamic_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                  <span class="n">shake_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">boundary_interface</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `SymmetricSolidModel`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -941,7 +942,7 @@
                  <span class="n">dynamic_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">shake_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
                  <span class="n">boundary_interface</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `NonSymmetricSolidModel`.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>

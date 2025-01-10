@@ -136,7 +136,7 @@
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -148,7 +148,7 @@
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -233,7 +233,7 @@
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -245,7 +245,7 @@
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -318,7 +318,7 @@
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -330,7 +330,7 @@
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -413,7 +413,7 @@
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -425,7 +425,7 @@
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -471,7 +471,7 @@ parameter. Results can be visualized with the <code class="docutils literal notr
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -483,7 +483,7 @@ parameter. Results can be visualized with the <code class="docutils literal notr
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -550,7 +550,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <p>When starting Plaxis remember to configure the license to include *Plaxis 2D Dynamics”. Otherwise, dynamic loads cannot be applied.</p>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Package import</span>
@@ -565,7 +565,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -574,12 +574,13 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># kPa</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1"># deg</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Direct&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter</span>
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -599,7 +600,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">plot_test</span></code> function can be used to show the load-displacement across time:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">testid</span> <span class="o">=</span> <span class="s1">&#39;dyn&#39;</span>
@@ -608,7 +609,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -617,7 +618,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">plot_dynamic_test</span></code> method shows the variation with time of the displacement and force components.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">testid</span> <span class="o">=</span> <span class="s1">&#39;dyn&#39;</span>
@@ -626,7 +627,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -635,7 +636,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>Displacement and force components are selected with the <code class="docutils literal notranslate"><span class="pre">displacement</span></code> and <code class="docutils literal notranslate"><span class="pre">force</span></code> arguments:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">testid</span> <span class="o">=</span> <span class="s1">&#39;dyn&#39;</span>
@@ -645,7 +646,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -664,7 +665,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <p>When starting Plaxis remember to configure the license to include *Plaxis 2D Dynamics”. Otherwise, dynamic boundary conditions cannot be applied.</p>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Package import</span>
@@ -679,7 +680,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -688,12 +689,13 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># kPa</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1"># deg</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;RayleighDampingInputMethod&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Direct&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter</span>
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -707,7 +709,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -716,7 +718,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">shake_test</span></code> method requires as an input a discretization of the acceleration that will be imposed at the base. The discretization is given by a time array and an acceleration array with as many elements of the time array. If the acceleration array is one dimensional, it is assumed to be the horizontal acceleration. A 2-dimensional array of (2, nt) elements can be provided, where the first row is the horizontal acceleration and the second the vertical acceleration.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">testid</span><span class="o">=</span><span class="s1">&#39;shake&#39;</span>
@@ -728,7 +730,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">plot_shake_test</span></code> method shows the variation with time of the foundation displacement and base acceleration.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">testid</span> <span class="o">=</span> <span class="s1">&#39;shake&#39;</span>
@@ -737,7 +739,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -746,7 +748,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>Displacement and acceleration components are selected with the <code class="docutils literal notranslate"><span class="pre">displacement</span></code> and <code class="docutils literal notranslate"><span class="pre">acceleration</span></code> arguments:</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">testid</span> <span class="o">=</span> <span class="s1">&#39;shake&#39;</span>
@@ -756,7 +758,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -769,7 +771,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <p>In all tests, the <code class="docutils literal notranslate"><span class="pre">qsurf</span></code> parameter imposes a uniformly distributed surface load. This load is applied in a separate phase before the rest of test is conducted. As with the loads acting on the foundation, compression is indicated by a negative value.</p>
 <p>The following example conducts the same load test with and without a surface load, and compares the results.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Geometry</span>
@@ -781,7 +783,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -793,7 +795,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -807,7 +809,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -815,7 +817,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load test without surface load</span>
@@ -830,7 +832,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_test</span><span class="p">(</span><span class="s1">&#39;test w/o qsurf&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">displacement</span><span class="o">=</span><span class="s1">&#39;uy&#39;</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="s1">&#39;Fy&#39;</span><span class="p">)</span>
@@ -838,7 +840,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -846,7 +848,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_test</span><span class="p">(</span><span class="s1">&#39;test w. qsurf&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -855,7 +857,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -864,7 +866,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>We can select to plot only the load phase to compare to the case without the surface load. By setting <code class="docutils literal notranslate"><span class="pre">reset_start</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> the plot starts from (0,0). As it can be seen, there is a significant difference in the load-displacement behavior.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_test</span><span class="p">(</span><span class="s1">&#39;test w. qsurf&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -874,7 +876,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
@@ -886,7 +888,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <h2>Start phase<a class="headerlink" href="#Start-phase" title="Permalink to this heading"></a></h2>
 <p>By default, all tests types are conducted starting from the construction phase of the model. This can be changed with the <code class="docutils literal notranslate"><span class="pre">start_from</span></code> parameter. If a existing test id is provided, then the new test is performed after the last stage of the selected test.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Geometry</span>
@@ -898,7 +900,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <span class="c1"># Mohr-Coulomb soil material</span>
 <span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
-<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Drained&#39;</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
 <span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
@@ -910,7 +912,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 
 <span class="c1"># elastic material for concrete</span>
 <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linear elastic&#39;</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span>  <span class="mf">30e6</span>  <span class="c1"># kPa</span>
 <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1">#</span>
@@ -929,7 +931,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>To start from the last phase of <code class="docutils literal notranslate"><span class="pre">'test</span> <span class="pre">A'</span></code>:</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load test</span>
@@ -941,7 +943,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 </div>
 <p>An specific stage of a test can be selected by providing a tuple with the test id and the stage number (starting from 0). For example, <code class="docutils literal notranslate"><span class="pre">'test</span> <span class="pre">A'</span></code> hast 3 stages, corresponding to the -60, +30, -40 load values. If the new test is to start from the +30 stage, then <code class="docutils literal notranslate"><span class="pre">start_from</span></code> should be set to <code class="docutils literal notranslate"><span class="pre">('test</span> <span class="pre">A',</span> <span class="pre">1)</span></code>.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># load test</span>
@@ -957,7 +959,7 @@ specified in the force array is Fy, Fx and M. If only Fy is provided, the other 
 <h2>Delete test<a class="headerlink" href="#Delete-test" title="Permalink to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">delete_test</span></code> method removes tests from both the results table and Plaxis. If <code class="docutils literal notranslate"><span class="pre">delete_phases</span></code> is set to <code class="docutils literal notranslate"><span class="pre">False</span></code> the calculation phases in Plaxis are kept.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">delete_test</span><span class="p">(</span><span class="s1">&#39;test C&#39;</span><span class="p">)</span>

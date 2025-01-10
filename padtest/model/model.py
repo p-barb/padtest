@@ -108,8 +108,7 @@ class Model(ABC):
                  ratchetting_threshold, mesh_density, locations, excavation,
                  deformation_boundary_condition=None,
                  dynamic_boundary_condtions=None, 
-                 shake_boundary_condtions=None, boundary_interface=False,
-                 license='ultimate'):
+                 shake_boundary_condtions=None, boundary_interface=False):
         """Initialize a new instance of `Model`.
 
         Parameters
@@ -169,13 +168,10 @@ class Model(ABC):
             Include boundary interfaces needed for a base shake test.
             This requires a much denser mesh and more computationally
             demanding models. By default False.
-        license : str
-            Plaxis lincese: 'advanced' or 'ultimate'. By default 'ultimate'.
         """
         self._s_i = s_i
         self._g_i = g_i
         self._g_o = g_o
-        self._license = license
         self._soil_material = {} # inputs required to create the materials
         self._plate_material = {} # inputs required to create the materials
         self._soil_material_plx = {} # Plaxis objects of the materials
@@ -485,10 +481,10 @@ class Model(ABC):
         """Creates soil and plate materials in the model.
         """
         for matid in self._soil_material:
-            self._soil_material_plx[matid] = SoilMaterialSelector.create_material(self._g_i, copy.deepcopy(self._soil_material[matid]), self._license)
+            self._soil_material_plx[matid] = SoilMaterialSelector.create_material(self._g_i, copy.deepcopy(self._soil_material[matid]))
         for matid in self._plate_material:
-            self._plate_material_plx[matid] = PlateMaterial.create_material(self._g_i, copy.deepcopy(self._plate_material[matid]), self._license)
-        self._interfaces.build_material(self._g_i, self._license)
+            self._plate_material_plx[matid] = PlateMaterial.create_material(self._g_i, copy.deepcopy(self._plate_material[matid]))
+        self._interfaces.build_material(self._g_i)
 
     @abstractmethod
     def _build_load(self):

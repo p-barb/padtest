@@ -87,30 +87,114 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface  that creates a plate material in Plaxis from</span>
 <span class="sd">    the contents of a dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="n">_parameter_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Identification&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;MaterialName&quot;</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s1">&#39;Identification&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;MaterialType&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;MaterialType&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;Colour&#39;</span><span class="p">:[</span><span class="s1">&#39;colour&#39;</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;commments&#39;</span><span class="p">:[</span><span class="s1">&#39;commments&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;w&#39;</span><span class="p">:[</span><span class="s1">&#39;w&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;PreventPunching&#39;</span><span class="p">:[</span><span class="s1">&#39;PreventPunching&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;RayleighBeta&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;Isotropic&#39;</span><span class="p">:[</span><span class="s1">&#39;Isotropic&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;EA1&#39;</span><span class="p">:[</span><span class="s1">&#39;EA1&#39;</span><span class="p">,</span> <span class="s1">&#39;EA&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;EA2&#39;</span><span class="p">:[</span><span class="s1">&#39;EA2&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;EI&#39;</span><span class="p">:[</span><span class="s1">&#39;EI&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;StructNu&#39;</span><span class="p">:[</span><span class="s1">&#39;StructNu&#39;</span><span class="p">,</span> <span class="s1">&#39;nu&#39;</span><span class="p">,</span> <span class="s1">&#39;poisson&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;MP&#39;</span><span class="p">:[</span><span class="s1">&#39;MP&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;Np1&#39;</span><span class="p">:[</span><span class="s1">&#39;Np1&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;Np2&#39;</span><span class="p">:[</span><span class="s1">&#39;Np2&#39;</span><span class="p">],</span>
+                      <span class="s1">&#39;MkappaDiagram&#39;</span><span class="p">:[</span><span class="s1">&#39;MkappaDiagram&#39;</span><span class="p">]}</span>
+    
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a new instance of `PlateMaterial`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span>
+
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PRIVATE METHODS</span>
+    <span class="c1">#===================================================================</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_set_paramters_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the material dicationary keys to the internal Plaxis</span>
+<span class="sd">        values.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        material : dict</span>
+<span class="sd">            Dictionary with the material parameters with the keys</span>
+<span class="sd">            provided by the user.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary with material parameters with interal Plaxis</span>
+<span class="sd">            keys.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Unsuported material parameter.</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Duplicated material parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">formated_material</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">parameter</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
+            <span class="n">sanitized_param</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_sanitized_name</span><span class="p">(</span><span class="n">parameter</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">plx_key</span><span class="p">,</span> <span class="n">user_keys</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_parameter_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">sanitized_param</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">cls</span><span class="o">.</span><span class="n">_sanitized_name</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">user_keys</span><span class="p">]:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Plate material parameter &lt;</span><span class="si">{}</span><span class="s2">&gt; in &lt;</span><span class="si">{}</span><span class="s2">&gt; not supported.&quot;</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">formated_material</span><span class="p">[</span><span class="s1">&#39;Identification&#39;</span><span class="p">])</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+                
+            <span class="k">if</span> <span class="n">plx_key</span> <span class="ow">in</span> <span class="n">formated_material</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Duplicated plate material parameter &lt;</span><span class="si">{}</span><span class="s2">&gt; as &lt;</span><span class="si">{}</span><span class="s2">&gt; in &lt;</span><span class="si">{}</span><span class="s2">&gt;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">plx_key</span><span class="p">,</span> <span class="n">parameter</span><span class="p">,</span> <span class="n">formated_material</span><span class="p">[</span><span class="s1">&#39;Identification&#39;</span><span class="p">])</span>
+                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="n">formated_material</span><span class="p">[</span><span class="n">plx_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">material</span><span class="p">[</span><span class="n">parameter</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">formated_material</span>
+
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_sanitized_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns a sanitized version (lower case, no spaces or</span>
+<span class="sd">        hyphens) of a parameter name.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Parameter name.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Sanitized parameter name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sanitized</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">]:</span>
+             <span class="n">sanitized</span> <span class="o">=</span> <span class="n">sanitized</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">char</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sanitized</span>
 
     <span class="c1">#===================================================================</span>
     <span class="c1"># PUBLIC METHODS</span>
     <span class="c1">#===================================================================</span>
 <div class="viewcode-block" id="PlateMaterial.concrete"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.plate.PlateMaterial.concrete">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">concrete</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">fc</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">young_modulus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">poisson</span><span class="o">=</span><span class="mf">0.4</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">concrete</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">young_modulus</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">poisson</span><span class="o">=</span><span class="mf">0.4</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a dictionary with the required plate properties based</span>
 <span class="sd">        on the concrete type.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        fc : float</span>
-<span class="sd">            Design compressive strenght of concrete [MPa].</span>
 <span class="sd">        gamma : float</span>
 <span class="sd">            Unit weight [kN/m3].</span>
 <span class="sd">        d : float</span>
 <span class="sd">            Thickness of the slab [m].</span>
 <span class="sd">        young_modulus : float, optional</span>
 <span class="sd">            Young modulus [kPa], by default None.</span>
+<span class="sd">        fc : float, optional</span>
+<span class="sd">            Compressive strenght of concrete [MPa]. Used to estimate the</span>
+<span class="sd">            Young modulus when not provided as</span>
+<span class="sd">            E[kPa] = 4700 sqrt(fc[MPa]) 10^3.</span>
 <span class="sd">        poisson : float, optional</span>
 <span class="sd">            Poisson coeffcient, by default 0.4.</span>
 
@@ -119,62 +203,52 @@
 <span class="sd">        dict</span>
 <span class="sd">            Dictionary with the properties required to create a plate</span>
 <span class="sd">            material.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Neither E or fc specified.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">young_modulus</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Either the Young modulus or the concrece compressive strength must be specified.&#39;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">young_modulus</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">young_modulus</span> <span class="o">=</span> <span class="mi">4700</span> <span class="o">*</span>  <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span> <span class="o">*</span><span class="mi">1000</span> <span class="c1"># kPa</span>
+
         <span class="n">concrete</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fc</span> <span class="c1"># kPa</span>
-        <span class="k">if</span> <span class="n">young_modulus</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4700</span> <span class="o">*</span>  <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;fc&#39;</span><span class="p">])</span> <span class="o">*</span><span class="mi">1000</span> <span class="c1"># kPa</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">young_modulus</span>
+        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;MaterialType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Elastic&#39;</span>
+        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Isotropic&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">poisson</span> 
-        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span>
-        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;EI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;E&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span><span class="o">**</span><span class="mi">3</span><span class="o">/</span><span class="mi">12</span>
-        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;EI&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">])</span>
-        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;Gref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span>  <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]))</span> <span class="c1"># KPa</span>
-        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gamma</span>
-        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;gamma&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span>
+        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;EA1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">young_modulus</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;EI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">young_modulus</span> <span class="o">*</span> <span class="n">d</span><span class="o">**</span><span class="mi">3</span> <span class="o">/</span> <span class="mi">12</span>
+        <span class="n">concrete</span><span class="p">[</span><span class="s1">&#39;w&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">*</span> <span class="n">d</span>
         <span class="k">return</span> <span class="n">concrete</span></div>
     
-<div class="viewcode-block" id="PlateMaterial.set"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.plate.PlateMaterial.set">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
+<div class="viewcode-block" id="PlateMaterial.create_material"><a class="viewcode-back" href="../../../padtest.material.html#padtest.material.plate.PlateMaterial.create_material">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create_material</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">material</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates an elastic plate  material in the model.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        g_i : PlxProxyGlobalObject</span>
 <span class="sd">            Global object of the current open Plaxis model in Input.</span>
-<span class="sd">        label : str</span>
-<span class="sd">            Material label.</span>
 <span class="sd">        material : dict</span>
-<span class="sd">            Dictionary with material properties</span>
+<span class="sd">            Dictionary with material properties.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        CombinedClass</span>
 <span class="sd">            Plaxis object of the plate material.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">formated_material</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_set_paramters_names</span><span class="p">(</span><span class="n">material</span><span class="p">)</span>
+
         <span class="n">g_i</span><span class="o">.</span><span class="n">gotosoil</span><span class="p">()</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighAlpha&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="s2">&quot;RayleighBeta&quot;</span><span class="ow">not</span> <span class="ow">in</span> <span class="n">material</span><span class="p">:</span>
-            <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">material</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">platemat</span><span class="p">(</span><span class="s2">&quot;MaterialName&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span>
-                                    <span class="s2">&quot;MaterialNumber&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
-                                    <span class="s2">&quot;Elasticity&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
-                                    <span class="s2">&quot;IsIsotropic&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
-                                    <span class="s2">&quot;EA&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">],</span>
-                                    <span class="s2">&quot;EA2&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">],</span>
-                                    <span class="s2">&quot;EI&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;EI&#39;</span><span class="p">],</span>
-                                    <span class="s2">&quot;nu&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">],</span>
-                                    <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">],</span>
-                                    <span class="s2">&quot;Gref&quot;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;Gref&#39;</span><span class="p">],</span>
-                                    <span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">],</span>
-                                    <span class="s1">&#39;RayleighBeta&#39;</span><span class="p">,</span> <span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">g_i</span><span class="o">.</span><span class="n">platemat</span><span class="p">(</span><span class="o">*</span><span class="n">formated_material</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Unable to create plate material &lt;</span><span class="si">{}</span><span class="s1">&gt;.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">material</span></div></div>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Unable to create plate material &lt;</span><span class="si">{}</span><span class="s1">&gt;. Check error &#39;</span>
+                   <span class="s1">&#39;message in Plaxis command line history for details.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">formated_material</span><span class="p">[</span><span class="s1">&#39;Identification&#39;</span><span class="p">]))</span></div></div>
 </pre></div>
 
            </div>

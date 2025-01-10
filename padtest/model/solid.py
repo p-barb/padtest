@@ -478,9 +478,6 @@ class SymmetricSolidModel(SG, SolidModel, Model):
         Include boundary interfaces needed for a base shake test.
         This requires a much denser mesh and more computationally
         demanding models. By default False.
-    license : str, optional
-        Plaxis lincese: 'advanced' or 'ultimate'. By default
-        'ultimate'.
     
     Methods
     -------
@@ -542,8 +539,7 @@ class SymmetricSolidModel(SG, SolidModel, Model):
                  locations=[0, 0.25, 0.5, 0.75, 1], build=True, excavation=True,
                  deformation_boundary_condition=None,
                  dynamic_boundary_condtions=None, 
-                 shake_boundary_condtions=None, boundary_interface=False,
-                 license='ultimate'):
+                 shake_boundary_condtions=None, boundary_interface=False):
         """Initialize a new instance of `SymmetricSolidModel`.
 
         Parameters
@@ -649,9 +645,6 @@ class SymmetricSolidModel(SG, SolidModel, Model):
             Include boundary interfaces needed for a base shake test.
             This requires a much denser mesh and more computationally
             demanding models. By default False.
-        license : str, optional
-            Plaxis lincese: 'advanced' or 'ultimate'. By default
-            'ultimate'.
         """
         SG.__init__(self, b, d, b1, d1, dstrata=dstrata, wt=wt,
                     fill_angle=fill_angle, bfill=bfill, nfill=nfill,
@@ -665,7 +658,7 @@ class SymmetricSolidModel(SG, SolidModel, Model):
                        deformation_boundary_condition=deformation_boundary_condition,
                        dynamic_boundary_condtions=dynamic_boundary_condtions,
                        shake_boundary_condtions=shake_boundary_condtions,
-                       boundary_interface=boundary_interface, license=license)
+                       boundary_interface=boundary_interface)
         self._init_foundation_material(concrete)
         if build:
             self.build()
@@ -802,9 +795,6 @@ class NonSymmetricSolidModel(NSG, SolidModel, Model):
         Include boundary interfaces needed for a base shake test.
         This requires a much denser mesh and more computationally
         demanding models. By default False.
-    license : str, optional
-        Plaxis lincese: 'advanced' or 'ultimate'. By default
-        'ultimate'.
     
     Methods
     -------
@@ -868,7 +858,7 @@ class NonSymmetricSolidModel(NSG, SolidModel, Model):
                  deformation_boundary_condition=None,
                  dynamic_boundary_condtions=None,
                  shake_boundary_condtions=None, 
-                 boundary_interface=False, license='ultimate'):
+                 boundary_interface=False):
         """Initialize a new instance of `NonSymmetricSolidModel`.
 
         Parameters
@@ -978,9 +968,6 @@ class NonSymmetricSolidModel(NSG, SolidModel, Model):
             Include boundary interfaces needed for a base shake test.
             This requires a much denser mesh and more computationally
             demanding models. By default False.
-        license : str, optional
-            Plaxis lincese: 'advanced' or 'ultimate'. By default
-            'ultimate'.
         """
         NSG.__init__(self, b, d, b1, d1, b2=b2, dstrata=dstrata, wt=wt,
                      fill_angle=fill_angle, bfill=bfill, nfill=nfill,
@@ -994,7 +981,7 @@ class NonSymmetricSolidModel(NSG, SolidModel, Model):
                        deformation_boundary_condition=deformation_boundary_condition,
                        dynamic_boundary_condtions=dynamic_boundary_condtions,
                        shake_boundary_condtions=shake_boundary_condtions,
-                       boundary_interface=boundary_interface, license=license)
+                       boundary_interface=boundary_interface)
         self._init_foundation_material(concrete)
         if build:
             self.build()
