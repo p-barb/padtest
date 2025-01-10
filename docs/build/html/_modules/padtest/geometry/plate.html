@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>padtest.geometry.plate &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../materials.html">Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">padtest.geometry.plate</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for padtest.geometry.plate</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">padtest.geometry.geometry</span> <span class="kn">import</span> <span class="n">Geometry</span>
+<span class="kn">from</span> <span class="nn">padtest.geometry.interface</span> <span class="kn">import</span> <span class="n">ModelInterfaces</span>
+
+<div class="viewcode-block" id="PlateGeometry"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.plate.PlateGeometry">[docs]</a><span class="k">class</span> <span class="nc">PlateGeometry</span><span class="p">(</span><span class="n">Geometry</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Geometry of a plate foudation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    b : float</span>
+<span class="sd">        Foundation width [m].</span>
+<span class="sd">    d : float</span>
+<span class="sd">        Foundation depth [m].</span>
+<span class="sd">    b2 : float, None, optional.</span>
+<span class="sd">        Distance from the left edge to the center of the column [m]. If</span>
+<span class="sd">        None then b/2. By default None.</span>
+<span class="sd">    dstrata : list, None</span>
+<span class="sd">        Width of soil layers [m].</span>
+<span class="sd">    wt : float, None</span>
+<span class="sd">        Water tabe depth [m]. By default None.</span>
+<span class="sd">    fill_angle : float</span>
+<span class="sd">        Fill angle [deg].</span>
+<span class="sd">    bfill : float</span>
+<span class="sd">        Distance between foundation edge and the start of the fill</span>
+<span class="sd">        slope [m]. By default 0.5.</span>
+<span class="sd">    nfill : int, None</span>
+<span class="sd">        Number of fill layers. By default None.</span>
+<span class="sd">    dfill : list, None</span>
+<span class="sd">        (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">    dratchetting : float, None</span>
+<span class="sd">        Widht of soil under the foundation that is replaced when</span>
+<span class="sd">        ratchetting occurs [m].</span>
+<span class="sd">    interface : bool, dict, optional</span>
+<span class="sd">        Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">        dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">        keys can be provided. For each key either a bool is provided</span>
+<span class="sd">        indicating whether that interface will be considered in the</span>
+<span class="sd">        model. Also a dict can be provided for each key with the</span>
+<span class="sd">        soil material to be assigned to it. By default False.</span>
+<span class="sd">    model_widht : float, optional</span>
+<span class="sd">        User specified model width [m]. By default None.</span>
+<span class="sd">    model_depth : float, optional</span>
+<span class="sd">        User specified model depth [m]. By default None.</span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False, output_location=False)</span>
+<span class="sd">        Foundation plot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bfill</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">model_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init mehtod.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        b : float</span>
+<span class="sd">            Foundation width [m].</span>
+<span class="sd">        d : float</span>
+<span class="sd">            Foundation depth [m].</span>
+<span class="sd">        b2 : float, None, optional.</span>
+<span class="sd">            Distance from the left edge to the center of the column [m].</span>
+<span class="sd">            If None then b/2. By default None.</span>
+<span class="sd">        dstrata : list, None</span>
+<span class="sd">            Width of soil layers [m].</span>
+<span class="sd">        wt : float, None</span>
+<span class="sd">            Water tabe depth [m]. By default None.</span>
+<span class="sd">        fill_angle : float</span>
+<span class="sd">            Fill angle [deg].</span>
+<span class="sd">        bfill : float</span>
+<span class="sd">            Distance between foundation edge and the start of the fill</span>
+<span class="sd">            slope [m]. By default 0.5.</span>
+<span class="sd">        nfill : int, None</span>
+<span class="sd">            Number of fill layers. By default None.</span>
+<span class="sd">        dfill : list, None</span>
+<span class="sd">            (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">        dratchetting : float, None</span>
+<span class="sd">            Widht of soil under the foundation that is replaced when</span>
+<span class="sd">            ratchetting occurs [m].</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        model_widht : float, optional</span>
+<span class="sd">            User specified model width [m]. By default None.</span>
+<span class="sd">        model_depth : float, optional</span>
+<span class="sd">            User specified model depth [m]. By default None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_foundation</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+        <span class="n">Geometry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="n">dstrata</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="n">wt</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="n">fill_angle</span><span class="p">,</span>
+                          <span class="n">bfill</span><span class="o">=</span><span class="n">bfill</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="n">nfill</span><span class="p">,</span> <span class="n">dfill</span><span class="o">=</span><span class="n">dfill</span><span class="p">,</span>
+                          <span class="n">dratchetting</span><span class="o">=</span><span class="n">dratchetting</span><span class="p">,</span>  <span class="n">model_width</span><span class="o">=</span><span class="n">model_width</span><span class="p">,</span>
+                          <span class="n">model_depth</span><span class="o">=</span><span class="n">model_depth</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_foundation_type</span><span class="p">(</span><span class="s1">&#39;plate&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_interfaces</span><span class="p">(</span><span class="n">interface</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_polygons</span><span class="p">()</span>
+
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PRIVATE METHODS</span>
+    <span class="c1">#===================================================================</span>
+    <span class="k">def</span> <span class="nf">_set_foundation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set foundation geometry</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        b : float</span>
+<span class="sd">            Foundation width [m].</span>
+<span class="sd">        d : float</span>
+<span class="sd">            Foundation depth [m].</span>
+<span class="sd">        b2 : float, None, optional.</span>
+<span class="sd">            Distance from the left edge to the center of the column [m].</span>
+<span class="sd">            If None then b/2. By default None.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Invalid b2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">=</span> <span class="n">b</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">b2</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">b2</span> <span class="o">=</span> <span class="n">b</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">b2</span> <span class="o">&gt;</span> <span class="n">b</span> <span class="ow">or</span> <span class="n">b2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The distance from the left edge to the center of the &quot;</span>
+                   <span class="s2">&quot;column &lt;b2&gt; must be between 0 and b.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">RecursionError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">=</span> <span class="n">b2</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_set_interfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set interfaces between the foundatio and soil.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">_validate_interface_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validates interface input.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        interface : bool, dict, None, optional</span>
+<span class="sd">            If True includes all interfaces between the footing and</span>
+<span class="sd">            soil. A dictionary with fields &#39;column&#39;, &#39;top&#39; and &#39;bottom&#39;</span>
+<span class="sd">            can be provided. If a field is True then the interface is</span>
+<span class="sd">            activated. Missing fields are assumed to be False.</span>
+<span class="sd">            If None, only the column interface is activated. By default</span>
+<span class="sd">            None.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Interface dictionary.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Wrong variable type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">interface</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span>
+            <span class="n">interface_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;column&#39;</span><span class="p">:</span><span class="kc">True</span><span class="p">,</span>  <span class="s1">&#39;top&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="s1">&#39;bottom&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">interface</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Interface settings must be specified by a boolean or a dictionary.&quot;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">interface</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="n">interface_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;column&#39;</span><span class="p">:</span><span class="n">interface</span><span class="p">,</span>  <span class="s1">&#39;top&#39;</span><span class="p">:</span><span class="n">interface</span><span class="p">,</span>
+                              <span class="s1">&#39;bottom&#39;</span><span class="p">:</span><span class="n">interface</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">interface</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">interface_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;column&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>  <span class="s1">&#39;top&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="s1">&#39;bottom&#39;</span><span class="p">:</span><span class="kc">False</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">interface</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">interface_dict</span><span class="p">:</span>
+                    <span class="n">interface_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">interface</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">interface_dict</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_set_foundation_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the plates used for the foundation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">_get_fill_polygon_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verteces for a polygon in the fill area.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            Top depth (&lt;=0) [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Bottom depth (&lt;ztop) [m]</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List with vertex coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_fill</span><span class="p">(</span><span class="n">ztop</span><span class="p">,</span> <span class="n">xsign</span><span class="p">),</span> <span class="n">ztop</span><span class="p">])</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_fill</span><span class="p">(</span><span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">),</span> <span class="n">zbottom</span><span class="p">])</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span> 
+        <span class="k">return</span> <span class="n">vertex</span></div>
+
+
+<div class="viewcode-block" id="SymmetricPlateGeometry"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.plate.SymmetricPlateGeometry">[docs]</a><span class="k">class</span> <span class="nc">SymmetricPlateGeometry</span><span class="p">(</span><span class="n">PlateGeometry</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Geometry of a symmetric plate foudation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    b : float</span>
+<span class="sd">        foundation width [m].</span>
+<span class="sd">    d : float</span>
+<span class="sd">        foundation depth [m]</span>
+<span class="sd">    dstrata : list, None</span>
+<span class="sd">        Width of soil layers [m].</span>
+<span class="sd">    wt : float, None</span>
+<span class="sd">        Water tabe depth [m]. By default None.</span>
+<span class="sd">    fill_angle : float</span>
+<span class="sd">        Fill angle [deg].</span>
+<span class="sd">    bfill : float</span>
+<span class="sd">        Distance between foundation edge and the start of the fill</span>
+<span class="sd">        slope [m]. By default 0.5.</span>
+<span class="sd">    nfill : int, None</span>
+<span class="sd">        Number of fill layers. By default None.</span>
+<span class="sd">    dfill : list, None</span>
+<span class="sd">        (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">    dratchetting : float, None</span>
+<span class="sd">        Widht of soil under the foundation that is replaced when</span>
+<span class="sd">        ratchetting occurs [m].</span>
+<span class="sd">    interface : bool, dict, optional</span>
+<span class="sd">        Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">        dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">        keys can be provided. For each key either a bool is provided</span>
+<span class="sd">        indicating whether that interface will be considered in the</span>
+<span class="sd">        model. Also a dict can be provided for each key with the</span>
+<span class="sd">        soil material to be assigned to it. By default False.</span>
+<span class="sd">    model_widht : float, optional</span>
+<span class="sd">        User specified model width [m]. By default None.</span>
+<span class="sd">    model_depth : float, optional</span>
+<span class="sd">        User specified model depth [m]. By default None.</span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False, output_location=False)</span>
+<span class="sd">        Foundation plot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">_symmetric</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bfill</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">model_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init mehtod.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        b : float</span>
+<span class="sd">            foundation width [m].</span>
+<span class="sd">        d : float</span>
+<span class="sd">            foundation depth [m]</span>
+<span class="sd">        dstrata : list, None</span>
+<span class="sd">            Width of soil layers [m].</span>
+<span class="sd">        wt : float, None</span>
+<span class="sd">            Water tabe depth [m]. By default None.</span>
+<span class="sd">        fill_angle : float</span>
+<span class="sd">            Fill angle [deg].</span>
+<span class="sd">        bfill : float</span>
+<span class="sd">            Distance between foundation edge and the start of the fill</span>
+<span class="sd">            slope [m]. By default 0.5.</span>
+<span class="sd">        nfill : int, None</span>
+<span class="sd">            Number of fill layers. By default None.</span>
+<span class="sd">        dfill : list, None</span>
+<span class="sd">            (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">        dratchetting : float, None</span>
+<span class="sd">            Widht of soil under the foundation that is replaced when</span>
+<span class="sd">            ratchetting occurs [m].</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        model_widht : float, optional</span>
+<span class="sd">            User specified model width [m]. By default None.</span>
+<span class="sd">        model_depth : float, optional</span>
+<span class="sd">            User specified model depth [m]. By default None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">PlateGeometry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="n">dstrata</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="n">wt</span><span class="p">,</span>
+                               <span class="n">fill_angle</span><span class="o">=</span><span class="n">fill_angle</span><span class="p">,</span> <span class="n">bfill</span><span class="o">=</span><span class="n">bfill</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="n">nfill</span><span class="p">,</span>
+                               <span class="n">dfill</span><span class="o">=</span><span class="n">dfill</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="n">dratchetting</span><span class="p">,</span>
+                               <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span> <span class="n">model_width</span><span class="o">=</span><span class="n">model_width</span><span class="p">,</span>
+                               <span class="n">model_depth</span><span class="o">=</span><span class="n">model_depth</span><span class="p">)</span>
+
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PRIVATE METHODS</span>
+    <span class="c1">#===================================================================</span>
+    <span class="k">def</span> <span class="nf">_set_interfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set interfaces between the foundatio and soil.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span> <span class="o">=</span> <span class="n">ModelInterfaces</span><span class="p">([</span><span class="s1">&#39;column&#39;</span><span class="p">,</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;column&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">apply_settings</span><span class="p">(</span><span class="n">interface</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_foundation_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the plates used for the foundation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_footing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_column</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span>
+                                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_footing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]])</span></div>
+
+
+<div class="viewcode-block" id="NonSymmetricPlateGeometry"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.plate.NonSymmetricPlateGeometry">[docs]</a><span class="k">class</span> <span class="nc">NonSymmetricPlateGeometry</span><span class="p">(</span><span class="n">PlateGeometry</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Geometry of a non-symmetric plate foudation.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    b : float</span>
+<span class="sd">        Foundation width [m].</span>
+<span class="sd">    d : float</span>
+<span class="sd">        Foundation depth [m].</span>
+<span class="sd">    b2 : float, None, optional.</span>
+<span class="sd">        Distance from the left edge of the footing to the center of</span>
+<span class="sd">        the column [m] (0&lt;=b2&lt;=b). If None then b/2. By default</span>
+<span class="sd">        None.</span>
+<span class="sd">    dstrata : list, None</span>
+<span class="sd">        Width of soil layers [m].</span>
+<span class="sd">    wt : float, None</span>
+<span class="sd">        Water tabe depth [m]. By default None.</span>
+<span class="sd">    fill_angle : float</span>
+<span class="sd">        Fill angle [deg].</span>
+<span class="sd">    bfill : float</span>
+<span class="sd">        Distance between foundation edge and the start of the fill</span>
+<span class="sd">        slope [m]. By default 0.5.</span>
+<span class="sd">    nfill : int, None</span>
+<span class="sd">        Number of fill layers. By default None.</span>
+<span class="sd">    dfill : list, None</span>
+<span class="sd">        (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">    dratchetting : float, None</span>
+<span class="sd">        Widht of soil under the foundation that is replaced when</span>
+<span class="sd">        ratchetting occurs [m].</span>
+<span class="sd">    interface : bool, dict, optional</span>
+<span class="sd">        Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">        dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">        keys can be provided. For each key either a bool is provided</span>
+<span class="sd">        indicating whether that interface will be considered in the</span>
+<span class="sd">        model. Also a dict can be provided for each key with the</span>
+<span class="sd">        soil material to be assigned to it. By default False.</span>
+<span class="sd">    model_widht : float, optional</span>
+<span class="sd">        User specified model width [m]. By default None.</span>
+<span class="sd">    model_depth : float, optional</span>
+<span class="sd">        User specified model depth [m]. By default None.</span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False, output_location=False)</span>
+<span class="sd">        Foundation plot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_symmetric</span> <span class="o">=</span> <span class="kc">False</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bfill</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">model_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init mehtod.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        b : float</span>
+<span class="sd">            Foundation width [m].</span>
+<span class="sd">        d : float</span>
+<span class="sd">            Foundation depth [m].</span>
+<span class="sd">        b2 : float, None, optional.</span>
+<span class="sd">            Distance from the left edge of the footing to the center of</span>
+<span class="sd">            the column [m] (0&lt;=b2&lt;=b). If None then b/2. By default</span>
+<span class="sd">            None.</span>
+<span class="sd">        dstrata : list, None</span>
+<span class="sd">            Width of soil layers [m].</span>
+<span class="sd">        wt : float, None</span>
+<span class="sd">            Water tabe depth [m]. By default None.</span>
+<span class="sd">        fill_angle : float</span>
+<span class="sd">            Fill angle [deg].</span>
+<span class="sd">        bfill : float</span>
+<span class="sd">            Distance between foundation edge and the start of the fill</span>
+<span class="sd">            slope [m]. By default 0.5.</span>
+<span class="sd">        nfill : int, None</span>
+<span class="sd">            Number of fill layers. By default None.</span>
+<span class="sd">        dfill : list, None</span>
+<span class="sd">            (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">        dratchetting : float, None</span>
+<span class="sd">            Widht of soil under the foundation that is replaced when</span>
+<span class="sd">            ratchetting occurs [m].</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        model_widht : float, optional</span>
+<span class="sd">            User specified model width [m]. By default None.</span>
+<span class="sd">        model_depth : float, optional</span>
+<span class="sd">            User specified model depth [m]. By default None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">PlateGeometry</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="n">dstrata</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="n">wt</span><span class="p">,</span>
+                               <span class="n">fill_angle</span><span class="o">=</span><span class="n">fill_angle</span><span class="p">,</span> <span class="n">bfill</span><span class="o">=</span><span class="n">bfill</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="n">nfill</span><span class="p">,</span>
+                               <span class="n">dfill</span><span class="o">=</span><span class="n">dfill</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="n">dratchetting</span><span class="p">,</span>
+                               <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span> <span class="n">model_width</span><span class="o">=</span><span class="n">model_width</span><span class="p">,</span>
+                               <span class="n">model_depth</span><span class="o">=</span><span class="n">model_depth</span><span class="p">)</span>
+
+
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PRIVATE METHODS</span>
+    <span class="c1">#===================================================================</span>
+    <span class="k">def</span> <span class="nf">_set_interfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set interfaces between the foundatio and soil.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span> <span class="o">=</span> <span class="n">ModelInterfaces</span><span class="p">([</span><span class="s1">&#39;column left&#39;</span><span class="p">,</span> <span class="s1">&#39;column right&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;top left&#39;</span><span class="p">,</span> <span class="s1">&#39;top right&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;bottom&#39;</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+        
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span> <span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;top left&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;top right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;top left&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;top right&#39;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;column right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;negative&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="p">[</span><span class="s1">&#39;column left&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">set_vertex</span><span class="p">(</span><span class="s1">&#39;positive&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;column left&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;column right&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">apply_settings</span><span class="p">(</span><span class="n">interface</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_foundation_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the plates used for the foundation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_footing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_column</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                                         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span>
+                                         <span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span>
+                                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_footing</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_column</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]])</span></div>
+
+
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

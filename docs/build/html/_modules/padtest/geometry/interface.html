@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>padtest.geometry.interface &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../materials.html">Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">padtest.geometry.interface</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for padtest.geometry.interface</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Interfaces.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">padtest.material.soil</span> <span class="kn">import</span> <span class="n">SoilMaterial</span>
+
+
+<div class="viewcode-block" id="ModelInterfaces"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.ModelInterfaces">[docs]</a><span class="k">class</span> <span class="nc">ModelInterfaces</span><span class="p">(</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Model interfaces.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    interfaces : list</span>
+<span class="sd">        List of str with interfaces ids.</span>
+<span class="sd">    symmetric : bool</span>
+<span class="sd">        Symmetric model flag.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    apply_settings(settings) :</span>
+<span class="sd">        Applies user settings to interfaces.</span>
+<span class="sd">    build_material(g_i, intidx) :</span>
+<span class="sd">        Builds interface mateirals.</span>
+<span class="sd">    build_geometry(g_i, plxid) :</span>
+<span class="sd">        Adds interfaces to the model.</span>
+<span class="sd">    activate(g_i) :</span>
+<span class="sd">        Activates the interfaces in the current phase.</span>
+<span class="sd">    remove_plaxis_objects() :</span>
+<span class="sd">        Deletes Plaxis objects stored in the interface objects.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interfaces</span><span class="p">,</span> <span class="n">symmetric</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        interfaces : list</span>
+<span class="sd">            List of str with interfaces ids.</span>
+<span class="sd">        symmetric : bool</span>
+<span class="sd">            Symmetric model flag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">inter</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">inter</span><span class="p">]</span> <span class="o">=</span> <span class="n">Interface</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span> <span class="o">=</span> <span class="n">symmetric</span>
+
+<div class="viewcode-block" id="ModelInterfaces.apply_settings"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.ModelInterfaces.apply_settings">[docs]</a>    <span class="k">def</span> <span class="nf">apply_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies user settings to interface.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        settings : bool, dict</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Interface settings must be specified by a boolean or a dictionary.&quot;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">intid</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">intid</span><span class="p">]</span><span class="o">.</span><span class="n">apply_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s1">&#39;top&#39;</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+                <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;top left&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">])</span>
+                <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;top right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">])</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;column&#39;</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+                <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;column left&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">])</span>
+                <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;column right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;column&#39;</span><span class="p">])</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;column&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;lateral&#39;</span> <span class="ow">in</span> <span class="n">settings</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+                <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;lateral left&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;lateral&#39;</span><span class="p">])</span>
+                <span class="n">settings</span><span class="p">[</span><span class="s1">&#39;lateral right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="s1">&#39;lateral&#39;</span><span class="p">])</span>
+                <span class="n">settings</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;lateral&#39;</span><span class="p">)</span>
+            
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">apply_settings</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">settings</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">apply_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
+    
+<div class="viewcode-block" id="ModelInterfaces.build_material"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.ModelInterfaces.build_material">[docs]</a>    <span class="k">def</span> <span class="nf">build_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds interface mateirals.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">intidx</span><span class="p">,</span> <span class="n">intid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">intid</span><span class="p">]</span><span class="o">.</span><span class="n">build_material</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="n">intidx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelInterfaces.build_geometry"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.ModelInterfaces.build_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">build_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds interfaces to the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">poscount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">negcount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">intid</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">[</span><span class="n">intid</span><span class="p">]</span><span class="o">.</span><span class="n">_active</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="p">[</span><span class="n">intid</span><span class="p">]</span><span class="o">.</span><span class="n">_interface_type</span> <span class="o">==</span> <span class="s1">&#39;positive&#39;</span><span class="p">:</span>
+                <span class="n">poscount</span> <span class="o">+=</span><span class="mi">1</span> 
+                <span class="n">plxid</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;PositiveInterface_</span><span class="si">{</span><span class="n">poscount</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">negcount</span> <span class="o">+=</span><span class="mi">1</span> 
+                <span class="n">plxid</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;NegativeInterface_</span><span class="si">{</span><span class="n">negcount</span><span class="si">:</span><span class="s1">.0f</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">intid</span><span class="p">]</span><span class="o">.</span><span class="n">build_geometry</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="n">plxid</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ModelInterfaces.activate"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.ModelInterfaces.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Activates the interfaces in the current phase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">intidx</span><span class="p">,</span> <span class="n">intid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">intid</span><span class="p">]</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="n">g_i</span><span class="p">)</span></div>
+    
+<div class="viewcode-block" id="ModelInterfaces.remove_plaxis_objects"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.ModelInterfaces.remove_plaxis_objects">[docs]</a>    <span class="k">def</span> <span class="nf">remove_plaxis_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes Plaxis objects stored in the interface objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">intid</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="bp">self</span><span class="p">[</span><span class="n">intid</span><span class="p">]</span><span class="o">.</span><span class="n">remove_plaxis_objects</span><span class="p">()</span></div></div>
+ 
+
+<div class="viewcode-block" id="Interface"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface">[docs]</a><span class="k">class</span> <span class="nc">Interface</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Single interace object.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    apply_settings(settings) :</span>
+<span class="sd">        Applies user settings to interface.</span>
+<span class="sd">    set_vertex(interface_type, vertex) :</span>
+<span class="sd">        Set vertex geometry.</span>
+<span class="sd">    build_material(g_i, intidx) :</span>
+<span class="sd">        Builds interface mateiral.</span>
+<span class="sd">    build_geometry(g_i, plxid) :</span>
+<span class="sd">        Adds interface to the model.</span>
+<span class="sd">    activate(g_i) :</span>
+<span class="sd">        Activates the interface in the current phase.</span>
+<span class="sd">    remove_plaxis_objects() :</span>
+<span class="sd">        Deletes Plaxis objects stored in the interface object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        settings : bool, dict</span>
+<span class="sd">            Bool activates/deactivates the interface. The soil material</span>
+<span class="sd">            is assigned to it. If a dict, it is assumed that the dict</span>
+<span class="sd">            contains the material properties that will be assigned to</span>
+<span class="sd">            the interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_material</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plxid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plxmaterialid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interface_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># =========================================================================</span>
+    <span class="c1"># PUBLIC MEHTODS</span>
+    <span class="c1"># =========================================================================</span>
+<div class="viewcode-block" id="Interface.apply_settings"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface.apply_settings">[docs]</a>    <span class="k">def</span> <span class="nf">apply_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Applies user settings to interface.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        settings : bool, dict</span>
+<span class="sd">            Bool activates/deactivates the interface. The soil material</span>
+<span class="sd">            is assigned to it. If a dict, it is assumed that the dict</span>
+<span class="sd">            contains the material properties that will be assigned to</span>
+<span class="sd">            the interface.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="n">settings</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_material</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_material</span> <span class="o">=</span> <span class="n">settings</span></div>
+
+<div class="viewcode-block" id="Interface.set_vertex"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface.set_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">set_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interface_type</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set vertex geometry.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        interface_type : str</span>
+<span class="sd">            &#39;negative&#39; or &#39;positive&#39; </span>
+<span class="sd">        vertex : array-like</span>
+<span class="sd">            (2,nv) vertex coordiantes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_interface_type</span> <span class="o">=</span> <span class="n">interface_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span> <span class="o">=</span> <span class="n">vertex</span></div>
+
+<div class="viewcode-block" id="Interface.build_material"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface.build_material">[docs]</a>    <span class="k">def</span> <span class="nf">build_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">intidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds interface mateiral.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        intidx : int</span>
+<span class="sd">            Interface number.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_material</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plxmaterialid</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;interface_</span><span class="si">{</span><span class="n">intidx</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_material_plx</span> <span class="o">=</span> <span class="n">SoilMaterial</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">g_i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_plxmaterialid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_material</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Interface.build_geometry"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface.build_geometry">[docs]</a>    <span class="k">def</span> <span class="nf">build_geometry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">plxid</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds interface to the model.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        plxid : int</span>
+<span class="sd">            Interface number according to Plaxis.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plxid</span> <span class="o">=</span> <span class="n">plxid</span>     
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interface_type</span> <span class="o">==</span> <span class="s1">&#39;positive&#39;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_plx_object</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">posinterface</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plx_object</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">neginterface</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Interface.activate"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface.activate">[docs]</a>    <span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Activates the interface in the current phase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">g_i</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_plx_object</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_material</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">txt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;g_i.setmaterial(g_i.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_plxid</span><span class="si">}</span><span class="s2">, g_i.Model.CurrentPhase, self._material_plx)&quot;</span>
+        <span class="n">exec</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span></div>
+        
+<div class="viewcode-block" id="Interface.remove_plaxis_objects"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.interface.Interface.remove_plaxis_objects">[docs]</a>    <span class="k">def</span> <span class="nf">remove_plaxis_objects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deletes Plaxis objects stored in the interface object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_plx_object</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_material_plx</span> <span class="o">=</span> <span class="kc">None</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>padtest.model.solid &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../materials.html">Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">padtest.model.solid</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for padtest.model.solid</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">padtest.geometry.solid</span> <span class="kn">import</span> <span class="n">SymmetricSolidGeometry</span> <span class="k">as</span> <span class="n">SG</span>
+<span class="kn">from</span> <span class="nn">padtest.geometry.solid</span> <span class="kn">import</span> <span class="n">NonSymmetricSolidGeometry</span> <span class="k">as</span> <span class="n">NSG</span>
+<span class="kn">from</span> <span class="nn">padtest.model.model</span> <span class="kn">import</span> <span class="n">Model</span>
+
+
+<div class="viewcode-block" id="SolidModel"><a class="viewcode-back" href="../../../padtest.model.html#padtest.model.solid.SolidModel">[docs]</a><span class="k">class</span> <span class="nc">SolidModel</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class with the shared methods of shallow foundaiton Plaxis</span>
+<span class="sd">    models where the structure is modelled with a soil material.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+        
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PRIVATE METHODS</span>
+    <span class="c1">#===================================================================</span>
+    <span class="k">def</span> <span class="nf">_init_foundation_material</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">concrete</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initializes the foundaiton material.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        concrete : dict</span>
+<span class="sd">            Dictionary with the properties of the material used in </span>
+<span class="sd">            the foundation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_soil_material</span><span class="p">[</span><span class="s1">&#39;concrete&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concrete</span>
+
+    <span class="k">def</span> <span class="nf">_build_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds the foundation load to the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">lineload</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">zload</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_load</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">lineload</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="n">zload</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">zload</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_load</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">Distribution</span><span class="p">,</span> <span class="s2">&quot;Linear&quot;</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_set_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets load value in the current phase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        load : np.ndarray</span>
+<span class="sd">            (3,) with (Fy, Fx, M) applied to the foundaiton.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Non vertical load in symmetric model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="n">qy_start</span> <span class="o">=</span> <span class="n">load</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">load</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span>
+        <span class="n">qy_end</span> <span class="o">=</span> <span class="n">load</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">load</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span>
+        <span class="n">qx_start</span> <span class="o">=</span> <span class="n">load</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span>
+        <span class="n">qx_end</span> <span class="o">=</span> <span class="n">load</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qy_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">qy_start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qy_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">qy_end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qx_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">qx_start</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qx_end</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">qx_end</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_activate_foundation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phaseidx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Activates the foundation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        phaseidx : int</span>
+<span class="sd">            Intex of the phase object in which the foundation is</span>
+<span class="sd">            activated.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">poly_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_structure_polygons</span><span class="p">[</span><span class="n">poly_idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">phases</span><span class="p">[</span><span class="n">phaseidx</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_soil_material</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="p">,</span> <span class="n">poly_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">phaseidx</span><span class="p">,</span> <span class="s1">&#39;concrete&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_output_precalc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select output points before calcualtion. Used for points in</span>
+<span class="sd">        the soil.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">gotostages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iphases</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_start_phase</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">selectmeshpoints</span><span class="p">()</span>
+
+        
+        <span class="n">soil_idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">soil</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Soils</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">soil</span><span class="o">.</span><span class="n">Name</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;Soil_</span><span class="si">{:.0f}</span><span class="s1">_1&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">soil_idx</span><span class="p">):</span>
+                <span class="n">soil_o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">get_equivalent</span><span class="p">(</span><span class="n">soil</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">for</span> <span class="n">loc</span><span class="p">,</span> <span class="n">xcoord</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_location</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_location_xcoord</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">addcurvepoint</span><span class="p">(</span><span class="s2">&quot;node&quot;</span><span class="p">,</span> <span class="n">soil_o</span><span class="p">,</span> <span class="p">(</span><span class="n">xcoord</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">))</span>
+        <span class="n">soil_o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">get_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Soil_1_1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">addcurvepoint</span><span class="p">(</span><span class="s2">&quot;node&quot;</span><span class="p">,</span> <span class="n">soil_o</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">addcurvepoint</span><span class="p">(</span><span class="s2">&quot;node&quot;</span><span class="p">,</span> <span class="n">soil_o</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_set_output_postcalc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select output points before calcualtion. Used for points in</span>
+<span class="sd">        structural elements.&quot;&quot;&quot;</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_extract_initial_phase_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phaseid</span><span class="p">,</span> <span class="n">nstep</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts results form the output of the initial phases calculation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        phaseid : str</span>
+<span class="sd">            Phase id.</span>
+<span class="sd">        nstep : int</span>
+<span class="sd">            Number of steps in the phase.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nstep, 1) sumMstage of the phase.</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nstep, nloc) uy displacement at the output locations.</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nstep, nloc) ux displacement at the output locations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Uy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_location</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nstep</span><span class="p">))</span>
+        <span class="n">Ux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_location</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nstep</span><span class="p">))</span>
+        <span class="n">sumMstage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">sidx</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ophases</span><span class="p">[</span><span class="n">phaseid</span><span class="p">]</span><span class="o">.</span><span class="n">Steps</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">sumMstage</span><span class="p">[</span><span class="n">sidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">Reached</span><span class="o">.</span><span class="n">SumMstage</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">for</span> <span class="n">locidx</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">Uy</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="n">sidx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">getcurveresults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">ResultTypes</span><span class="o">.</span><span class="n">Soil</span><span class="o">.</span><span class="n">Uy</span><span class="p">)</span>
+                <span class="n">Ux</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="n">sidx</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">getcurveresults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">ResultTypes</span><span class="o">.</span><span class="n">Soil</span><span class="o">.</span><span class="n">Ux</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sumMstage</span><span class="p">,</span> <span class="n">Uy</span><span class="p">,</span> <span class="n">Ux</span>
+
+    <span class="k">def</span> <span class="nf">_set_phase_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">testid</span><span class="p">,</span> <span class="n">phaseid</span><span class="p">,</span> <span class="n">prevphaseid</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds phase results to the results dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        testid : str</span>
+<span class="sd">            Test id.</span>
+<span class="sd">        phaseid : str</span>
+<span class="sd">            Phase id</span>
+<span class="sd">        prevphaseid : str</span>
+<span class="sd">            Id of the previous phase.</span>
+<span class="sd">        load : np.ndarray</span>
+<span class="sd">            (3,) load applied at the end of the phase (Fy, Fx, M).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">iphase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iphases</span><span class="p">[</span><span class="n">phaseid</span><span class="p">]</span>
+        <span class="n">previphase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iphases</span><span class="p">[</span><span class="n">prevphaseid</span><span class="p">]</span>
+        <span class="n">ophase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ophases</span><span class="p">[</span><span class="n">phaseid</span><span class="p">]</span>
+        <span class="n">prevophase</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ophases</span><span class="p">[</span><span class="n">prevphaseid</span><span class="p">]</span>
+
+        <span class="n">nstep</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ophase</span><span class="o">.</span><span class="n">Steps</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nstep</span><span class="p">,</span> <span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">sumMstage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">SumMsf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">qy0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">qy1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">qx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">base_accel_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">base_accel_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Fy_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Fx_target</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">M_target</span><span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">Uy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_location</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">Ux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_location</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        
+        <span class="c1"># start with last step from previous phase</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">prevophase</span><span class="o">.</span><span class="n">Steps</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">locidx</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="n">Uy</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">getcurveresults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">ResultTypes</span><span class="o">.</span><span class="n">Soil</span><span class="o">.</span><span class="n">Uy</span><span class="p">)</span>
+            <span class="n">Ux</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">getcurveresults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">ResultTypes</span><span class="o">.</span><span class="n">Soil</span><span class="o">.</span><span class="n">Ux</span><span class="p">)</span>
+        
+        <span class="k">for</span> <span class="n">sidx</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ophase</span><span class="o">.</span><span class="n">Steps</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+            <span class="n">sumMstage</span><span class="p">[</span><span class="n">sidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">Reached</span><span class="o">.</span><span class="n">SumMstage</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">SumMsf</span><span class="p">[</span><span class="n">sidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">Reached</span><span class="o">.</span><span class="n">SumMsf</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">time</span><span class="p">[</span><span class="n">sidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>  <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">Reached</span><span class="o">.</span><span class="n">DynamicTime</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">for</span> <span class="n">locidx</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">Uy</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="n">sidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">getcurveresults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">ResultTypes</span><span class="o">.</span><span class="n">Soil</span><span class="o">.</span><span class="n">Uy</span><span class="p">)</span>
+                <span class="n">Ux</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="n">sidx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">getcurveresults</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">[</span><span class="n">node</span><span class="p">],</span> <span class="n">step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_o</span><span class="o">.</span><span class="n">ResultTypes</span><span class="o">.</span><span class="n">Soil</span><span class="o">.</span><span class="n">Ux</span><span class="p">)</span>
+        
+        <span class="n">target_load_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_phase_load</span><span class="p">(</span><span class="n">prevphaseid</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># Target loads</span>
+        <span class="n">Fy_target</span> <span class="o">=</span> <span class="n">target_load_start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">load</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_load_start</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">sumMstage</span>
+        <span class="n">Fx_target</span> <span class="o">=</span> <span class="n">target_load_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">load</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_load_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">sumMstage</span>
+        <span class="n">M_target</span> <span class="o">=</span> <span class="n">target_load_start</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">load</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">target_load_start</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">*</span> <span class="n">sumMstage</span>
+        
+        <span class="c1"># Applied loads</span>
+        <span class="n">qy0_start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">qy0_end</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">qy1_start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">qy1_end</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">qx_start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">qx_end</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">Active</span><span class="p">[</span><span class="n">previphase</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">Active</span><span class="p">[</span><span class="n">previphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">qy0_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qy_start</span><span class="p">[</span><span class="n">previphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">qy1_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qy_end</span><span class="p">[</span><span class="n">previphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">qx_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qx_start</span><span class="p">[</span><span class="n">previphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">Active</span><span class="p">[</span><span class="n">iphase</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">Active</span><span class="p">[</span><span class="n">iphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                <span class="n">qy0_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qy_start</span><span class="p">[</span><span class="n">iphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">qy1_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qy_end</span><span class="p">[</span><span class="n">iphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">qx_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qx_start</span><span class="p">[</span><span class="n">iphase</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+
+                <span class="n">qy0</span> <span class="o">=</span> <span class="n">qy0_start</span> <span class="o">+</span> <span class="p">(</span><span class="n">qy0_end</span> <span class="o">-</span> <span class="n">qy0_start</span><span class="p">)</span> <span class="o">*</span> <span class="n">sumMstage</span>
+                <span class="n">qy1</span> <span class="o">=</span> <span class="n">qy1_start</span> <span class="o">+</span> <span class="p">(</span><span class="n">qy1_end</span> <span class="o">-</span> <span class="n">qy1_start</span><span class="p">)</span> <span class="o">*</span> <span class="n">sumMstage</span>
+                <span class="n">qx</span> <span class="o">=</span> <span class="n">qx_start</span> <span class="o">+</span> <span class="p">(</span><span class="n">qx_end</span> <span class="o">-</span> <span class="n">qx_start</span><span class="p">)</span> <span class="o">*</span> <span class="n">sumMstage</span>
+                <span class="n">Fy</span> <span class="o">=</span> <span class="p">(</span><span class="n">qy0</span> <span class="o">+</span> <span class="n">qy1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span>
+                <span class="n">Fx</span> <span class="o">=</span> <span class="n">qx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span>
+                <span class="n">M</span> <span class="o">=</span> <span class="p">(</span><span class="n">qy1</span> <span class="o">-</span> <span class="n">qy0</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">12</span>
+        
+        <span class="c1"># ad results to dataframe</span>
+        <span class="k">for</span> <span class="n">locidx</span><span class="p">,</span> <span class="n">loc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="p">):</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;test&#39;</span><span class="p">:[</span><span class="n">testid</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                               <span class="s1">&#39;phase&#39;</span><span class="p">:[</span><span class="n">iphase</span><span class="o">.</span><span class="n">Identification</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                               <span class="s1">&#39;previous&#39;</span><span class="p">:[</span><span class="n">previphase</span><span class="o">.</span><span class="n">Identification</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                               <span class="s1">&#39;plx id&#39;</span><span class="p">:[</span><span class="n">iphase</span><span class="o">.</span><span class="n">Name</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                               <span class="s1">&#39;previous plx id&#39;</span><span class="p">:[</span><span class="n">previphase</span><span class="o">.</span><span class="n">Name</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                               <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">loc</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                               <span class="s1">&#39;step&#39;</span><span class="p">:</span> <span class="n">steps</span><span class="p">,</span>
+                               <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">time</span><span class="p">,</span>
+                               <span class="s1">&#39;sumMstage&#39;</span><span class="p">:</span><span class="n">sumMstage</span><span class="p">,</span> 
+                               <span class="s1">&#39;SumMsf&#39;</span><span class="p">:</span><span class="n">SumMsf</span><span class="p">,</span>
+                               <span class="s1">&#39;uy&#39;</span><span class="p">:</span> <span class="n">Uy</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="p">:],</span>
+                               <span class="s1">&#39;ux&#39;</span><span class="p">:</span> <span class="n">Ux</span><span class="p">[</span><span class="n">locidx</span><span class="p">,</span> <span class="p">:],</span>
+                               <span class="s1">&#39;Fy&#39;</span><span class="p">:</span> <span class="n">Fy</span><span class="p">,</span>
+                               <span class="s1">&#39;Fx&#39;</span><span class="p">:</span> <span class="n">Fx</span><span class="p">,</span>
+                               <span class="s1">&#39;M&#39;</span><span class="p">:</span><span class="n">M</span><span class="p">,</span>
+                               <span class="s1">&#39;qy0&#39;</span><span class="p">:</span><span class="n">qy0</span><span class="p">,</span>
+                               <span class="s1">&#39;qy1&#39;</span><span class="p">:</span><span class="n">qy1</span><span class="p">,</span>
+                               <span class="s1">&#39;qx&#39;</span><span class="p">:</span><span class="n">qx</span><span class="p">,</span>
+                               <span class="s1">&#39;agx&#39;</span><span class="p">:</span><span class="n">base_accel_x</span><span class="p">,</span>
+                               <span class="s1">&#39;agy&#39;</span><span class="p">:</span><span class="n">base_accel_y</span><span class="p">,</span>
+                               <span class="s1">&#39;Fy target&#39;</span><span class="p">:</span><span class="n">Fy_target</span><span class="p">,</span>
+                               <span class="s1">&#39;Fx target&#39;</span><span class="p">:</span><span class="n">Fx_target</span><span class="p">,</span>
+                               <span class="s1">&#39;M target&#39;</span><span class="p">:</span><span class="n">M_target</span><span class="p">,</span>                               
+                               <span class="s1">&#39;ratchetting&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">nstep</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)})</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">df</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">,</span> <span class="n">df</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_dynamic_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets dynamic load.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time : array-like</span>
+<span class="sd">            (nt,) time array.</span>
+<span class="sd">        load : array-like</span>
+<span class="sd">            (ncomp, nt) force array (Fy, Fx). If only Fy is provided, Fx</span>
+<span class="sd">            is assumed as 0.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nt,) time.</span>
+<span class="sd">        array-like</span>
+<span class="sd">            Original load input.</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (2, nt) Load array (Fy, Fx).</span>
+<span class="sd">    </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Time is not 1-dimensional.</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            More than 10,000 time steps.</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Load has horizontal component in symmetric model.</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            Length of load array does not match the time array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Time must be defined by a 1-dimensional array.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Number of time steps must be &lt;=10,000.&#39;</span><span class="p">)</span>
+    
+        <span class="n">nt</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">input_load</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">load</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span> <span class="ow">and</span> <span class="n">load</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Symmetric foundations only allow for vertical loading. A 1-dimensional array is required.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span> <span class="ow">or</span> <span class="n">load</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">load</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">load</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">load</span><span class="p">)])</span>
+
+        <span class="k">if</span> <span class="n">load</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">nt</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Load and time arrays must have the same length.&#39;</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">time</span><span class="p">,</span> <span class="n">input_load</span><span class="p">,</span> <span class="n">load</span>
+
+    <span class="k">def</span> <span class="nf">_calculate_dynamic_load_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calcualtes a dynamic load phase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time : np.ndarray</span>
+<span class="sd">            (nt,) time array.</span>
+<span class="sd">        load : np.ndaarray</span>
+<span class="sd">            (ncom, nt) Applied forces (Fy, Fx, M).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Calculation status.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">lmFy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">loadmultiplier</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lmFy</span><span class="o">.</span><span class="n">Signal</span><span class="p">,</span> <span class="s2">&quot;Table&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Fy</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">load</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+            <span class="n">lmFy</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lmFy</span><span class="o">.</span><span class="n">Table</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">Time</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lmFy</span><span class="o">.</span><span class="n">Table</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">Multiplier</span><span class="p">,</span> <span class="n">Fy</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span><span class="p">)</span>
+        
+        <span class="n">lmFx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">loadmultiplier</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lmFx</span><span class="o">.</span><span class="n">Signal</span><span class="p">,</span> <span class="s2">&quot;Table&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Fx</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">load</span><span class="p">[</span><span class="mi">1</span><span class="p">])):</span>
+            <span class="n">lmFx</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">add</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lmFx</span><span class="o">.</span><span class="n">Table</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">Time</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">lmFx</span><span class="o">.</span><span class="n">Table</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">Multiplier</span><span class="p">,</span> <span class="n">Fx</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">deactivate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">DynLineLoad_1_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">DynLineLoad_1_1</span><span class="o">.</span><span class="n">Distribution</span> <span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="s2">&quot;Uniform&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">DynLineLoad_1_1</span><span class="o">.</span><span class="n">qy_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_1_1</span><span class="o">.</span><span class="n">qx_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">DynLineLoad_1_1</span><span class="o">.</span><span class="n">Multipliery</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">lmFy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">DynLineLoad_1_1</span><span class="o">.</span><span class="n">Multiplierx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">lmFx</span><span class="p">)</span>
+        
+        <span class="n">status</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">status</span>
+
+    <span class="k">def</span> <span class="nf">_set_dynamic_load_result</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">testid</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">load</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds dynamic load values to results dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        testid : str</span>
+<span class="sd">            Test id.</span>
+<span class="sd">        time : np.ndarray</span>
+<span class="sd">            (nt,) time array.</span>
+<span class="sd">        load : np.ndarray</span>
+<span class="sd">            (2, nt) Load array (Fy, Fx).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="s1">&#39;test&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">testid</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_point</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">idx2</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">]</span><span class="o">==</span><span class="n">loc</span><span class="p">)</span>
+            <span class="n">result_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="s1">&#39;time&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
+            <span class="n">Fy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">result_time</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">load</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">Fx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">result_time</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">load</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="s1">&#39;Fy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Fy</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="s1">&#39;Fx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Fx</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="s1">&#39;qy0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Fy</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="s1">&#39;qy1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Fy</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="s1">&#39;qx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Fx</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span></div>
+
+
+<div class="viewcode-block" id="SymmetricSolidModel"><a class="viewcode-back" href="../../../padtest.model.html#padtest.model.solid.SymmetricSolidModel">[docs]</a><span class="k">class</span> <span class="nc">SymmetricSolidModel</span><span class="p">(</span><span class="n">SG</span><span class="p">,</span> <span class="n">SolidModel</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shallow symmetric foundaiton Plaxis model where the structure is</span>
+<span class="sd">    modelled with a soil material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s_i : Server</span>
+<span class="sd">        Plaxis Input Application remote sripting server.</span>
+<span class="sd">    g_i : PlxProxyGlobalObject</span>
+<span class="sd">        Global object of the current open Plaxis model in Input.</span>
+<span class="sd">    g_o : PlxProxyGlobalObject</span>
+<span class="sd">        Global object of the current open Plaxis model in Output.</span>
+<span class="sd">    b : float</span>
+<span class="sd">        Foundation width [m].</span>
+<span class="sd">    d : float</span>
+<span class="sd">        Foundation depth [m].</span>
+<span class="sd">    b1 : float</span>
+<span class="sd">        Foundation column widht [m].</span>
+<span class="sd">    d1 : float</span>
+<span class="sd">        Foundation width [m].</span>
+<span class="sd">    soil : soil : dict, list</span>
+<span class="sd">        Dictionary with the material properties or list of</span>
+<span class="sd">        dictionaries.</span>
+<span class="sd">    concrete : dict</span>
+<span class="sd">        Dictionary with the properties of the material used in </span>
+<span class="sd">        the foundation.</span>
+<span class="sd">    model_type : str, optional</span>
+<span class="sd">        Model type: &#39;axisymmetry&#39; or &#39;planestrain&#39;. By default</span>
+<span class="sd">        &#39;axisymetry&#39;. By dafault &#39;axisymmetry&#39;.</span>
+<span class="sd">    element_type : str, optional</span>
+<span class="sd">        Element type: &#39;6-Noded&#39; or &#39;15-Noded&#39;. By default</span>
+<span class="sd">        &#39;15-Noded&#39;.</span>
+<span class="sd">    title : str, optional</span>
+<span class="sd">        Model title in Plaxis. By default &#39;&#39;.</span>
+<span class="sd">    comments : str, optional</span>
+<span class="sd">        Model comments in Plaxis. By defautl &#39;&#39;.</span>
+<span class="sd">    dstrata : list, None, optional</span>
+<span class="sd">        Width of soil layers [m]. By defautl None.</span>
+<span class="sd">    wt : float, None, optional</span>
+<span class="sd">        Water tabe depth [m]. By default None.</span>
+<span class="sd">    fill_angle : float, None, optional</span>
+<span class="sd">        Fill angle [deg]. By default None.</span>
+<span class="sd">    bfill : float, optional.</span>
+<span class="sd">        Distance between foundation edge and the start of the fill</span>
+<span class="sd">        slope [m]. By default 0.5.</span>
+<span class="sd">    nfill : int, None, optional</span>
+<span class="sd">        Number of fill layers. By default None.</span>
+<span class="sd">    dfill : list, None, optional</span>
+<span class="sd">        (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">    interface : bool, dict, optional</span>
+<span class="sd">        Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">        dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">        keys can be provided. For each key either a bool is provided</span>
+<span class="sd">        indicating whether that interface will be considered in the</span>
+<span class="sd">        model. Also a dict can be provided for each key with the</span>
+<span class="sd">        soil material to be assigned to it. By default False.</span>
+<span class="sd">    model_widht : float, None, optional</span>
+<span class="sd">        User specified model width [m]. By default None.</span>
+<span class="sd">    model_depth : float, None, optional</span>
+<span class="sd">        User specified model depth [m]. By default None.</span>
+<span class="sd">    fill : dict, list, None, optional</span>
+<span class="sd">        Dictionary with the fill properties or list of dictionaries.</span>
+<span class="sd">        By default None.</span>
+<span class="sd">    mesh_density : float, optional</span>
+<span class="sd">        Mesh density. By default 0.06.</span>
+<span class="sd">    dratchetting : float, optional</span>
+<span class="sd">        Widht of soil under the foundation that is replaced when</span>
+<span class="sd">        ratchetting occurs [m]. By default 0.</span>
+<span class="sd">    ratchetting_material  : dict, None, optional</span>
+<span class="sd">        Dictionary with the material properties after ratchetting.</span>
+<span class="sd">    ratchetting_threshold : float, optional</span>
+<span class="sd">        Upwards displacement threshold that when surpassed by any</span>
+<span class="sd">        output location under the foundation the material under</span>
+<span class="sd">        it is replaced by the ratchetting material. By default</span>
+<span class="sd">        np.inf.</span>
+<span class="sd">    locations : array-like, optional</span>
+<span class="sd">        (nloc, 1) location of output points in the foundation</span>
+<span class="sd">        bottom, measured as [0, 1] where 0 is the center of the</span>
+<span class="sd">        foundation and 1 the edge. By default</span>
+<span class="sd">        [0, 0.25, 0.5, 0.75, 1].</span>
+<span class="sd">    build : bool, optional</span>
+<span class="sd">        Builds Plaxis model automatically. By default True.</span>
+<span class="sd">    excavation : bool, optional</span>
+<span class="sd">        If True in models with fill, the excavation and fill</span>
+<span class="sd">        processes are included in the initial phases. By default</span>
+<span class="sd">        True.</span>
+<span class="sd">    deformation_boundary_condition : dict, None, optional</span>
+<span class="sd">        Deformation boundary conditions of the model. If None the</span>
+<span class="sd">        default setting is adopted. Dictionary with keys `XMin`,</span>
+<span class="sd">        `XMax`, `YMin` and `YMax`, with supported values</span>
+<span class="sd">        &#39;Free&#39;,  &#39;Normally fixed&#39;,  &#39;Horizontally fixed&#39;,</span>
+<span class="sd">        &#39;Vertically fixed&#39; and &#39;Fully fixed&#39;. By default None.</span>
+<span class="sd">    dynamic_boundary_condtions : dict, None, optional</span>
+<span class="sd">        Dynamic boundary conditions of the model used in dynamic load</span>
+<span class="sd">        tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">        with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">        values &#39;None&#39; and &#39;Viscous&#39;. By default None.</span>
+<span class="sd">    shake_boundary_condtions : dict, None, optional</span>
+<span class="sd">        Dynamic boundary conditions of the model used in base shake</span>
+<span class="sd">        tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">        with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">        values &#39;None&#39;, &#39;Viscous&#39;, &#39;Free-field&#39; and &#39;Compliant base&#39;.</span>
+<span class="sd">        By default None.</span>
+<span class="sd">    boundary_interface : bool, optional</span>
+<span class="sd">        Include boundary interfaces needed for a base shake test.</span>
+<span class="sd">        This requires a much denser mesh and more computationally</span>
+<span class="sd">        demanding models. By default False.</span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    build()</span>
+<span class="sd">        Builds the model in Plaxis.</span>
+<span class="sd">    regen(s_i, g_i, g_o, test=False) : </span>
+<span class="sd">        Regenerates the model in Plaxis. Optinoally it recalculates</span>
+<span class="sd">        previous load tests.</span>
+<span class="sd">    save(filename)</span>
+<span class="sd">        Saves model to file. Plaxis objects cannot be stored, only</span>
+<span class="sd">        input properties and results. When loaded, the model can</span>
+<span class="sd">        be regenerated with &lt;regen&gt; method.</span>
+<span class="sd">    load(filename)</span>
+<span class="sd">        Loads saved test.</span>
+<span class="sd">    failure_test(testid, load, max_load=[np.inf, np.inf, np.inf], load_factor=2, load_increment=[0, 0, 0], qsurf=None, start_from=&#39;construction&#39;, delete_fail=True)</span>
+<span class="sd">        Test the foundation until the model does not converge.</span>
+<span class="sd">    load_test(testid, load, start_from=&#39;construction&#39;, qsurf=None, delete_fail=True)</span>
+<span class="sd">        Conducts a load test in the model.</span>
+<span class="sd">    safety_test(testid, start_from, test=&#39;incremental&#39;, SumMsf=None, Msf=0.1, qsurf=None, delete_fail=True)</span>
+<span class="sd">        Conducts a safety test on the model.</span>
+<span class="sd">    dynamic_test(testid, time, load, start_from=&#39;construction&#39;, nsubstep=10, qsurf=None, delete_fail=True)</span>
+<span class="sd">        Apply a dynamic load to the foundation.</span>
+<span class="sd">    shake_test(testid, time, acceleration, start_from=&#39;construction&#39;, qsurf=None, nsubstep=10, delete_fail=True)</span>
+<span class="sd">        Apply a displacement time history at the model base.</span>
+<span class="sd">    delete_test( testid, delete_phases=True) </span>
+<span class="sd">        Deletes a test from the model.</span>
+<span class="sd">    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False, output_location=False)</span>
+<span class="sd">        Foundation plot.</span>
+<span class="sd">    plot_test(testid, force=None, displacement=None, phase=None, location=None, compression_positive=True, pullout_positive=False, reset_start=False, legend=False, xlim=None, ylim=None, figsize=(4, 3)) </span>
+<span class="sd">        Plots test results.</span>
+<span class="sd">    plot_safety_test(testid, location=None, pullout_positive=False, reset_start=False, legend=False, figsize=(6, 4))</span>
+<span class="sd">        Plots safety test.</span>
+<span class="sd">    plot_dynamic_test(testid, displacement=None, force=None, location=None, compression_positive=True, pullout_positive=False, xlim=None, ylim=None, legend=False, figsize=(8, 2))</span>
+<span class="sd">        Plot dynamic test resutls versus time.</span>
+<span class="sd">    plot_shake_test(self, testid, displacement=None, acceleration=None, location=None, pullout_positive=False, xlim=None, ylim=None, legend=False, figsize=(8, 2))</span>
+<span class="sd">        Plot shake test results versus time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_DEFAULT_DEFORMATION_BC</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;Horizontally fixed&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;XMax&#39;</span><span class="p">:</span><span class="s1">&#39;Horizontally fixed&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;YMin&#39;</span><span class="p">:</span><span class="s1">&#39;Fully fixed&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;YMax&#39;</span><span class="p">:</span><span class="s1">&#39;Free&#39;</span><span class="p">}</span>
+    <span class="n">_DEFAULT_DYNAMIC_BC</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;None&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;XMax&#39;</span><span class="p">:</span><span class="s1">&#39;Viscous&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;YMin&#39;</span><span class="p">:</span><span class="s1">&#39;Viscous&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;YMax&#39;</span><span class="p">:</span><span class="s1">&#39;None&#39;</span><span class="p">}</span>
+    <span class="n">_DEFAULT_SHAKE_BC</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;Free-field&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;XMax&#39;</span><span class="p">:</span><span class="s1">&#39;Free-field&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;YMin&#39;</span><span class="p">:</span><span class="s1">&#39;Compliant base &#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;YMax&#39;</span><span class="p">:</span><span class="s1">&#39;None&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">concrete</span><span class="p">,</span>
+                 <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;axisymmetry&#39;</span><span class="p">,</span> <span class="n">element_type</span><span class="o">=</span><span class="s1">&#39;15-Noded&#39;</span><span class="p">,</span>
+                 <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bfill</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">model_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">mesh_density</span><span class="o">=</span><span class="mf">0.06</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ratchetting_material</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">ratchetting_threshold</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+                 <span class="n">locations</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">build</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">excavation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">deformation_boundary_condition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dynamic_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">shake_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">boundary_interface</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s_i : Server</span>
+<span class="sd">            Plaxis Input Application remote sripting server.</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        g_o : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Output.</span>
+<span class="sd">        b : float</span>
+<span class="sd">            Foundation width [m].</span>
+<span class="sd">        d : float</span>
+<span class="sd">            Foundation depth [m].</span>
+<span class="sd">        b1 : float</span>
+<span class="sd">            Foundation column widht [m].</span>
+<span class="sd">        d1 : float</span>
+<span class="sd">            Foundation width [m].</span>
+<span class="sd">        soil : soil : dict, list</span>
+<span class="sd">            Dictionary with the material properties or list of</span>
+<span class="sd">            dictionaries.</span>
+<span class="sd">        concrete : dict</span>
+<span class="sd">            Dictionary with the properties of the material used in </span>
+<span class="sd">            the foundation.</span>
+<span class="sd">        model_type : str, optional</span>
+<span class="sd">            Model type: &#39;axisymmetry&#39; or &#39;planestrain&#39;. By default</span>
+<span class="sd">            &#39;axisymetry&#39;. By dafault &#39;axisymmetry&#39;.</span>
+<span class="sd">        element_type : str, optional</span>
+<span class="sd">            Element type: &#39;6-Noded&#39; or &#39;15-Noded&#39;. By default</span>
+<span class="sd">            &#39;15-Noded&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Model title in Plaxis. By default &#39;&#39;.</span>
+<span class="sd">        comments : str, optional</span>
+<span class="sd">            Model comments in Plaxis. By defautl &#39;&#39;.</span>
+<span class="sd">        dstrata : list, None, optional</span>
+<span class="sd">            Width of soil layers [m]. By defautl None.</span>
+<span class="sd">        wt : float, None, optional</span>
+<span class="sd">            Water tabe depth [m]. By default None.</span>
+<span class="sd">        fill_angle : float, None, optional</span>
+<span class="sd">            Fill angle [deg]. By default None.</span>
+<span class="sd">        bfill : float, optional.</span>
+<span class="sd">            Distance between foundation edge and the start of the fill</span>
+<span class="sd">            slope [m]. By default 0.5.</span>
+<span class="sd">        nfill : int, None, optional</span>
+<span class="sd">            Number of fill layers. By default None.</span>
+<span class="sd">        dfill : list, None, optional</span>
+<span class="sd">            (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        model_widht : float, None, optional</span>
+<span class="sd">            User specified model width [m]. By default None.</span>
+<span class="sd">        model_depth : float, None, optional</span>
+<span class="sd">            User specified model depth [m]. By default None.</span>
+<span class="sd">        fill : dict, list, None, optional</span>
+<span class="sd">            Dictionary with the fill properties or list of dictionaries.</span>
+<span class="sd">            By default None.</span>
+<span class="sd">        mesh_density : float, optional</span>
+<span class="sd">            Mesh density. By default 0.06.</span>
+<span class="sd">        dratchetting : float, optional</span>
+<span class="sd">            Widht of soil under the foundation that is replaced when</span>
+<span class="sd">            ratchetting occurs [m]. By default 0.</span>
+<span class="sd">        ratchetting_material  : dict, None, optional</span>
+<span class="sd">            Dictionary with the material properties after ratchetting.</span>
+<span class="sd">        ratchetting_threshold : float, optional</span>
+<span class="sd">            Upwards displacement threshold that when surpassed by any</span>
+<span class="sd">            output location under the foundation the material under</span>
+<span class="sd">            it is replaced by the ratchetting material. By default</span>
+<span class="sd">            np.inf.</span>
+<span class="sd">        locations : array-like, optional</span>
+<span class="sd">            (nloc, 1) location of output points in the foundation</span>
+<span class="sd">            bottom, measured as [0, 1] where 0 is the center of the</span>
+<span class="sd">            foundation and 1 the edge. By default</span>
+<span class="sd">            [0, 0.25, 0.5, 0.75, 1].</span>
+<span class="sd">        build : bool, optional</span>
+<span class="sd">            Builds Plaxis model automatically. By default True.</span>
+<span class="sd">        excavation : bool, optional</span>
+<span class="sd">            If True in models with fill, the excavation and fill</span>
+<span class="sd">            processes are included in the initial phases. By default</span>
+<span class="sd">            True.</span>
+<span class="sd">        deformation_boundary_condition : dict, None, optional</span>
+<span class="sd">            Deformation boundary conditions of the model. If None the</span>
+<span class="sd">            default setting is adopted. Dictionary with keys `XMin`,</span>
+<span class="sd">            `XMax`, `YMin` and `YMax`, with supported values</span>
+<span class="sd">            &#39;Free&#39;,  &#39;Normally fixed&#39;,  &#39;Horizontally fixed&#39;,</span>
+<span class="sd">            &#39;Vertically fixed&#39; and &#39;Fully fixed&#39;. By default None.</span>
+<span class="sd">        dynamic_boundary_condtions : dict, None, optional</span>
+<span class="sd">            Dynamic boundary conditions of the model used in dynamic load</span>
+<span class="sd">            tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">            values &#39;None&#39; and &#39;Viscous&#39;. By default None.</span>
+<span class="sd">        shake_boundary_condtions : dict, None, optional</span>
+<span class="sd">            Dynamic boundary conditions of the model used in base shake</span>
+<span class="sd">            tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">            values &#39;None&#39;, &#39;Viscous&#39;, &#39;Free-field&#39; and &#39;Compliant base&#39;.</span>
+<span class="sd">            By default None.</span>
+<span class="sd">        boundary_interface : bool, optional</span>
+<span class="sd">            Include boundary interfaces needed for a base shake test.</span>
+<span class="sd">            This requires a much denser mesh and more computationally</span>
+<span class="sd">            demanding models. By default False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">SG</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="n">dstrata</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="n">wt</span><span class="p">,</span>
+                    <span class="n">fill_angle</span><span class="o">=</span><span class="n">fill_angle</span><span class="p">,</span> <span class="n">bfill</span><span class="o">=</span><span class="n">bfill</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="n">nfill</span><span class="p">,</span>
+                    <span class="n">dfill</span><span class="o">=</span><span class="n">dfill</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="n">dratchetting</span><span class="p">,</span>
+                    <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span> <span class="n">model_width</span><span class="o">=</span><span class="n">model_width</span><span class="p">,</span>
+                    <span class="n">model_depth</span><span class="o">=</span><span class="n">model_depth</span><span class="p">)</span>
+        <span class="n">SolidModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">model_type</span><span class="p">,</span> <span class="n">element_type</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>
+                       <span class="n">comments</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">fill</span><span class="p">,</span> <span class="n">ratchetting_material</span><span class="p">,</span>
+                       <span class="n">ratchetting_threshold</span><span class="p">,</span> <span class="n">mesh_density</span><span class="p">,</span> <span class="n">locations</span><span class="p">,</span> <span class="n">excavation</span><span class="p">,</span>
+                       <span class="n">deformation_boundary_condition</span><span class="o">=</span><span class="n">deformation_boundary_condition</span><span class="p">,</span>
+                       <span class="n">dynamic_boundary_condtions</span><span class="o">=</span><span class="n">dynamic_boundary_condtions</span><span class="p">,</span>
+                       <span class="n">shake_boundary_condtions</span><span class="o">=</span><span class="n">shake_boundary_condtions</span><span class="p">,</span>
+                       <span class="n">boundary_interface</span><span class="o">=</span><span class="n">boundary_interface</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_foundation_material</span><span class="p">(</span><span class="n">concrete</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">build</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_build_surface_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds surface load to the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface_load</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">load</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">lineload</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface_load</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_surface_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qsurf</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Activates and sets a value to the surface load in the</span>
+<span class="sd">        curernt phase. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qsurf : numeric</span>
+<span class="sd">            Surface load.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_2_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_2_1</span><span class="o">.</span><span class="n">qy_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">qsurf</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NonSymmetricSolidModel"><a class="viewcode-back" href="../../../padtest.model.html#padtest.model.solid.NonSymmetricSolidModel">[docs]</a><span class="k">class</span> <span class="nc">NonSymmetricSolidModel</span><span class="p">(</span><span class="n">NSG</span><span class="p">,</span> <span class="n">SolidModel</span><span class="p">,</span> <span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Shallow foundaiton Plaxis model where the structure is modelled</span>
+<span class="sd">    with a soil material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s_i : Server</span>
+<span class="sd">        Plaxis Input Application remote sripting server.</span>
+<span class="sd">    g_i : PlxProxyGlobalObject</span>
+<span class="sd">        Global object of the current open Plaxis model in Input.</span>
+<span class="sd">    g_o : PlxProxyGlobalObject</span>
+<span class="sd">        Global object of the current open Plaxis model in Output.</span>
+<span class="sd">    b : float</span>
+<span class="sd">        Foundation width [m].</span>
+<span class="sd">    d : float</span>
+<span class="sd">        Foundation depth [m].</span>
+<span class="sd">    b1 : float</span>
+<span class="sd">        Foundation column widht [m].</span>
+<span class="sd">    d1 : float</span>
+<span class="sd">        Foundation width [m].</span>
+<span class="sd">    soil : soil : dict, list</span>
+<span class="sd">        Dictionary with the material properties or list of</span>
+<span class="sd">        dictionaries.</span>
+<span class="sd">    concrete : dict</span>
+<span class="sd">        Dictionary with the properties of the material used in </span>
+<span class="sd">        the foundation.</span>
+<span class="sd">    b2 : float, None, optional.</span>
+<span class="sd">        Distance from the left edge of the footing to the center of</span>
+<span class="sd">        the column [m] (b1/2&lt;=b2&lt;=b-b1/2). If None then b/2. By</span>
+<span class="sd">        default None.</span>
+<span class="sd">    model_type : str, optional</span>
+<span class="sd">        Model type: &#39;axisymmetry&#39; or &#39;planestrain&#39;. By default</span>
+<span class="sd">        &#39;axisymetry&#39;. By dafault &#39;planestrain&#39;.</span>
+<span class="sd">    element_type : str, optional</span>
+<span class="sd">        Element type: &#39;6-Noded&#39; or &#39;15-Noded&#39;. By default</span>
+<span class="sd">        &#39;15-Noded&#39;.</span>
+<span class="sd">    title : str, optional</span>
+<span class="sd">        Model title in Plaxis. By default &#39;&#39;.</span>
+<span class="sd">    comments : str, optional</span>
+<span class="sd">        Model comments in Plaxis. By defautl &#39;&#39;.</span>
+<span class="sd">    dstrata : list, None, optional</span>
+<span class="sd">        Width of soil layers [m]. By defautl None.</span>
+<span class="sd">    wt : float, None, optional</span>
+<span class="sd">        Water tabe depth [m]. By default None.</span>
+<span class="sd">    fill_angle : float, None, optional</span>
+<span class="sd">        Fill angle [deg]. By default None.</span>
+<span class="sd">    bfill : float, optional.</span>
+<span class="sd">        Distance between foundation edge and the start of the fill</span>
+<span class="sd">        slope [m]. By default 0.5.</span>
+<span class="sd">    nfill : int, None, optional</span>
+<span class="sd">        Number of fill layers. By default None.</span>
+<span class="sd">    dfill : list, None, optional</span>
+<span class="sd">        (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">    interface : bool, dict, optional</span>
+<span class="sd">        Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">        dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">        keys can be provided. For each key either a bool is provided</span>
+<span class="sd">        indicating whether that interface will be considered in the</span>
+<span class="sd">        model. Also a dict can be provided for each key with the</span>
+<span class="sd">        soil material to be assigned to it. By default False.</span>
+<span class="sd">    model_widht : float, None, optional</span>
+<span class="sd">        User specified model width [m]. By default None.</span>
+<span class="sd">    model_depth : float, None, optional</span>
+<span class="sd">        User specified model depth [m]. By default None.</span>
+<span class="sd">    fill : dict, list, None, optional</span>
+<span class="sd">        Dictionary with the fill properties or list of dictionaries.</span>
+<span class="sd">        By default None.</span>
+<span class="sd">    mesh_density : float, optional</span>
+<span class="sd">        Mesh density. By default 0.06.</span>
+<span class="sd">    dratchetting : float, optional</span>
+<span class="sd">        Widht of soil under the foundation that is replaced when</span>
+<span class="sd">        ratchetting occurs [m]. By default 0.</span>
+<span class="sd">    ratchetting_material  : dict, None, optional</span>
+<span class="sd">        Dictionary with the material properties after ratchetting.</span>
+<span class="sd">    ratchetting_threshold : float, optional</span>
+<span class="sd">        Upwards displacement threshold that when surpassed by any</span>
+<span class="sd">        output location under the foundation the material under</span>
+<span class="sd">        it is replaced by the ratchetting material. By default</span>
+<span class="sd">        np.inf.</span>
+<span class="sd">    locations : array-like, optional</span>
+<span class="sd">        (nloc, 1) location of output points in the foundation</span>
+<span class="sd">        bottom, measured as [0, 1] where 0 is the center of the</span>
+<span class="sd">        foundation and 1 the edge. By default</span>
+<span class="sd">        [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1].</span>
+<span class="sd">    build : bool, optional</span>
+<span class="sd">        Builds Plaxis model automatically. By default True.</span>
+<span class="sd">    excavation : bool, optional</span>
+<span class="sd">        If True in models with fill, the excavation and fill</span>
+<span class="sd">        processes are included in the initial phases. By default</span>
+<span class="sd">        True.</span>
+<span class="sd">    deformation_boundary_condition : dict, None, optional</span>
+<span class="sd">        Deformation boundary conditions of the model. If None the</span>
+<span class="sd">        default setting is adopted. Dictionary with keys `XMin`,</span>
+<span class="sd">        `XMax`, `YMin` and `YMax`, with supported values</span>
+<span class="sd">        &#39;Free&#39;,  &#39;Normally fixed&#39;,  &#39;Horizontally fixed&#39;,</span>
+<span class="sd">        &#39;Vertically fixed&#39; and &#39;Fully fixed&#39;. By default None.</span>
+<span class="sd">    dynamic_boundary_condtions : dict, None, optional</span>
+<span class="sd">        Dynamic boundary conditions of the model used in dynamic load</span>
+<span class="sd">        tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">        with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">        values &#39;None&#39; and &#39;Viscous&#39;. By default None.</span>
+<span class="sd">    shake_boundary_condtions : dict, None, optional</span>
+<span class="sd">        Dynamic boundary conditions of the model used in base shake</span>
+<span class="sd">        tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">        with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">        values &#39;None&#39;, &#39;Viscous&#39;, &#39;Free-field&#39; and &#39;Compliant base&#39;.</span>
+<span class="sd">        By default None.</span>
+<span class="sd">    boundary_interface : bool, optional</span>
+<span class="sd">        Include boundary interfaces needed for a base shake test.</span>
+<span class="sd">        This requires a much denser mesh and more computationally</span>
+<span class="sd">        demanding models. By default False.</span>
+<span class="sd">    </span>
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    build()</span>
+<span class="sd">        Builds the model in Plaxis.</span>
+<span class="sd">    regen(s_i, g_i, g_o, test=False) : </span>
+<span class="sd">        Regenerates the model in Plaxis. Optinoally it recalculates</span>
+<span class="sd">        previous load tests.</span>
+<span class="sd">    save(filename)</span>
+<span class="sd">        Saves model to file. Plaxis objects cannot be stored, only</span>
+<span class="sd">        input properties and results. When loaded, the model can</span>
+<span class="sd">        be regenerated with &lt;regen&gt; method.</span>
+<span class="sd">    load(filename)</span>
+<span class="sd">        Loads saved test.</span>
+<span class="sd">    failure_test(testid, load, max_load=[np.inf, np.inf, np.inf], load_factor=2, load_increment=[0, 0, 0], qsurf=None, start_from=&#39;construction&#39;, delete_fail=True)</span>
+<span class="sd">        Test the foundation until the model does not converge.</span>
+<span class="sd">    load_test(testid, load, start_from=&#39;construction&#39;, qsurf=None, delete_fail=True)</span>
+<span class="sd">        Conducts a load test in the model.</span>
+<span class="sd">    safety_test(testid, start_from, test=&#39;incremental&#39;, SumMsf=None, Msf=0.1, qsurf=None, delete_fail=True)</span>
+<span class="sd">        Conducts a safety test on the model.</span>
+<span class="sd">    dynamic_test(testid, time, load, start_from=&#39;construction&#39;, nsubstep=10, qsurf=None, delete_fail=True)</span>
+<span class="sd">        Apply a dynamic load to the foundation.</span>
+<span class="sd">    shake_test(testid, time, acceleration, start_from=&#39;construction&#39;, qsurf=None, nsubstep=10, delete_fail=True)</span>
+<span class="sd">        Apply a displacement time history at the model base.</span>
+<span class="sd">    delete_test( testid, delete_phases=True) </span>
+<span class="sd">        Deletes a test from the model.</span>
+<span class="sd">    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False, output_location=False)</span>
+<span class="sd">        Foundation plot.</span>
+<span class="sd">    plot_test(testid, force=None, displacement=None, phase=None, location=None, compression_positive=True, pullout_positive=False, reset_start=False, legend=False, xlim=None, ylim=None, figsize=(4, 3))</span>
+<span class="sd">        Plots test results.</span>
+<span class="sd">    plot_safety_test(testid, location=None, pullout_positive=False, reset_start=False, legend=False, figsize=(6, 4))</span>
+<span class="sd">        Plots safety test</span>
+<span class="sd">    plot_dynamic_test(testid, displacement=None, force=None, location=None, compression_positive=True, pullout_positive=False, xlim=None, ylim=None, legend=False, figsize=(8, 2))</span>
+<span class="sd">        Plot dynamic test resutls versus time.</span>
+<span class="sd">    plot_shake_test(self, testid, displacement=None, acceleration=None, location=None, pullout_positive=False, xlim=None, ylim=None, legend=False, figsize=(8, 2))</span>
+<span class="sd">        Plot shake test results versus time.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_DEFAULT_DEFORMATION_BC</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;Horizontally fixed&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;XMax&#39;</span><span class="p">:</span><span class="s1">&#39;Horizontally fixed&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;YMin&#39;</span><span class="p">:</span><span class="s1">&#39;Fully fixed&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;YMax&#39;</span><span class="p">:</span><span class="s1">&#39;Free&#39;</span><span class="p">}</span>
+    <span class="n">_DEFAULT_DYNAMIC_BC</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;Viscous&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;XMax&#39;</span><span class="p">:</span><span class="s1">&#39;Viscous&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;YMin&#39;</span><span class="p">:</span><span class="s1">&#39;Viscous&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;YMax&#39;</span><span class="p">:</span><span class="s1">&#39;None&#39;</span><span class="p">}</span>
+    <span class="n">_DEFAULT_SHAKE_BC</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;Free-field&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;XMax&#39;</span><span class="p">:</span><span class="s1">&#39;Free-field&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;YMin&#39;</span><span class="p">:</span><span class="s1">&#39;Compliant base &#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;YMax&#39;</span><span class="p">:</span><span class="s1">&#39;None&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">concrete</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;planestrain&#39;</span><span class="p">,</span> <span class="n">element_type</span><span class="o">=</span><span class="s1">&#39;15-Noded&#39;</span><span class="p">,</span>
+                 <span class="n">title</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bfill</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                 <span class="n">model_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">model_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mesh_density</span><span class="o">=</span><span class="mf">0.06</span><span class="p">,</span> 
+                 <span class="n">dratchetting</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ratchetting_material</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">ratchetting_threshold</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+                 <span class="n">locations</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.75</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.25</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                 <span class="n">build</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">excavation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                 <span class="n">deformation_boundary_condition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">dynamic_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">shake_boundary_condtions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">boundary_interface</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        s_i : Server</span>
+<span class="sd">            Plaxis Input Application remote sripting server.</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+<span class="sd">        g_o : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Output.</span>
+<span class="sd">        b : float</span>
+<span class="sd">            Foundation width [m].</span>
+<span class="sd">        d : float</span>
+<span class="sd">            Foundation depth [m].</span>
+<span class="sd">        b1 : float</span>
+<span class="sd">            Foundation column widht [m].</span>
+<span class="sd">        d1 : float</span>
+<span class="sd">            Foundation width [m].</span>
+<span class="sd">        soil : soil : dict, list</span>
+<span class="sd">            Dictionary with the material properties or list of</span>
+<span class="sd">            dictionaries.</span>
+<span class="sd">        concrete : dict</span>
+<span class="sd">            Dictionary with the properties of the material used in </span>
+<span class="sd">            the foundation.</span>
+<span class="sd">        b2 : float, None, optional.</span>
+<span class="sd">            Distance from the left edge of the footing to the center of</span>
+<span class="sd">            the column [m] (b1/2&lt;=b2&lt;=b-b1/2). If None then b/2. By</span>
+<span class="sd">            default None.</span>
+<span class="sd">        model_type : str, optional</span>
+<span class="sd">            Model type: &#39;axisymmetry&#39; or &#39;planestrain&#39;. By default</span>
+<span class="sd">            &#39;axisymetry&#39;. By dafault &#39;planestrain&#39;.</span>
+<span class="sd">        element_type : str, optional</span>
+<span class="sd">            Element type: &#39;6-Noded&#39; or &#39;15-Noded&#39;. By default</span>
+<span class="sd">            &#39;15-Noded&#39;.</span>
+<span class="sd">        title : str, optional</span>
+<span class="sd">            Model title in Plaxis. By default &#39;&#39;.</span>
+<span class="sd">        comments : str, optional</span>
+<span class="sd">            Model comments in Plaxis. By defautl &#39;&#39;.</span>
+<span class="sd">        dstrata : list, None, optional</span>
+<span class="sd">            Width of soil layers [m]. By defautl None.</span>
+<span class="sd">        wt : float, None, optional</span>
+<span class="sd">            Water tabe depth [m]. By default None.</span>
+<span class="sd">        fill_angle : float, None, optional</span>
+<span class="sd">            Fill angle [deg]. By default None.</span>
+<span class="sd">        bfill : float, optional.</span>
+<span class="sd">            Distance between foundation edge and the start of the fill</span>
+<span class="sd">            slope [m]. By default 0.5.</span>
+<span class="sd">        nfill : int, None, optional</span>
+<span class="sd">            Number of fill layers. By default None.</span>
+<span class="sd">        dfill : list, None, optional</span>
+<span class="sd">            (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">        interface : bool, dict, optional</span>
+<span class="sd">            Bool activates/deactivates all the interfaces. Otherwise a </span>
+<span class="sd">            dictionary with the &#39;top&#39;, &#39;bottom&#39;, &#39;column&#39; and &#39;lateral&#39;</span>
+<span class="sd">            keys can be provided. For each key either a bool is provided</span>
+<span class="sd">            indicating whether that interface will be considered in the</span>
+<span class="sd">            model. Also a dict can be provided for each key with the</span>
+<span class="sd">            soil material to be assigned to it. By default False.</span>
+<span class="sd">        model_widht : float, None, optional</span>
+<span class="sd">            User specified model width [m]. By default None.</span>
+<span class="sd">        model_depth : float, None, optional</span>
+<span class="sd">            User specified model depth [m]. By default None.</span>
+<span class="sd">        fill : dict, list, None, optional</span>
+<span class="sd">            Dictionary with the fill properties or list of dictionaries.</span>
+<span class="sd">            By default None.</span>
+<span class="sd">        mesh_density : float, optional</span>
+<span class="sd">            Mesh density. By default 0.06.</span>
+<span class="sd">        dratchetting : float, optional</span>
+<span class="sd">            Widht of soil under the foundation that is replaced when</span>
+<span class="sd">            ratchetting occurs [m]. By default 0.</span>
+<span class="sd">        ratchetting_material  : dict, None, optional</span>
+<span class="sd">            Dictionary with the material properties after ratchetting.</span>
+<span class="sd">        ratchetting_threshold : float, optional</span>
+<span class="sd">            Upwards displacement threshold that when surpassed by any</span>
+<span class="sd">            output location under the foundation the material under</span>
+<span class="sd">            it is replaced by the ratchetting material. By default</span>
+<span class="sd">            np.inf.</span>
+<span class="sd">        locations : array-like, optional</span>
+<span class="sd">            (nloc, 1) location of output points in the foundation</span>
+<span class="sd">            bottom, measured as [0, 1] where 0 is the center of the</span>
+<span class="sd">            foundation and 1 the edge. By default</span>
+<span class="sd">            [-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1].</span>
+<span class="sd">        build : bool, optional</span>
+<span class="sd">            Builds Plaxis model automatically. By default True.</span>
+<span class="sd">        excavation : bool, optional</span>
+<span class="sd">            If True in models with fill, the excavation and fill</span>
+<span class="sd">            processes are included in the initial phases. By default</span>
+<span class="sd">            True.</span>
+<span class="sd">        deformation_boundary_condition : dict, None, optional</span>
+<span class="sd">            Deformation boundary conditions of the model. If None the</span>
+<span class="sd">            default setting is adopted. Dictionary with keys `XMin`,</span>
+<span class="sd">            `XMax`, `YMin` and `YMax`, with supported values</span>
+<span class="sd">            &#39;Free&#39;,  &#39;Normally fixed&#39;,  &#39;Horizontally fixed&#39;,</span>
+<span class="sd">            &#39;Vertically fixed&#39; and &#39;Fully fixed&#39;. By default None.</span>
+<span class="sd">        dynamic_boundary_condtions : dict, None, optional</span>
+<span class="sd">            Dynamic boundary conditions of the model used in dynamic load</span>
+<span class="sd">            tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">            values &#39;None&#39; and &#39;Viscous&#39;. By default None.</span>
+<span class="sd">        shake_boundary_condtions : dict, None, optional</span>
+<span class="sd">            Dynamic boundary conditions of the model used in base shake</span>
+<span class="sd">            tests. If None the default setting is adopted. Dictionary</span>
+<span class="sd">            with keys `XMin`, `XMax`, `YMin` and `YMax`, with supported</span>
+<span class="sd">            values &#39;None&#39;, &#39;Viscous&#39;, &#39;Free-field&#39; and &#39;Compliant base&#39;.</span>
+<span class="sd">            By default None.</span>
+<span class="sd">        boundary_interface : bool, optional</span>
+<span class="sd">            Include boundary interfaces needed for a base shake test.</span>
+<span class="sd">            This requires a much denser mesh and more computationally</span>
+<span class="sd">            demanding models. By default False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">NSG</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">b2</span><span class="o">=</span><span class="n">b2</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="n">dstrata</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="n">wt</span><span class="p">,</span>
+                     <span class="n">fill_angle</span><span class="o">=</span><span class="n">fill_angle</span><span class="p">,</span> <span class="n">bfill</span><span class="o">=</span><span class="n">bfill</span><span class="p">,</span> <span class="n">nfill</span><span class="o">=</span><span class="n">nfill</span><span class="p">,</span>
+                     <span class="n">dfill</span><span class="o">=</span><span class="n">dfill</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="n">dratchetting</span><span class="p">,</span>
+                     <span class="n">interface</span><span class="o">=</span><span class="n">interface</span><span class="p">,</span> <span class="n">model_width</span><span class="o">=</span><span class="n">model_width</span><span class="p">,</span>
+                     <span class="n">model_depth</span><span class="o">=</span><span class="n">model_depth</span><span class="p">)</span>
+        <span class="n">SolidModel</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">Model</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">model_type</span><span class="p">,</span> <span class="n">element_type</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span>
+                       <span class="n">comments</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">fill</span><span class="p">,</span> <span class="n">ratchetting_material</span><span class="p">,</span>
+                       <span class="n">ratchetting_threshold</span><span class="p">,</span> <span class="n">mesh_density</span><span class="p">,</span> <span class="n">locations</span><span class="p">,</span> <span class="n">excavation</span><span class="p">,</span>
+                       <span class="n">deformation_boundary_condition</span><span class="o">=</span><span class="n">deformation_boundary_condition</span><span class="p">,</span>
+                       <span class="n">dynamic_boundary_condtions</span><span class="o">=</span><span class="n">dynamic_boundary_condtions</span><span class="p">,</span>
+                       <span class="n">shake_boundary_condtions</span><span class="o">=</span><span class="n">shake_boundary_condtions</span><span class="p">,</span>
+                       <span class="n">boundary_interface</span><span class="o">=</span><span class="n">boundary_interface</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_foundation_material</span><span class="p">(</span><span class="n">concrete</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">build</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_build_surface_load</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds surface load to the model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface_load</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="n">load</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">lineload</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface_load</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load</span><span class="p">)</span>
+
+        <span class="n">load</span> <span class="o">=</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">lineload</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_surface_load</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">load</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_set_surface_load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qsurf</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Activates and sets a value to the surface load in the</span>
+<span class="sd">        curernt phase. </span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        qsurf : numeric</span>
+<span class="sd">            Surface load.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_2_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_2_1</span><span class="o">.</span><span class="n">qy_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">qsurf</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_3_1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">LineLoad_3_1</span><span class="o">.</span><span class="n">qy_start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_g_i</span><span class="o">.</span><span class="n">Model</span><span class="o">.</span><span class="n">CurrentPhase</span><span class="p">,</span> <span class="n">qsurf</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

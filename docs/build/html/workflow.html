@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usage &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"equationNumbers": {"autoNumber": "AMS", "useLabelIds": true}}, "tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Geometry" href="geometry.html" />
+    <link rel="prev" title="Installation" href="Installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Workflow</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Plaxis-connection">Plaxis connection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Create-foundation-model">Create foundation model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Test">Test</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Save/Load">Save/Load</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#General-model-settings">General model settings</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Boundary-conditions">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Element-type">Element type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Preliminary-model-check">Preliminary model check</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="materials.html">Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Usage</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/workflow.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Usage">
+<h1>Usage<a class="headerlink" href="#Usage" title="Permalink to this heading"></a></h1>
+<section id="Plaxis-connection">
+<h2>Plaxis connection<a class="headerlink" href="#Plaxis-connection" title="Permalink to this heading"></a></h2>
+<p>Along with <code class="docutils literal notranslate"><span class="pre">padtest</span></code> you will need to import <code class="docutils literal notranslate"><span class="pre">plxscripting</span></code> and connect with Plaxis following <a class="reference external" href="https://communities.bentley.com/products/geotech-analysis/w/wiki/46005/using-plaxis-remote-scripting-with-the-python-wrapper">these instructions</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">plxscripting.easy</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">padtest</span>
+
+<span class="n">password</span> <span class="o">=</span> <span class="s2">&quot;nicFgr^TtsFm~h~M&quot;</span>
+<span class="n">localhostport_input</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">localhostport_output</span> <span class="o">=</span> <span class="mi">10001</span>
+<span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span> <span class="o">=</span> <span class="n">new_server</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">localhostport_input</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span>
+<span class="n">s_o</span><span class="p">,</span> <span class="n">g_o</span> <span class="o">=</span> <span class="n">new_server</span><span class="p">(</span><span class="s1">&#39;localhost&#39;</span><span class="p">,</span> <span class="n">localhostport_output</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="n">password</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title fa fa-exclamation-circle"><strong>WARNING</strong></p>
+<p>This code will not be repeated in every example, but it is assumed it was executed.</p>
+</div>
+</section>
+<section id="Create-foundation-model">
+<h2>Create foundation model<a class="headerlink" href="#Create-foundation-model" title="Permalink to this heading"></a></h2>
+<div class="admonition warning">
+<p class="admonition-title fa fa-exclamation-circle"><strong>WARNING</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">padtest</span></code> employs units of <strong>kN</strong> and <strong>m</strong> by default.</p>
+</div>
+<p>The <a class="reference internal" href="geometry.html"><span class="doc">geometry</span></a> of the foundation is given by:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="mf">1.2</span> <span class="c1"># Foundation depth</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># Foundation width</span>
+<span class="n">b1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># Foundation column width</span>
+<span class="n">d1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># Foundation width</span>
+</pre></div>
+</div>
+</div>
+<p><a class="reference internal" href="materials.html"><span class="doc">Materials</span></a> are defined by dictionaries containing the properties required in each case by Plaxis. <a class="reference internal" href="materials.html#Linear-elastic"><span class="std std-ref">Linear-Elastic</span></a>, <a class="reference internal" href="materials.html#Mohr-Coulomb"><span class="std std-ref">Mohr-Coulomb</span></a> and <a class="reference internal" href="materials.html#Hardening-soil"><span class="std std-ref">Hardening Soil (HS)</span></a> soil materials are supported. A Mohr-Coulomb material is used for the soil:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mohr-Coulomb soil material</span>
+<span class="n">soil</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
+<span class="n">soil</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span> <span class="c1"># kN</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># kPa</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1"># deg</span>
+<span class="n">soil</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
+</pre></div>
+</div>
+</div>
+<p>The foundation itself is modeled by plate elements. The <code class="docutils literal notranslate"><span class="pre">concrete</span></code> method generates the dictionary with the <a class="reference internal" href="materials.html#Plate-materials"><span class="std std-ref">plate material</span></a> properties from the desired compressive strength, unit weight and plate thickness.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 40cm thickness and 24kN/m3 unit weight</span>
+<span class="n">column</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">b1</span><span class="p">)</span>
+<span class="c1"># Plate material for a f&#39;c=30MPa concrete slab with a 60cm thickness and 24kN/m3 unit weight</span>
+<span class="n">footing</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="n">d1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Create an <a class="reference internal" href="geometry.html#Model-types"><span class="std std-ref">axisymmetric foundation</span></a> model using plate elements for the column and footing:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">SPlate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The resulting model geometry can be inspected visually in python:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="_images/workflow_16_0.png" src="_images/workflow_16_0.png" />
+</div>
+</div>
+</section>
+<section id="Test">
+<h2>Test<a class="headerlink" href="#Test" title="Permalink to this heading"></a></h2>
+<p><a class="reference internal" href="test.html#Load-test"><span class="std std-ref">Static</span></a>, <a class="reference internal" href="test.html#Failure-test"><span class="std std-ref">failure</span></a>, <a class="reference internal" href="test.html#Safety-test"><span class="std std-ref">safety</span></a>, <a class="reference internal" href="test.html#Dynamic-load-test"><span class="std std-ref">dynamic loading</span></a> and <a class="reference internal" href="test.html#Shake-test"><span class="std std-ref">earthquake shake</span></a> tests are available. A static load test is conducted using the <code class="docutils literal notranslate"><span class="pre">load_test</span></code> method. The test consist in consecutive load levels being applied to the foundation. Negative loads imply compression, while positive pull-out. Each load level is a phase where the load is set to the provided
+value.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">testid</span> <span class="o">=</span> <span class="s1">&#39;test A&#39;</span>
+<span class="n">load</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">60</span><span class="p">]</span> <span class="c1">#kN</span>
+<span class="n">model</span><span class="o">.</span><span class="n">load_test</span><span class="p">(</span><span class="n">testid</span><span class="p">,</span> <span class="n">load</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>Calculation results are stored in a dataframe:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>test</th>
+      <th>phase</th>
+      <th>previous</th>
+      <th>plx id</th>
+      <th>previous plx id</th>
+      <th>location</th>
+      <th>step</th>
+      <th>time</th>
+      <th>sumMstage</th>
+      <th>SumMsf</th>
+      <th>...</th>
+      <th>M</th>
+      <th>qy0</th>
+      <th>qy1</th>
+      <th>qx</th>
+      <th>agx</th>
+      <th>agy</th>
+      <th>Fy target</th>
+      <th>Fx target</th>
+      <th>M target</th>
+      <th>ratchetting</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>None</td>
+      <td>construction</td>
+      <td>None</td>
+      <td>Phase_1</td>
+      <td>None</td>
+      <td>top</td>
+      <td>1.0</td>
+      <td>None</td>
+      <td>0.500000</td>
+      <td>None</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>None</td>
+      <td>construction</td>
+      <td>None</td>
+      <td>Phase_1</td>
+      <td>None</td>
+      <td>top</td>
+      <td>2.0</td>
+      <td>None</td>
+      <td>1.000000</td>
+      <td>None</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>None</td>
+      <td>construction</td>
+      <td>None</td>
+      <td>Phase_1</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>None</td>
+      <td>0.500000</td>
+      <td>None</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>None</td>
+      <td>construction</td>
+      <td>None</td>
+      <td>Phase_1</td>
+      <td>None</td>
+      <td>0.0</td>
+      <td>2.0</td>
+      <td>None</td>
+      <td>1.000000</td>
+      <td>None</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>None</td>
+      <td>construction</td>
+      <td>None</td>
+      <td>Phase_1</td>
+      <td>None</td>
+      <td>0.25</td>
+      <td>1.0</td>
+      <td>None</td>
+      <td>0.500000</td>
+      <td>None</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>1123</th>
+      <td>test A</td>
+      <td>test A_stage_2</td>
+      <td>test A_stage_1</td>
+      <td>Phase_4</td>
+      <td>Phase_3</td>
+      <td>1.0</td>
+      <td>44.0</td>
+      <td>0.0</td>
+      <td>0.894563</td>
+      <td>1.0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-53.673803</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1124</th>
+      <td>test A</td>
+      <td>test A_stage_2</td>
+      <td>test A_stage_1</td>
+      <td>Phase_4</td>
+      <td>Phase_3</td>
+      <td>1.0</td>
+      <td>45.0</td>
+      <td>0.0</td>
+      <td>0.926229</td>
+      <td>1.0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-55.573761</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1125</th>
+      <td>test A</td>
+      <td>test A_stage_2</td>
+      <td>test A_stage_1</td>
+      <td>Phase_4</td>
+      <td>Phase_3</td>
+      <td>1.0</td>
+      <td>46.0</td>
+      <td>0.0</td>
+      <td>0.957895</td>
+      <td>1.0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-57.473717</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1126</th>
+      <td>test A</td>
+      <td>test A_stage_2</td>
+      <td>test A_stage_1</td>
+      <td>Phase_4</td>
+      <td>Phase_3</td>
+      <td>1.0</td>
+      <td>47.0</td>
+      <td>0.0</td>
+      <td>0.989561</td>
+      <td>1.0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-59.373676</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1127</th>
+      <td>test A</td>
+      <td>test A_stage_2</td>
+      <td>test A_stage_1</td>
+      <td>Phase_4</td>
+      <td>Phase_3</td>
+      <td>1.0</td>
+      <td>48.0</td>
+      <td>0.0</td>
+      <td>1.000000</td>
+      <td>1.0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>-60.000000</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+<p>1128 rows × 24 columns</p>
+</div></div>
+</div>
+<p>By default 6 points are selected surveyed. The load application point at the surface, and points located at the foundation level at a distance of 0, 0.25, 0.5, 0.75 and 1 times b/2. The load test results can be inspected using the <code class="docutils literal notranslate"><span class="pre">plot_test</span></code> function.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">plot_test</span><span class="p">(</span><span class="s1">&#39;test A&#39;</span><span class="p">,</span> <span class="n">location</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="_images/workflow_23_0.png" src="_images/workflow_23_0.png" />
+</div>
+</div>
+<p>Multiple load tests can be performed in the same model.Each load test will start from the construction phase. **</p>
+</section>
+<section id="Save/Load">
+<h2>Save/Load<a class="headerlink" href="#Save/Load" title="Permalink to this heading"></a></h2>
+<p>Saving a model wipes out the Plaxis objects stored in it. This prevents the load test object from further communicating with Plaxis, so no additional can be performed. The information regarding the model geometry, material properties and test results is preserved.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;exmaple_model.mdl&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+WARNIGN: Saving the load test to memory whipes out the Plaxis objects. Test results and input parameters will still be avaiable, but no further interaction with Plaxis will be possible. The model can be restored with the &lt;regen&gt; method, but load tests will have to be recalculated to access the results whitin Plaxis.
+
+ Do you whish to proceed: [Y/n]
+</pre></div></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">regen</span></code> method regenerates the Plaxis model from a saved model so it can be used to calculate new tests. It can also recalculate the saved tests by setting the argument <code class="docutils literal notranslate"><span class="pre">test</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;exmaple_model.mdl&#39;</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">regen</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="General-model-settings">
+<h2>General model settings<a class="headerlink" href="#General-model-settings" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">model_type</span></code> argument can be set to <code class="docutils literal notranslate"><span class="pre">'axisymmetry'</span></code> (default) or <code class="docutils literal notranslate"><span class="pre">'planestrain'</span></code>. Also, the title and comments of the model in Plaxis can be set with the <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">comments</span></code> arguments.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">Plate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span>
+                      <span class="n">model_type</span><span class="o">=</span><span class="s1">&#39;planestrain&#39;</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;plane strain&#39;</span><span class="p">,</span>
+                      <span class="n">comments</span><span class="o">=</span><span class="s1">&#39;This is a plane strain model example.&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Boundary-conditions">
+<h2>Boundary conditions<a class="headerlink" href="#Boundary-conditions" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">deformation_boundary_condition</span></code> argument imposes user defined deformation boundary conditions to the model. A dictionary must be provided with some, or all, of the fields <code class="docutils literal notranslate"><span class="pre">'XMin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'XMax'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YMin'</span></code> or <code class="docutils literal notranslate"><span class="pre">'YMax'</span></code>. Supported values are <code class="docutils literal notranslate"><span class="pre">&quot;Free&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Normally</span> <span class="pre">fixed&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Horizontally</span> <span class="pre">fixed&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Vertically</span> <span class="pre">fixed&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;Fully</span> <span class="pre">fixed&quot;</span></code>. If a boundary is not specified by the user, the default value is adopted.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">dynamic_boundary_condtions</span></code> argument imposes user defined dynamic boundary conditions to the model to be used in a <a class="reference internal" href="test.html#Dynamic-load-test"><span class="std std-ref">dynamic load test</span></a>. A dictionary must be provided with some, or all, of the fields <code class="docutils literal notranslate"><span class="pre">'XMin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'XMax'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YMin'</span></code> or <code class="docutils literal notranslate"><span class="pre">'YMax'</span></code>. Supported values are <code class="docutils literal notranslate"><span class="pre">&quot;None&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;Viscous&quot;</span></code>. If a boundary is not specified by the user, the default value is adopted.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">shake_boundary_condtions</span></code> argument imposes user defined dynamic boundary conditions to the model to be used in a <a class="reference internal" href="test.html#Shake-test"><span class="std std-ref">shake test</span></a>. A dictionary must be provided with some, or all, of the fields <code class="docutils literal notranslate"><span class="pre">'XMin'</span></code>, <code class="docutils literal notranslate"><span class="pre">'XMax'</span></code>, <code class="docutils literal notranslate"><span class="pre">'YMin'</span></code> or <code class="docutils literal notranslate"><span class="pre">'YMax'</span></code>. Supported values are <code class="docutils literal notranslate"><span class="pre">&quot;None&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;Viscous&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;Free-field&quot;</span></code>. If a boundary is not specified by the user, the default value is adopted.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">Plate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span>
+                      <span class="n">deformation_boundary_condition</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;Fully fixed&#39;</span><span class="p">,</span>
+                                                      <span class="s1">&#39;YMax&#39;</span><span class="p">:</span><span class="s1">&#39;Horizontally fixed&#39;</span><span class="p">},</span>
+                      <span class="n">dynamic_boundary_condtions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;XMin&#39;</span><span class="p">:</span><span class="s1">&#39;Viscous&#39;</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Element-type">
+<h2>Element type<a class="headerlink" href="#Element-type" title="Permalink to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">element_type</span></code> argument controls the type of elements used in the model. It can be set to <code class="docutils literal notranslate"><span class="pre">'6-Noded'</span></code> or <code class="docutils literal notranslate"><span class="pre">'15-Noded'</span></code>. By default, 15-noded elements are used.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">Plate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span>
+                      <span class="n">element_type</span><span class="o">=</span><span class="s1">&#39;6-Noded&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Preliminary-model-check">
+<h2>Preliminary model check<a class="headerlink" href="#Preliminary-model-check" title="Permalink to this heading"></a></h2>
+<p>Waiting for Plaxis to build and run the initial phases can be time consuming only to check that the model has the correct geometry. The <code class="docutils literal notranslate"><span class="pre">build</span></code> attribute controls whether the Plaxis model gets build. By setting it to <code class="docutils literal notranslate"><span class="pre">False</span></code> the geometry can be inspecting with <code class="docutils literal notranslate"><span class="pre">plot()</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">padtest</span><span class="o">.</span><span class="n">Plate</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">g_i</span><span class="p">,</span> <span class="n">g_o</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">soil</span><span class="p">,</span> <span class="n">footing</span><span class="p">,</span> <span class="n">column</span><span class="p">,</span> <span class="n">build</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="_images/workflow_41_0.png" src="_images/workflow_41_0.png" />
+</div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">build()</span></code> method creates the model in Plaxis so it can be used.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="Installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="geometry.html" class="btn btn-neutral float-right" title="Geometry" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

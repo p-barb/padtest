@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>padtest.geometry.polygon &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../materials.html">Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">padtest.geometry.polygon</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for padtest.geometry.polygon</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<div class="viewcode-block" id="Polygon"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.polygon.Polygon">[docs]</a><span class="k">class</span> <span class="nc">Polygon</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;2D clsoed polygon.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vertex : array-llike</span>
+<span class="sd">        (nv, 2) vertex cooodrinates.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    in_strata(zstrata)</span>
+<span class="sd">        Identifies the strata where the polygon is located.</span>
+<span class="sd">    add_2_model(g_i)</span>
+<span class="sd">        Adds the polygon as a Plaxis model structure.</span>
+<span class="sd">    plot(figsize=3)</span>
+<span class="sd">        Creates a figure showing the polygon and its centroid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init method.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        vertex : array-llike</span>
+<span class="sd">            (nv, 2) vertex cooodrinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">vertex</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">vertex</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="n">vertex</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span> <span class="o">=</span> <span class="n">vertex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nvertex</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_area</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_bounding_box</span><span class="p">()</span>
+    
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PRIVATE METHODS</span>
+    <span class="c1">#===================================================================</span>
+    <span class="k">def</span> <span class="nf">_closed_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the closed polygon vertex coordinates.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nv+1, 2) vertex coordiantes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        
+    <span class="k">def</span> <span class="nf">_set_area</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes polygon area and centroid.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            0 area polygon.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed_vertex</span><span class="p">()</span>
+        <span class="n">area</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cy</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nvertex</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">vertex</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">vertex</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">vertex</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">vertex</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">cx</span> <span class="o">+=</span> <span class="p">(</span><span class="n">vertex</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">vertex</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span>
+            <span class="n">cy</span> <span class="o">+=</span> <span class="p">(</span><span class="n">vertex</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">vertex</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">x</span>
+            <span class="n">area</span> <span class="o">+=</span> <span class="n">x</span>
+        <span class="n">area</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">area</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Polygon has no area.&#39;</span><span class="p">)</span>            
+        <span class="bp">self</span><span class="o">.</span><span class="n">_centroid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">6</span> <span class="o">*</span> <span class="n">area</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Computes polygo bounding box.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bounding_box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">],</span> <span class="p">[</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">],</span> <span class="p">[</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">],</span> <span class="p">[</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span>
+    
+    <span class="k">def</span> <span class="nf">_vertex_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the polygon vertex as a list.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List with vertex coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex</span><span class="p">]</span>
+    
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PUBLIC METHODS</span>
+    <span class="c1">#===================================================================</span>
+<div class="viewcode-block" id="Polygon.in_strata"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.polygon.Polygon.in_strata">[docs]</a>    <span class="k">def</span> <span class="nf">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">zstrata</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identifies the strata where the polygon is located.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        zstrata : array-like</span>
+<span class="sd">            (nstrata,) depth of the bottom of each strata, in descending</span>
+<span class="sd">            order.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Index of the strata in the zstrata array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># beyond max straa depth</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">zstrata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">&gt;</span> <span class="n">zstrata</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Polygon.add_2_model"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.polygon.Polygon.add_2_model">[docs]</a>    <span class="k">def</span> <span class="nf">add_2_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">g_i</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds the polygon as a Plaxis model structure.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        g_i : PlxProxyGlobalObject</span>
+<span class="sd">            Global object of the current open Plaxis model in Input.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        _type_</span>
+<span class="sd">            _description_</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g_i</span><span class="o">.</span><span class="n">gotostructures</span><span class="p">()</span>
+        <span class="n">struct_poly</span><span class="p">,</span> <span class="n">struct_soil</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">polygon</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_vertex_list</span><span class="p">())</span>
+        <span class="n">g_i</span><span class="o">.</span><span class="n">gotostages</span><span class="p">()</span>
+        <span class="n">phase_poly</span> <span class="o">=</span> <span class="n">g_i</span><span class="o">.</span><span class="n">polygons</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    
+        <span class="k">return</span> <span class="n">struct_poly</span><span class="p">,</span> <span class="n">struct_soil</span><span class="p">,</span> <span class="n">phase_poly</span></div>
+
+<div class="viewcode-block" id="Polygon.plot"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.polygon.Polygon.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a figure showing the polygon and its centroid.</span>
+
+<span class="sd">        :noindex:</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        figsize : float, optional</span>
+<span class="sd">            Figure size, by default 3</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Figure</span>
+<span class="sd">            Figure with the polygon and its centroid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">))</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed_vertex</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">vertex</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">vertex</span><span class="p">[:,</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;-ok&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_centroid</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;xk&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;y&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">fig</span></div></div>
+        
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

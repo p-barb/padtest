@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materials &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/nbsphinx-code-cells.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"TeX": {"equationNumbers": {"autoNumber": "AMS", "useLabelIds": true}}, "tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "tex2jax_ignore|mathjax_ignore|document", "processClass": "tex2jax_process|mathjax_process|math|output_area"}})</script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Foundation test" href="test.html" />
+    <link rel="prev" title="Geometry" href="geometry.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Materials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Soil-materials">Soil materials</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Linear-elastic">Linear elastic</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Mohr-Coulomb">Mohr-Coulomb</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Hardening-soil">Hardening soil</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#Plate-materials">Plate materials</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Materials</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/materials.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Materials">
+<h1>Materials<a class="headerlink" href="#Materials" title="Permalink to this heading"></a></h1>
+<section id="Soil-materials">
+<h2>Soil materials<a class="headerlink" href="#Soil-materials" title="Permalink to this heading"></a></h2>
+<section id="Linear-elastic">
+<h3>Linear elastic<a class="headerlink" href="#Linear-elastic" title="Permalink to this heading"></a></h3>
+<p>Linear elastic soil materials are specified by a dictionary whit the following fields:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;elastic&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">728e3</span> <span class="c1"># kPa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span> <span class="c1"># Poisson</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
+</pre></div>
+</div>
+</div>
+<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># interface strength, default value 1</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="c1"># [m/day] Permeability in the horizontal direction, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.04</span> <span class="c1"># [m/day] Permeability in the vertical direction, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Mohr-Coulomb">
+<h3>Mohr-Coulomb<a class="headerlink" href="#Mohr-Coulomb" title="Permalink to this heading"></a></h3>
+<p>Mohr-Coulomb soil materials are specified by a dictionary whit the following fields:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Mohr-Coulomb soil material</span>
+<span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;mohr-coulomb&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># kN/m3</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span> <span class="c1"># kN/m3</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span> <span class="c1"># kN</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;cref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># kPa</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">35</span> <span class="c1"># deg</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1"># deg</span>
+</pre></div>
+</div>
+</div>
+<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># interface strength, default value 1</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;K0nc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="c1"># default value sin(45 - phi / 2)</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="c1"># [m/day] Permeability in the horizontal direction, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.04</span> <span class="c1"># [m/day] Permeability in the vertical direction, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Hardening-soil">
+<h3>Hardening soil<a class="headerlink" href="#Hardening-soil" title="Permalink to this heading"></a></h3>
+<p>Hardening soil materials are specified by a dictionary whit the following fields:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;SoilModel&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;hardening soil&#39;</span>
+<span class="n">material</span><span class="p">[</span><span class="s2">&quot;DrainageType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaSat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">17</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;gammaUnsat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;e0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;E50ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Eoedref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4e4</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;Euref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.2e5</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;powerm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;psi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>
+</pre></div>
+</div>
+</div>
+<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">material</span><span class="p">[</span><span class="s1">&#39;Rinter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="c1"># interface strength, default value 1</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;K0nc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="c1"># default value sin(45 - phi / 2)</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;kx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.02</span> <span class="c1"># [m/day] Permeability in the horizontal direction, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;ky&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.04</span> <span class="c1"># [m/day] Permeability in the vertical direction, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
+<span class="n">material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Plate-materials">
+<h2>Plate materials<a class="headerlink" href="#Plate-materials" title="Permalink to this heading"></a></h2>
+<p>Plate materials are specified by a dictionary whit the following fields:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plate_material</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;nu&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;EA&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.73e6</span> <span class="c1"># KPa m</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;EI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="mi">12</span> <span class="o">*</span> <span class="mf">7.73e6</span> <span class="c1"># KPa m</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span> <span class="c1"># m</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;Gref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.73e6</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.4</span><span class="p">))</span> <span class="c1"># KPa</span>
+</pre></div>
+</div>
+</div>
+<p>There are optional parameters that, if not provided, the default value calculated by Plaxis is assigned:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighAlpha&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.57</span> <span class="c1"># Rayleight damping alpha parameter, default value 0</span>
+<span class="n">plate_material</span><span class="p">[</span><span class="s1">&#39;RayleighBeta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Rayleight damping beta parameter, default value 0</span>
+</pre></div>
+</div>
+</div>
+<p>Plates material are specified per m of cross-section width. Therefore, the stiffness parameters must comply with the following relations. The equivalent thickness <code class="docutils literal notranslate"><span class="pre">d</span></code> is related to the axial and flexural stiffness by:</p>
+<div class="math notranslate nohighlight">
+\[d=\sqrt{12 \frac{EI}{EA}}\]</div>
+<p>The reference shear modulus:</p>
+<div class="math notranslate nohighlight">
+\[G_{ref} = \frac{EA}{2 \ d \ \left(1 + \nu \right)}\]</div>
+<p>An alternative way to define a plate material is using the <code class="docutils literal notranslate"><span class="pre">concrete</span></code> function, where the properties of the plate are computed form the compressive strength of concrete as:</p>
+<div class="math notranslate nohighlight">
+\[E \left[kPa\right] = 4700 \ \sqrt{f'_c \left[MPa\right]} \ 10^3\]</div>
+<div class="math notranslate nohighlight">
+\[EA = E \ d \ 1m\]</div>
+<div class="math notranslate nohighlight">
+\[EI = E \ \frac{d^3 \ 1m}{12}\]</div>
+<div class="math notranslate nohighlight">
+\[w = \gamma \ d \ 1m\]</div>
+<p>The default value for the Poisson modulus can be modified when calling the function:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">padtest</span>
+<span class="n">fc</span> <span class="o">=</span> <span class="mi">30</span> <span class="c1"># MPa</span>
+<span class="n">gamma</span> <span class="o">=</span> <span class="mi">24</span> <span class="c1">#kN/m3</span>
+<span class="n">d</span> <span class="o">=</span> <span class="mf">0.4</span>
+<span class="n">padtest</span><span class="o">.</span><span class="n">concrete</span><span class="p">(</span><span class="n">fc</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="n">poisson</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;fc&#39;: 30,
+ &#39;E&#39;: 25742960.202742808,
+ &#39;nu&#39;: 0.3,
+ &#39;EA&#39;: 10297184.081097124,
+ &#39;EI&#39;: 137295.78774796167,
+ &#39;d&#39;: 0.4,
+ &#39;Gref&#39;: 9901138.539516464,
+ &#39;gamma&#39;: 24,
+ &#39;w&#39;: 9.600000000000001}
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="geometry.html" class="btn btn-neutral float-left" title="Geometry" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="test.html" class="btn btn-neutral float-right" title="Foundation test" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

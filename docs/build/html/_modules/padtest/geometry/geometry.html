@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>padtest.geometry.geometry &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../materials.html">Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">padtest.geometry.geometry</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for padtest.geometry.geometry</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Polygon</span> <span class="k">as</span> <span class="n">PatchPolygon</span>
+<span class="kn">from</span> <span class="nn">matplotlib.collections</span> <span class="kn">import</span> <span class="n">PatchCollection</span>
+<span class="n">DEFAULT_CYCLE</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;axes.prop_cycle&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="kn">from</span> <span class="nn">padtest.geometry.polygon</span> <span class="kn">import</span> <span class="n">Polygon</span>
+
+<div class="viewcode-block" id="Geometry"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.geometry.Geometry">[docs]</a><span class="k">class</span> <span class="nc">Geometry</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for the foundation geometry. Set inputs that are not</span>
+<span class="sd">    dependent on whether the foundation is modelled as a solid or a</span>
+<span class="sd">    plate.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dstrata : list, None</span>
+<span class="sd">        Width of soil layers [m].</span>
+<span class="sd">    wt : float, None</span>
+<span class="sd">        Water tabe depth [m]. By default None.</span>
+<span class="sd">    fill_angle : float</span>
+<span class="sd">        Fill angle [deg].</span>
+<span class="sd">    bfill : float</span>
+<span class="sd">        Distance between foundation edge and the start of the fill</span>
+<span class="sd">        slope [m]. By default 0.5.</span>
+<span class="sd">    nfill : int, None</span>
+<span class="sd">        Number of fill layers. By default None.</span>
+<span class="sd">    dfill : list, None</span>
+<span class="sd">        (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">    dratchetting : float, None</span>
+<span class="sd">        Widht of soil under the foundation that is replaced when</span>
+<span class="sd">        ratchetting occurs [m].</span>
+<span class="sd">    model_widht : float, optional</span>
+<span class="sd">        User specified model width [m]. By default None.</span>
+<span class="sd">    model_depth : float, optional</span>
+<span class="sd">        User specified model depth [m]. By default None.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    plot(figsize=2.5, foundation=True, fill=True, soil=True, excavation=False, ratchetting=True, wt=True, interface=False, output_location=False)</span>
+<span class="sd">        Foundation plot.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dstrata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fill_angle</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bfill</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                 <span class="n">nfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dfill</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dratchetting</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>  <span class="n">model_width</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">model_depth</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init mehtod.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dstrata : list, None</span>
+<span class="sd">            Width of soil layers [m].</span>
+<span class="sd">        wt : float, None</span>
+<span class="sd">            Water tabe depth [m]. By default None.</span>
+<span class="sd">        fill_angle : float</span>
+<span class="sd">            Fill angle [deg].</span>
+<span class="sd">        bfill : float</span>
+<span class="sd">            Distance between foundation edge and the start of the fill</span>
+<span class="sd">            slope [m]. By default 0.5.</span>
+<span class="sd">        nfill : int, None</span>
+<span class="sd">            Number of fill layers. By default None.</span>
+<span class="sd">        dfill : list, None</span>
+<span class="sd">            (nfill,) width of fill layers [m]. By default None.</span>
+<span class="sd">        dratchetting : float, None</span>
+<span class="sd">            Widht of soil under the foundation that is replaced when</span>
+<span class="sd">            ratchetting occurs [m].</span>
+<span class="sd">        model_widht : float, optional</span>
+<span class="sd">            User specified model width [m]. By default None.</span>
+<span class="sd">        model_depth : float, optional</span>
+<span class="sd">            User specified model depth [m]. By default None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_soil_parameters</span><span class="p">(</span><span class="n">dstrata</span><span class="p">,</span> <span class="n">model_depth</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fill_parameters</span><span class="p">(</span><span class="n">fill_angle</span><span class="p">,</span> <span class="n">nfill</span><span class="p">,</span> <span class="n">dfill</span><span class="p">,</span> <span class="n">bfill</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_excavation_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_ratchetting_parameters</span><span class="p">(</span><span class="n">dratchetting</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_model_width</span><span class="p">(</span><span class="n">model_width</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_global_wt</span><span class="p">(</span><span class="n">wt</span><span class="p">)</span>
+        
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PRIVATE METHODS</span>
+    <span class="c1">#===================================================================</span>
+    <span class="k">def</span> <span class="nf">_param_value_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paramid</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">desc</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Creates a formated string that displays the value stored in</span>
+<span class="sd">        a foundation parameter and it&#39;s unit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        paramid : str</span>
+<span class="sd">            Parameter label</span>
+<span class="sd">        value : numeric</span>
+<span class="sd">            Value stored in the parameter.</span>
+<span class="sd">        desc : str</span>
+<span class="sd">            Description of the parameter</span>
+<span class="sd">        units : str</span>
+<span class="sd">            Units.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Value stored in the parameter with the description of the</span>
+<span class="sd">            parameter and its units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fist_col_width</span> <span class="o">=</span> <span class="mi">35</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;  -</span><span class="si">{}</span><span class="s1"> = </span><span class="si">{:.2f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">paramid</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">*</span> <span class="p">(</span><span class="n">fist_col_width</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">))</span>
+        <span class="n">subsequent_indent</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">fist_col_width</span>
+        <span class="n">wrapper</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">TextWrapper</span><span class="p">(</span><span class="n">initial_indent</span><span class="o">=</span><span class="n">prefix</span><span class="p">,</span>
+                                       <span class="n">subsequent_indent</span><span class="o">=</span><span class="n">subsequent_indent</span><span class="p">,</span>
+                                       <span class="n">width</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">units</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&#39;</span> <span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">]:</span>
+            <span class="n">desc</span> <span class="o">+=</span> <span class="s1">&#39; [</span><span class="si">{}</span><span class="s1">]&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">wrapper</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_soil_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dstrata</span><span class="p">,</span> <span class="n">model_depth</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set soil layers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dstrata : list, None</span>
+<span class="sd">            Width of soil layers [m].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">default_model_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span>
+        <span class="n">min_model_depth</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span>
+        <span class="k">if</span> <span class="n">dstrata</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">model_depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">model_depth</span> <span class="o">=</span> <span class="n">default_model_depth</span>
+            <span class="k">elif</span> <span class="n">model_depth</span> <span class="o">&lt;</span> <span class="n">min_model_depth</span><span class="p">:</span>
+                <span class="n">model_depth</span> <span class="o">=</span> <span class="n">min_model_depth</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nstrata</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dstrata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">model_depth</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zstrata</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dstrata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model_depth</span> <span class="o">=</span> <span class="n">model_depth</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">model_depth</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="k">return</span>
+        
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dstrata</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
+            <span class="n">dstrata</span> <span class="o">=</span> <span class="p">[</span><span class="n">dstrata</span><span class="p">]</span>
+        <span class="n">dstrata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)</span>
+        <span class="n">default_model_depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">default_model_depth</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)])</span>
+        <span class="n">min_model_depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">default_model_depth</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)])</span>
+
+        <span class="k">if</span> <span class="n">model_depth</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_depth</span> <span class="o">=</span> <span class="n">default_model_depth</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">default_model_depth</span><span class="p">:</span>
+                <span class="n">dstrata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_model_depth</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">model_depth</span> <span class="o">&lt;</span> <span class="n">min_model_depth</span><span class="p">:</span>
+            <span class="n">model_depth</span> <span class="o">=</span> <span class="n">min_model_depth</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">min_model_depth</span><span class="p">:</span>
+                <span class="n">dstrata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">min_model_depth</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">model_depth</span><span class="p">:</span>
+            <span class="n">dstrata</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_depth</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dstrata</span> <span class="o">=</span> <span class="n">dstrata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nstrata</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_model_depth</span> <span class="o">=</span> <span class="n">model_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">model_depth</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zstrata</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dstrata</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_fill_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fill_angle</span><span class="p">,</span> <span class="n">nfill</span><span class="p">,</span> <span class="n">dfill</span><span class="p">,</span> <span class="n">bfill</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set buried foundation fill.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fill_angle : float</span>
+<span class="sd">            Fill angle [deg].</span>
+<span class="sd">        nfill : int, None</span>
+<span class="sd">            Number of fill layers. </span>
+<span class="sd">        dfill : list</span>
+<span class="sd">            (nfill,) width of fill layers [m].</span>
+<span class="sd">        bfill : float</span>
+<span class="sd">            Distance between foundation edge and the start of the fill</span>
+<span class="sd">            slope [m].</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            nfill and fill.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># surface foundaiton has no fill</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">fill_angle</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fill_angle</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dfill</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zfill</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+ 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill_angle</span> <span class="o">=</span> <span class="n">fill_angle</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span> <span class="o">=</span> <span class="n">bfill</span>
+        <span class="k">if</span> <span class="n">nfill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dfill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Either define the number of uniform fill layers &lt;nfill&gt; or their widhts &lt;dfill&gt;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nfill</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">dfill</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nfill</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">dfill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">nfill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">nfill</span> <span class="o">=</span> <span class="n">nfill</span>
+            <span class="n">dfill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">/</span> <span class="n">nfill</span><span class="p">]</span> <span class="o">*</span> <span class="n">nfill</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dfill</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
+            <span class="n">dfill</span> <span class="o">=</span> <span class="p">[</span><span class="n">dfill</span><span class="p">]</span>
+        <span class="n">dfill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dfill</span><span class="p">)</span>
+        <span class="n">dfill</span> <span class="o">=</span> <span class="n">dfill</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dfill</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]</span>
+        <span class="n">dfill</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">dfill</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dfill</span><span class="p">)]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dfill</span> <span class="o">=</span> <span class="n">dfill</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dfill</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zfill</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dfill</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_excavation_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nexcavated</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dexcavated</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_zexcavated</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="n">dexcavated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dstrata</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dstrata</span><span class="p">)</span><span class="o">&lt;=</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dexcavated</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+            <span class="n">dexcavated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">dexcavated</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dexcavated</span><span class="p">)]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dexcavated</span> <span class="o">=</span> <span class="n">dexcavated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nexcavated</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dexcavated</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_zexcavated</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">dexcavated</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_set_ratchetting_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dratchetting</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set under base layer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dratchetting : float, None</span>
+<span class="sd">            Widht of soil under the foundation that is replaced when</span>
+<span class="sd">            ratchetting occurs [m].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span> <span class="o">=</span> <span class="n">dratchetting</span>
+
+    <span class="k">def</span> <span class="nf">_set_model_width</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_width</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the model width.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_width : float, None</span>
+<span class="sd">            User defiend model width [m].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">default_model_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="mf">1.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span><span class="p">])</span>
+        
+        <span class="n">min_model_width</span> <span class="o">=</span> <span class="mf">1.1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">])</span> <span class="c1">#self._b / 2</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill_angle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">min_model_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span><span class="p">])</span>  <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fill_angle</span><span class="p">))</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+                                      <span class="n">min_model_width</span><span class="p">])</span>
+            <span class="n">default_model_width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">min_model_width</span><span class="p">,</span> <span class="n">default_model_width</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">model_width</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">model_width</span> <span class="o">=</span> <span class="n">default_model_width</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">model_width</span> <span class="o">/=</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">model_width</span> <span class="o">&lt;</span> <span class="n">min_model_width</span><span class="p">:</span>
+            <span class="n">model_width</span> <span class="o">=</span> <span class="n">min_model_width</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model_width</span> <span class="o">=</span> <span class="n">model_width</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">model_width</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_model_width</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">model_width</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">model_width</span><span class="p">,</span> <span class="n">model_width</span><span class="p">])</span>
+    
+    <span class="k">def</span> <span class="nf">_set_global_wt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wt</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets water table.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wt : float, None</span>
+<span class="sd">            Water tabe depth [m].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_global_wt</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">wt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_global_wt</span> <span class="o">=</span> <span class="n">wt</span>
+    
+    <span class="k">def</span> <span class="nf">_set_foundation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">foundation_type</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_foundation_type</span> <span class="o">=</span> <span class="n">foundation_type</span>
+        <span class="c1">#plate | surface | under | fill </span>
+        <span class="n">foundation_types</span> <span class="o">=</span> <span class="p">{(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;surface plate foundation with no underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;surface plate foundation with underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;buried plate foundation with no fill or underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">4</span> <span class="p">,</span><span class="s1">&#39;buried plate foundation with underfill and no fill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;buried plate foundation with fill and no underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;buried plate foundation with fill and underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;surface solid foundation with not underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;surface solid foundation with underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39; buried solid foundation with no fill or underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;buried solid foundation with underfill and no fill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;buried solid foundation with fill and no underfill&#39;</span><span class="p">],</span>
+                            <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;buried solid foundation with fill and underfill&#39;</span><span class="p">]}</span>
+        <span class="n">ftype</span> <span class="o">=</span>  <span class="n">foundation_types</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_foundation_type</span> <span class="o">==</span> <span class="s1">&#39;plate&#39;</span><span class="p">,</span> 
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">,</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ftypeid</span> <span class="o">=</span> <span class="n">ftype</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_desc</span> <span class="o">=</span> <span class="n">ftype</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_set_polygons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strata</span> <span class="o">=</span> <span class="p">{</span><span class="n">new_list</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">new_list</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nstrata</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fill</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_excavation</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ratchetting</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fill</span> <span class="o">=</span> <span class="p">{</span><span class="n">new_list</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">new_list</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span><span class="p">)}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_excavation</span> <span class="o">=</span> <span class="p">{</span><span class="n">new_list</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">new_list</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nstrata</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ratchetting</span> <span class="o">=</span> <span class="p">{</span><span class="n">new_list</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">new_list</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nstrata</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_foundation_structures</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_fill_polygons</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_soil_polygons</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_ratchetting_polygons</span><span class="p">()</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_set_foundation_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">_set_fill_polygons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the model excavation and fill structures.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dexcavated</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> 
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zexcavated</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zfill</span><span class="p">])))</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fill_polygon_vertex</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+            <span class="n">poly_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">)</span> <span class="o">-</span>  <span class="mi">1</span>
+            <span class="n">fill_idx</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zfill</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fill</span><span class="p">[</span><span class="n">fill_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly_idx</span><span class="p">)</span>
+            <span class="n">excavation_idx</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zexcavated</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_excavation</span><span class="p">[</span><span class="n">excavation_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly_idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_fill_polygon_vertex</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+            <span class="n">poly_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">)</span> <span class="o">-</span>  <span class="mi">1</span>
+            <span class="n">fill_idx</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zfill</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fill</span><span class="p">[</span><span class="n">fill_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly_idx</span><span class="p">)</span>
+            <span class="n">excavation_idx</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zexcavated</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_excavation</span><span class="p">[</span><span class="n">excavation_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly_idx</span><span class="p">)</span>
+ 
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_get_fill_polygon_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">NotImplementedError</span>
+    
+    <span class="k">def</span> <span class="nf">_set_soil_polygons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the model local soil structures.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_depth</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zstrata</span><span class="p">])))</span>
+        
+        <span class="n">vertexfunc</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_strata_case_1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_strata_case_2</span><span class="p">,</span>
+                      <span class="mi">3</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_strata_case_3</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_strata_case_4</span><span class="p">,</span>
+                      <span class="mi">5</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_strata_case_5</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_strata_case_6</span><span class="p">,</span>
+                      <span class="mi">7</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">_strata_case_7</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">vertexfunc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ftypeid</span><span class="p">](</span><span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="o">+</span><span class="mi">1</span><span class="p">))</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+            <span class="n">poly_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">)</span> <span class="o">-</span>  <span class="mi">1</span>
+            <span class="n">strata_idx</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zstrata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strata</span><span class="p">[</span><span class="n">strata_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly_idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+            <span class="k">return</span>   
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">vertexfunc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_ftypeid</span><span class="p">](</span><span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+            <span class="n">poly_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">)</span> <span class="o">-</span>  <span class="mi">1</span>
+            <span class="n">strata_idx</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zstrata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_strata</span><span class="p">[</span><span class="n">strata_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly_idx</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_x_fill</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;X coordiante of fill slope given the depth.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        z : float</span>
+<span class="sd">            Depth [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            x-coordinate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">x0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+            <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="n">z</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fill_angle</span><span class="p">))</span> <span class="o">+</span> <span class="n">x0</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+        <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="n">z</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fill_angle</span><span class="p">))</span> <span class="o">+</span> <span class="n">x0</span>
+          
+    <span class="k">def</span> <span class="nf">_strata_case_1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Strata for surface foundations without under-base or for</span>
+<span class="sd">        buried plate foundation without ratchetting and fill.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            depth at the top of the strata [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Depth at the bottom of the strata [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (4, 2) strata polygon coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">],</span>
+                             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ztop</span><span class="p">],</span>
+                             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">zbottom</span><span class="p">],</span>
+                             <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">],</span>
+                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ztop</span><span class="p">],</span>
+                         <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">zbottom</span><span class="p">],</span>
+                         <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">]])</span>
+         
+    <span class="k">def</span> <span class="nf">_strata_case_2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Strata for surface foundations  with ratchetting.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            depth at the top of the strata [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Depth at the bottom of the strata [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nvertex, 2) strata polygon coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+            <span class="n">xmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span> <span class="ow">and</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmax</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span> <span class="ow">and</span> <span class="n">zbottom</span> <span class="o">&lt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmax</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmin</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">ztop</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmax</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_strata_case_3</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Strata for buried solid foundations without under-base or</span>
+<span class="sd">        fill.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            depth at the top of the strata [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Depth at the bottom of the strata [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nvertex, 2) strata polygon coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">xcol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">xfoot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xcol</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">xfoot</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">zbottom</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_strata_case_4</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Strata for buried plate foundations with under-base and no</span>
+<span class="sd">        fill.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            depth at the top of the strata [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Depth at the bottom of the strata [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nvertex, 2) strata polygon coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">xfoot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xfoot</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span>  <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_strata_case_5</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Strata for buried solid foundations with under-base and no</span>
+<span class="sd">        fill.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            depth at the top of the strata [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Depth at the bottom of the strata [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nvertex, 2) strata polygon coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">xcol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">xfoot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xcol</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_b1</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">xfoot</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xcol</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xfoot</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_strata_case_6</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;vertex for buried foundations with fill and no under-base.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            depth at the top of the strata [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Depth at the bottom of the strata [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nvertex, 2) vertex polygon coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">xratch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xratch</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_fill</span><span class="p">(</span><span class="n">ztop</span><span class="p">,</span> <span class="n">xsign</span><span class="p">),</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_fill</span><span class="p">(</span><span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">),</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_strata_case_7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ztop</span><span class="p">,</span> <span class="n">zbottom</span><span class="p">,</span> <span class="n">xsign</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;vertex for buried foundations with fill and under-base.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ztop : float</span>
+<span class="sd">            depth at the top of the strata [m].</span>
+<span class="sd">        zbottom : float</span>
+<span class="sd">            Depth at the bottom of the strata [m].</span>
+<span class="sd">        xsign : float</span>
+<span class="sd">            Side of the foundation (&lt;0) for left (&gt;0) for right. </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            (nvertex, 2) vertex polygon coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">xsign</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">xratch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">xratch</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+            <span class="n">xmodel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">vertex</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_fill</span><span class="p">(</span><span class="n">ztop</span><span class="p">,</span> <span class="n">xsign</span><span class="p">),</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_x_fill</span><span class="p">(</span><span class="n">zbottom</span><span class="p">,</span>  <span class="n">xsign</span><span class="p">),</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">ztop</span> <span class="o">&gt;</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">zbottom</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+                <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xratch</span><span class="p">,</span>  <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">ztop</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">xmodel</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span>  <span class="n">zbottom</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_ratchetting_polygons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Builds the model ratchetting structures.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">]</span> <span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_zstrata</span><span class="p">])</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">z</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dratchetting</span><span class="p">]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">z</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">z</span><span class="p">))</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symmetric</span><span class="p">:</span>
+            <span class="n">xmin</span> <span class="o">=</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_b2</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bfill</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">vertex</span> <span class="o">=</span> <span class="p">[[</span><span class="n">xmin</span><span class="p">,</span>  <span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
+                      <span class="p">[</span><span class="n">xmax</span><span class="p">,</span>  <span class="n">z</span><span class="p">[</span><span class="n">idx</span><span class="p">]],</span>
+                      <span class="p">[</span><span class="n">xmax</span><span class="p">,</span>  <span class="n">z</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]],</span>
+                      <span class="p">[</span><span class="n">xmin</span><span class="p">,</span>  <span class="n">z</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]]]</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+            <span class="n">poly_idx</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">)</span> <span class="o">-</span>  <span class="mi">1</span>
+            <span class="n">rat_idx</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">in_strata</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zstrata</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ratchetting</span><span class="p">[</span><span class="n">rat_idx</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly_idx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_plot_poly</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">polyidx</span><span class="p">,</span> <span class="n">others</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Plots polygons.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        polyidx : numeric, array-like</span>
+<span class="sd">            Polygon indexes.</span>
+<span class="sd">        others : bool, optional</span>
+<span class="sd">            If True the remaining polygons are plotted in grey, by</span>
+<span class="sd">            default True.</span>
+<span class="sd">        figsize : float, optional</span>
+<span class="sd">            Figure width [inch], by default 4</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Figure</span>
+<span class="sd">            Figure with the polygons plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">polyidx</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">):</span>
+            <span class="n">polyidx</span> <span class="o">=</span> <span class="p">[</span><span class="n">polyidx</span><span class="p">]</span>
+        <span class="n">polyidx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">polyidx</span><span class="p">)</span>
+
+        <span class="n">allpoly</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">polyidx</span><span class="p">:</span>
+            <span class="n">allpoly</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+
+        <span class="n">patches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">polyidx</span><span class="p">:</span>
+            <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PatchPolygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="n">colors</span> <span class="o">+=</span> <span class="p">[</span><span class="n">DEFAULT_CYCLE</span><span class="p">[</span><span class="n">idx</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">DEFAULT_CYCLE</span><span class="p">)]]</span>
+            <span class="n">lw</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">others</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">allpoly</span><span class="p">:</span>
+                <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PatchPolygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+                <span class="n">colors</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;lightgray&#39;</span><span class="p">]</span>
+                <span class="n">lw</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_depth</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_width</span><span class="p">))</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">PatchCollection</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="n">lw</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mf">1.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span>
+    
+    <span class="c1">#===================================================================</span>
+    <span class="c1"># PUBLIC METHODS</span>
+    <span class="c1">#===================================================================</span>
+<div class="viewcode-block" id="Geometry.plot"><a class="viewcode-back" href="../../../padtest.geometry.html#padtest.geometry.geometry.Geometry.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">foundation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">soil</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+             <span class="n">excavation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ratchetting</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">wt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">interface</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+             <span class="n">output_location</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Foundation plot.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        figsize : float, optional</span>
+<span class="sd">            Figure width [inch], by default 2.5</span>
+<span class="sd">        foundation : bool, optional</span>
+<span class="sd">            Shows foundation structure. By default True</span>
+<span class="sd">        fill : bool, optional</span>
+<span class="sd">            Shows the fill material, if False shows the original</span>
+<span class="sd">            stratigraphy. By default True</span>
+<span class="sd">        soil : bool, optional</span>
+<span class="sd">            Shows the local soil. By default True.</span>
+<span class="sd">        excavation : bool, optional</span>
+<span class="sd">            Shows the material excavated to build the foundation. By</span>
+<span class="sd">            default False.</span>
+<span class="sd">        ratchetting : bool, optional</span>
+<span class="sd">            Shows the ratchetting material. By default True.</span>
+<span class="sd">        wt : bool, optional</span>
+<span class="sd">            Shows the global water table. By defautl True.</span>
+<span class="sd">        interface : bool, optional</span>
+<span class="sd">            Shows interface between the foundation and soil. By default</span>
+<span class="sd">            False.</span>
+<span class="sd">        output_location : bool, optional</span>
+<span class="sd">            Show output locations. By default False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Figure</span>
+<span class="sd">            Figure with the foundation plot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figsize</span><span class="p">,</span> <span class="n">figsize</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_model_depth</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">_model_width</span><span class="p">))</span>
+
+        <span class="n">patches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">foundation</span>  <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_foundation_type</span><span class="o">==</span><span class="s1">&#39;solid&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">polyidx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span><span class="p">:</span>
+                <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PatchPolygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">[</span><span class="n">polyidx</span><span class="p">]</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+                <span class="n">colors</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;gray&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">fill</span><span class="p">:</span>
+            <span class="n">fill_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;greenyellow&#39;</span><span class="p">,</span> <span class="s1">&#39;yellowgreen&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">fill_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">polyidx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fill</span><span class="p">[</span><span class="n">fill_idx</span><span class="p">]:</span>
+                    <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PatchPolygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">[</span><span class="n">polyidx</span><span class="p">]</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+                    <span class="n">colors</span> <span class="o">+=</span> <span class="p">[</span><span class="n">fill_colors</span><span class="p">[</span><span class="n">fill_idx</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nfill</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">excavation</span><span class="p">:</span>
+            <span class="n">exc_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;goldenrod&#39;</span><span class="p">,</span> <span class="s1">&#39;darkgoldenrod&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">exc_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_excavation</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">polyidx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_excavation</span><span class="p">[</span><span class="n">exc_idx</span><span class="p">]:</span>
+                    <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PatchPolygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">[</span><span class="n">polyidx</span><span class="p">]</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+                    <span class="n">colors</span> <span class="o">+=</span> <span class="p">[</span><span class="n">exc_colors</span><span class="p">[</span><span class="n">exc_idx</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">soil</span><span class="p">:</span>
+            <span class="n">strata_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;darkolivegreen&#39;</span><span class="p">,</span> <span class="s1">&#39;olivedrab&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">strata_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strata</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">polyidx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strata</span><span class="p">[</span><span class="n">strata_idx</span><span class="p">]:</span>
+                    <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PatchPolygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">[</span><span class="n">polyidx</span><span class="p">]</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+                    <span class="n">colors</span> <span class="o">+=</span> <span class="p">[</span><span class="n">strata_colors</span><span class="p">[</span><span class="n">strata_idx</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">ratchetting</span> <span class="ow">and</span> <span class="n">soil</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratchetting</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">strata_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;darkolivegreen&#39;</span><span class="p">,</span> <span class="s1">&#39;olivedrab&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">under_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratchetting</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">polyidx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratchetting</span><span class="p">[</span><span class="n">under_idx</span><span class="p">]:</span>
+                    <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PatchPolygon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_polygons</span><span class="p">[</span><span class="n">polyidx</span><span class="p">]</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+                    <span class="n">colors</span> <span class="o">+=</span> <span class="p">[</span><span class="n">strata_colors</span><span class="p">[</span><span class="n">under_idx</span> <span class="o">%</span> <span class="mi">2</span><span class="p">]]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">patches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">PatchCollection</span><span class="p">(</span><span class="n">patches</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.4</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_collection</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+        <span class="c1"># plate foundation    </span>
+        <span class="k">if</span> <span class="n">foundation</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_foundation_type</span><span class="o">==</span><span class="s1">&#39;plate&#39;</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_foundation</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># interfaces</span>
+        <span class="k">if</span> <span class="n">interface</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">interface</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_interfaces</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">interface</span><span class="o">.</span><span class="n">_active</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">interface</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">interface</span><span class="o">.</span><span class="n">_vertex</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="c1"># water table</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_global_wt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">wt</span><span class="p">:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_global_wt</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_global_wt</span><span class="p">],</span> <span class="s1">&#39;-b&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1"># output locations</span>
+        <span class="k">if</span> <span class="n">output_location</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_output_location_xcoord&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">xcoord</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_location_xcoord</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xcoord</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_d</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_d1</span><span class="p">,</span> <span class="s1">&#39;ok&#39;</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mf">1.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xlim</span><span class="p">)</span>
+
+        <span class="n">ylim</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="mf">1.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ylim</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">ylim</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ylim</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fig</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

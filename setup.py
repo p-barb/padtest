@@ -6,19 +6,24 @@ import setuptools
 
 
 setuptools.setup(
-    name="ltest",
-    version="0.0.1",
+    name="padtest",
+    version="1.0.2",
     author="Pablo Barbieri",
     author_email="pbarbie2@uwo.ca",
-    description="shallow foundation test in Plaxis",
-    long_description=("shallow foundation test in Plaxis"),
+    license='MIT',
+    description="pad foundation test in Plaxis",
+    long_description=("Load test axisymmetric or strip pad foundations subjected to static or dynamic vertical, horizontal or flexural loads in Plaxis 2D."),
     long_description_content_type="text/markdown",
-    url="https://github.com/p-barb/ltest",
+    keywords = ['civil', 'engineering', 'geotechnical', 'pad', 'foundation'], 
+    url="https://github.com/p-barb/padtest",
+    download_url = 'https://github.com/p-barb/padtest/archive/v_101.tar.gz'
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3.7.16",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Operating System :: Windows",
     ],
     python_requires='==3.7.16',
+    install_requires=['numpy', 'pandas', 'matplotlib', 'pycryptodome'],
+
 )

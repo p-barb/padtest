@@ -1,0 +1,31 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.0.2
+title: padtest
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Pablo
+    family-names: Barbieri
+    email: pbarbie2@uwo.ca
+    affiliation: University of Western Ontario
+    orcid: 'https://orcid.org/0000-0002-8181-1651'
+repository-code: 'https://github.com/p-barb/padtest'
+url: 'https://github.com/p-barb/padtest'
+abstract: >-
+  Load test axisymmetric or strip pad foundations subjected
+  to static or dynamic vertical, horizontal or flexural
+  loads in Plaxis 2D.
+keywords:
+  - egineering
+  - geotechnical engineering
+  - civil egineering
+  - foundation
+  - pad foundation
+  - load test
+license: MIT
+version: 1.0.2
+date-released: '2024-04-26'

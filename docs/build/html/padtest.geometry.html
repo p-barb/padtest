@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>padtest.geometry package &mdash; padtest 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script src="_static/clipboard.min.js"></script>
+        <script src="_static/copybutton.js"></script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            padtest
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="Installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflow.html">Workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="materials.html">Materials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test.html">Foundation tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">padtest</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">padtest.geometry package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/padtest.geometry.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="padtest-geometry-package">
+<h1>padtest.geometry package<a class="headerlink" href="#padtest-geometry-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-padtest.geometry.geometry">
+<span id="padtest-geometry-geometry-module"></span><h2>padtest.geometry.geometry module<a class="headerlink" href="#module-padtest.geometry.geometry" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.geometry.Geometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.geometry.</span></span><span class="sig-name descname"><span class="pre">Geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dstrata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/geometry.html#Geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.geometry.Geometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>Base class for the foundation geometry. Set inputs that are not
+dependent on whether the foundation is modelled as a solid or a
+plate.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dstrata</strong> (<em>list</em><em>, </em><em>None</em>) – Width of soil layers [m].</p></li>
+<li><p><strong>wt</strong> (<em>float</em><em>, </em><em>None</em>) – Water tabe depth [m]. By default None.</p></li>
+<li><p><strong>fill_angle</strong> (<em>float</em>) – Fill angle [deg].</p></li>
+<li><p><strong>bfill</strong> (<em>float</em>) – Distance between foundation edge and the start of the fill
+slope [m]. By default 0.5.</p></li>
+<li><p><strong>nfill</strong> (<em>int</em><em>, </em><em>None</em>) – Number of fill layers. By default None.</p></li>
+<li><p><strong>dfill</strong> (<em>list</em><em>, </em><em>None</em>) – (nfill,) width of fill layers [m]. By default None.</p></li>
+<li><p><strong>dratchetting</strong> (<em>float</em><em>, </em><em>None</em>) – Widht of soil under the foundation that is replaced when
+ratchetting occurs [m].</p></li>
+<li><p><strong>model_widht</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model width [m]. By default None.</p></li>
+<li><p><strong>model_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model depth [m]. By default None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.geometry.Geometry.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/geometry.html#Geometry.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.geometry.Geometry.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/geometry.html#Geometry.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>figsize</strong> (<em>float</em><em>, </em><em>optional</em>) – Figure width [inch], by default 2.5</p></li>
+<li><p><strong>foundation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Shows foundation structure. By default True</p></li>
+<li><p><strong>fill</strong> (<em>bool</em><em>, </em><em>optional</em>) – Shows the fill material, if False shows the original
+stratigraphy. By default True</p></li>
+<li><p><strong>soil</strong> (<em>bool</em><em>, </em><em>optional</em>) – Shows the local soil. By default True.</p></li>
+<li><p><strong>excavation</strong> (<em>bool</em><em>, </em><em>optional</em>) – Shows the material excavated to build the foundation. By
+default False.</p></li>
+<li><p><strong>ratchetting</strong> (<em>bool</em><em>, </em><em>optional</em>) – Shows the ratchetting material. By default True.</p></li>
+<li><p><strong>wt</strong> (<em>bool</em><em>, </em><em>optional</em>) – Shows the global water table. By defautl True.</p></li>
+<li><p><strong>interface</strong> (<em>bool</em><em>, </em><em>optional</em>) – Shows interface between the foundation and soil. By default
+False.</p></li>
+<li><p><strong>output_location</strong> (<em>bool</em><em>, </em><em>optional</em>) – Show output locations. By default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure with the foundation plot.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-padtest.geometry.interface">
+<span id="padtest-geometry-interface-module"></span><h2>padtest.geometry.interface module<a class="headerlink" href="#module-padtest.geometry.interface" title="Permalink to this heading"></a></h2>
+<p>Interfaces.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.interface.Interface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.interface.</span></span><span class="sig-name descname"><span class="pre">Interface</span></span><a class="reference internal" href="_modules/padtest/geometry/interface.html#Interface"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.Interface" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Single interace object.</p>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">apply_settings(settings)</span> <span class="pre">:</span></span></dt>
+<dd><p>Applies user settings to interface.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">set_vertex(interface_type,</span> <span class="pre">vertex)</span> <span class="pre">:</span></span></dt>
+<dd><p>Set vertex geometry.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">build_material(g_i,</span> <span class="pre">intidx)</span> <span class="pre">:</span></span></dt>
+<dd><p>Builds interface mateiral.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">build_geometry(g_i,</span> <span class="pre">plxid)</span> <span class="pre">:</span></span></dt>
+<dd><p>Adds interface to the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">activate(g_i)</span> <span class="pre">:</span></span></dt>
+<dd><p>Activates the interface in the current phase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">remove_plaxis_objects()</span> <span class="pre">:</span></span></dt>
+<dd><p>Deletes Plaxis objects stored in the interface object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.Interface.activate">
+<span class="sig-name descname"><span class="pre">activate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#Interface.activate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.Interface.activate" title="Permalink to this definition"></a></dt>
+<dd><p>Activates the interface in the current phase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.Interface.apply_settings">
+<span class="sig-name descname"><span class="pre">apply_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#Interface.apply_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.Interface.apply_settings" title="Permalink to this definition"></a></dt>
+<dd><p>Applies user settings to interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> (<em>bool</em><em>, </em><em>dict</em>) – Bool activates/deactivates the interface. The soil material
+is assigned to it. If a dict, it is assumed that the dict
+contains the material properties that will be assigned to
+the interface.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.Interface.build_geometry">
+<span class="sig-name descname"><span class="pre">build_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plxid</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#Interface.build_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.Interface.build_geometry" title="Permalink to this definition"></a></dt>
+<dd><p>Adds interface to the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p></li>
+<li><p><strong>plxid</strong> (<em>int</em>) – Interface number according to Plaxis.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.Interface.build_material">
+<span class="sig-name descname"><span class="pre">build_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intidx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#Interface.build_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.Interface.build_material" title="Permalink to this definition"></a></dt>
+<dd><p>Builds interface mateiral.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p></li>
+<li><p><strong>intidx</strong> (<em>int</em>) – Interface number.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.Interface.remove_plaxis_objects">
+<span class="sig-name descname"><span class="pre">remove_plaxis_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#Interface.remove_plaxis_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.Interface.remove_plaxis_objects" title="Permalink to this definition"></a></dt>
+<dd><p>Deletes Plaxis objects stored in the interface object.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.Interface.set_vertex">
+<span class="sig-name descname"><span class="pre">set_vertex</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interface_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#Interface.set_vertex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.Interface.set_vertex" title="Permalink to this definition"></a></dt>
+<dd><p>Set vertex geometry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interface_type</strong> (<em>str</em>) – ‘negative’ or ‘positive’</p></li>
+<li><p><strong>vertex</strong> (<em>array-like</em>) – (2,nv) vertex coordiantes.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.interface.ModelInterfaces">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.interface.</span></span><span class="sig-name descname"><span class="pre">ModelInterfaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interfaces</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#ModelInterfaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.ModelInterfaces" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
+<p>Model interfaces.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interfaces</strong> (<em>list</em>) – List of str with interfaces ids.</p></li>
+<li><p><strong>symmetric</strong> (<em>bool</em>) – Symmetric model flag.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">apply_settings(settings)</span> <span class="pre">:</span></span></dt>
+<dd><p>Applies user settings to interfaces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">build_material(g_i,</span> <span class="pre">intidx)</span> <span class="pre">:</span></span></dt>
+<dd><p>Builds interface mateirals.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">build_geometry(g_i,</span> <span class="pre">plxid)</span> <span class="pre">:</span></span></dt>
+<dd><p>Adds interfaces to the model.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">activate(g_i)</span> <span class="pre">:</span></span></dt>
+<dd><p>Activates the interfaces in the current phase.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py">
+<span class="sig-name descname"><span class="pre">remove_plaxis_objects()</span> <span class="pre">:</span></span></dt>
+<dd><p>Deletes Plaxis objects stored in the interface objects.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.ModelInterfaces.activate">
+<span class="sig-name descname"><span class="pre">activate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#ModelInterfaces.activate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.ModelInterfaces.activate" title="Permalink to this definition"></a></dt>
+<dd><p>Activates the interfaces in the current phase.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.ModelInterfaces.apply_settings">
+<span class="sig-name descname"><span class="pre">apply_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">settings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#ModelInterfaces.apply_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.ModelInterfaces.apply_settings" title="Permalink to this definition"></a></dt>
+<dd><p>Applies user settings to interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>settings</strong> (<em>bool</em><em>, </em><em>dict</em>) – Bool activates/deactivates all the interfaces. Otherwise a
+dictionary with the ‘top’, ‘bottom’, ‘column’ and ‘lateral’
+keys can be provided. For each key either a bool is provided
+indicating whether that interface will be considered in the
+model. Also a dict can be provided for each key with the
+soil material to be assigned to it.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.ModelInterfaces.build_geometry">
+<span class="sig-name descname"><span class="pre">build_geometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#ModelInterfaces.build_geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.ModelInterfaces.build_geometry" title="Permalink to this definition"></a></dt>
+<dd><p>Adds interfaces to the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.ModelInterfaces.build_material">
+<span class="sig-name descname"><span class="pre">build_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#ModelInterfaces.build_material"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.ModelInterfaces.build_material" title="Permalink to this definition"></a></dt>
+<dd><p>Builds interface mateirals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.interface.ModelInterfaces.remove_plaxis_objects">
+<span class="sig-name descname"><span class="pre">remove_plaxis_objects</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/interface.html#ModelInterfaces.remove_plaxis_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.interface.ModelInterfaces.remove_plaxis_objects" title="Permalink to this definition"></a></dt>
+<dd><p>Deletes Plaxis objects stored in the interface objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-padtest.geometry.plate">
+<span id="padtest-geometry-plate-module"></span><h2>padtest.geometry.plate module<a class="headerlink" href="#module-padtest.geometry.plate" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.plate.NonSymmetricPlateGeometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.plate.</span></span><span class="sig-name descname"><span class="pre">NonSymmetricPlateGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstrata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/plate.html#NonSymmetricPlateGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.plate.NonSymmetricPlateGeometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.geometry.plate.PlateGeometry" title="padtest.geometry.plate.PlateGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlateGeometry</span></code></a></p>
+<p>Geometry of a non-symmetric plate foudation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<em>float</em>) – Foundation width [m].</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – Foundation depth [m].</p></li>
+<li><p><strong>b2</strong> (<em>float</em><em>, </em><em>None</em><em>, </em><em>optional.</em>) – Distance from the left edge of the footing to the center of
+the column [m] (0&lt;=b2&lt;=b). If None then b/2. By default
+None.</p></li>
+<li><p><strong>dstrata</strong> (<em>list</em><em>, </em><em>None</em>) – Width of soil layers [m].</p></li>
+<li><p><strong>wt</strong> (<em>float</em><em>, </em><em>None</em>) – Water tabe depth [m]. By default None.</p></li>
+<li><p><strong>fill_angle</strong> (<em>float</em>) – Fill angle [deg].</p></li>
+<li><p><strong>bfill</strong> (<em>float</em>) – Distance between foundation edge and the start of the fill
+slope [m]. By default 0.5.</p></li>
+<li><p><strong>nfill</strong> (<em>int</em><em>, </em><em>None</em>) – Number of fill layers. By default None.</p></li>
+<li><p><strong>dfill</strong> (<em>list</em><em>, </em><em>None</em>) – (nfill,) width of fill layers [m]. By default None.</p></li>
+<li><p><strong>dratchetting</strong> (<em>float</em><em>, </em><em>None</em>) – Widht of soil under the foundation that is replaced when
+ratchetting occurs [m].</p></li>
+<li><p><strong>interface</strong> (<em>bool</em><em>, </em><em>dict</em><em>, </em><em>optional</em>) – Bool activates/deactivates all the interfaces. Otherwise a
+dictionary with the ‘top’, ‘bottom’, ‘column’ and ‘lateral’
+keys can be provided. For each key either a bool is provided
+indicating whether that interface will be considered in the
+model. Also a dict can be provided for each key with the
+soil material to be assigned to it. By default False.</p></li>
+<li><p><strong>model_widht</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model width [m]. By default None.</p></li>
+<li><p><strong>model_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model depth [m]. By default None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.plate.NonSymmetricPlateGeometry.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#padtest.geometry.plate.NonSymmetricPlateGeometry.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.plate.PlateGeometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.plate.</span></span><span class="sig-name descname"><span class="pre">PlateGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstrata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/plate.html#PlateGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.plate.PlateGeometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.geometry.geometry.Geometry" title="padtest.geometry.geometry.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a></p>
+<p>Geometry of a plate foudation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<em>float</em>) – Foundation width [m].</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – Foundation depth [m].</p></li>
+<li><p><strong>b2</strong> (<em>float</em><em>, </em><em>None</em><em>, </em><em>optional.</em>) – Distance from the left edge to the center of the column [m]. If
+None then b/2. By default None.</p></li>
+<li><p><strong>dstrata</strong> (<em>list</em><em>, </em><em>None</em>) – Width of soil layers [m].</p></li>
+<li><p><strong>wt</strong> (<em>float</em><em>, </em><em>None</em>) – Water tabe depth [m]. By default None.</p></li>
+<li><p><strong>fill_angle</strong> (<em>float</em>) – Fill angle [deg].</p></li>
+<li><p><strong>bfill</strong> (<em>float</em>) – Distance between foundation edge and the start of the fill
+slope [m]. By default 0.5.</p></li>
+<li><p><strong>nfill</strong> (<em>int</em><em>, </em><em>None</em>) – Number of fill layers. By default None.</p></li>
+<li><p><strong>dfill</strong> (<em>list</em><em>, </em><em>None</em>) – (nfill,) width of fill layers [m]. By default None.</p></li>
+<li><p><strong>dratchetting</strong> (<em>float</em><em>, </em><em>None</em>) – Widht of soil under the foundation that is replaced when
+ratchetting occurs [m].</p></li>
+<li><p><strong>interface</strong> (<em>bool</em><em>, </em><em>dict</em><em>, </em><em>optional</em>) – Bool activates/deactivates all the interfaces. Otherwise a
+dictionary with the ‘top’, ‘bottom’, ‘column’ and ‘lateral’
+keys can be provided. For each key either a bool is provided
+indicating whether that interface will be considered in the
+model. Also a dict can be provided for each key with the
+soil material to be assigned to it. By default False.</p></li>
+<li><p><strong>model_widht</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model width [m]. By default None.</p></li>
+<li><p><strong>model_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model depth [m]. By default None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.plate.PlateGeometry.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#padtest.geometry.plate.PlateGeometry.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.plate.SymmetricPlateGeometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.plate.</span></span><span class="sig-name descname"><span class="pre">SymmetricPlateGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstrata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/plate.html#SymmetricPlateGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.plate.SymmetricPlateGeometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.geometry.plate.PlateGeometry" title="padtest.geometry.plate.PlateGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlateGeometry</span></code></a></p>
+<p>Geometry of a symmetric plate foudation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<em>float</em>) – foundation width [m].</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – foundation depth [m]</p></li>
+<li><p><strong>dstrata</strong> (<em>list</em><em>, </em><em>None</em>) – Width of soil layers [m].</p></li>
+<li><p><strong>wt</strong> (<em>float</em><em>, </em><em>None</em>) – Water tabe depth [m]. By default None.</p></li>
+<li><p><strong>fill_angle</strong> (<em>float</em>) – Fill angle [deg].</p></li>
+<li><p><strong>bfill</strong> (<em>float</em>) – Distance between foundation edge and the start of the fill
+slope [m]. By default 0.5.</p></li>
+<li><p><strong>nfill</strong> (<em>int</em><em>, </em><em>None</em>) – Number of fill layers. By default None.</p></li>
+<li><p><strong>dfill</strong> (<em>list</em><em>, </em><em>None</em>) – (nfill,) width of fill layers [m]. By default None.</p></li>
+<li><p><strong>dratchetting</strong> (<em>float</em><em>, </em><em>None</em>) – Widht of soil under the foundation that is replaced when
+ratchetting occurs [m].</p></li>
+<li><p><strong>interface</strong> (<em>bool</em><em>, </em><em>dict</em><em>, </em><em>optional</em>) – Bool activates/deactivates all the interfaces. Otherwise a
+dictionary with the ‘top’, ‘bottom’, ‘column’ and ‘lateral’
+keys can be provided. For each key either a bool is provided
+indicating whether that interface will be considered in the
+model. Also a dict can be provided for each key with the
+soil material to be assigned to it. By default False.</p></li>
+<li><p><strong>model_widht</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model width [m]. By default None.</p></li>
+<li><p><strong>model_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model depth [m]. By default None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.plate.SymmetricPlateGeometry.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#padtest.geometry.plate.SymmetricPlateGeometry.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-padtest.geometry.polygon">
+<span id="padtest-geometry-polygon-module"></span><h2>padtest.geometry.polygon module<a class="headerlink" href="#module-padtest.geometry.polygon" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.polygon.Polygon">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.polygon.</span></span><span class="sig-name descname"><span class="pre">Polygon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vertex</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/polygon.html#Polygon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.polygon.Polygon" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>2D clsoed polygon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>vertex</strong> (<em>array-llike</em>) – (nv, 2) vertex cooodrinates.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.polygon.Polygon.in_strata">
+<span class="sig-name descname"><span class="pre">in_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zstrata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/polygon.html#Polygon.in_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.polygon.Polygon.in_strata" title="Permalink to this definition"></a></dt>
+<dd><p>Identifies the strata where the polygon is located.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.polygon.Polygon.add_2_model">
+<span class="sig-name descname"><span class="pre">add_2_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/polygon.html#Polygon.add_2_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.polygon.Polygon.add_2_model" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the polygon as a Plaxis model structure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.polygon.Polygon.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/polygon.html#Polygon.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.polygon.Polygon.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a figure showing the polygon and its centroid.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">add_2_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">g_i</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/polygon.html#Polygon.add_2_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd><p>Adds the polygon as a Plaxis model structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>g_i</strong> (<em>PlxProxyGlobalObject</em>) – Global object of the current open Plaxis model in Input.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>_type_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">in_strata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zstrata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/polygon.html#Polygon.in_strata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd><p>Identifies the strata where the polygon is located.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>zstrata</strong> (<em>array-like</em>) – (nstrata,) depth of the bottom of each strata, in descending
+order.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Index of the strata in the zstrata array.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id3">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/polygon.html#Polygon.plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id3" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a figure showing the polygon and its centroid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Noindex<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>figsize</strong> (<em>float</em><em>, </em><em>optional</em>) – Figure size, by default 3</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Figure with the polygon and its centroid.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-padtest.geometry.solid">
+<span id="padtest-geometry-solid-module"></span><h2>padtest.geometry.solid module<a class="headerlink" href="#module-padtest.geometry.solid" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.solid.NonSymmetricSolidGeometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.solid.</span></span><span class="sig-name descname"><span class="pre">NonSymmetricSolidGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstrata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/solid.html#NonSymmetricSolidGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.solid.NonSymmetricSolidGeometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.geometry.solid.SolidGeometry" title="padtest.geometry.solid.SolidGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">SolidGeometry</span></code></a></p>
+<p>Geometry of a non symmetric solid foundation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<em>float</em>) – Foundation width [m].</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – Foundation depth [m].</p></li>
+<li><p><strong>b1</strong> (<em>float</em>) – Foundation column widht [m].</p></li>
+<li><p><strong>d1</strong> (<em>float</em>) – Foundation width [m].</p></li>
+<li><p><strong>b2</strong> (<em>float</em><em>, </em><em>None</em><em>, </em><em>optional.</em>) – Distance from the left edge of the footing to the center of
+the column [m] (b1/2&lt;=b2&lt;=b-b1/2). If None then b/2. By
+default None.</p></li>
+<li><p><strong>dstrata</strong> (<em>list</em><em>, </em><em>None</em>) – Width of soil layers [m].</p></li>
+<li><p><strong>wt</strong> (<em>float</em><em>, </em><em>None</em>) – Water tabe depth [m]. By default None.</p></li>
+<li><p><strong>fill_angle</strong> (<em>float</em>) – Fill angle [deg].</p></li>
+<li><p><strong>bfill</strong> (<em>float</em>) – Distance between foundation edge and the start of the fill
+slope [m]. By default 0.5.</p></li>
+<li><p><strong>nfill</strong> (<em>int</em><em>, </em><em>None</em>) – Number of fill layers. By default None.</p></li>
+<li><p><strong>dfill</strong> (<em>list</em><em>, </em><em>None</em>) – (nfill,) width of fill layers [m]. By default None.</p></li>
+<li><p><strong>dratchetting</strong> (<em>float</em><em>, </em><em>None</em>) – Widht of soil under the foundation that is replaced when
+ratchetting occurs [m].</p></li>
+<li><p><strong>interface</strong> (<em>bool</em><em>, </em><em>dict</em><em>, </em><em>optional</em>) – Bool activates/deactivates all the interfaces. Otherwise a
+dictionary with the ‘top’, ‘bottom’, ‘column’ and ‘lateral’
+keys can be provided. For each key either a bool is provided
+indicating whether that interface will be considered in the
+model. Also a dict can be provided for each key with the
+soil material to be assigned to it. By default False.</p></li>
+<li><p><strong>model_widht</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model width [m]. By default None.</p></li>
+<li><p><strong>model_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model depth [m]. By default None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.solid.NonSymmetricSolidGeometry.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#padtest.geometry.solid.NonSymmetricSolidGeometry.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.solid.SolidGeometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.solid.</span></span><span class="sig-name descname"><span class="pre">SolidGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstrata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/solid.html#SolidGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.solid.SolidGeometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.geometry.geometry.Geometry" title="padtest.geometry.geometry.Geometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">Geometry</span></code></a></p>
+<p>Geometry of a symmetric solid foundation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<em>float</em>) – Foundation width [m].</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – Foundation depth [m].</p></li>
+<li><p><strong>b1</strong> (<em>float</em>) – foundation column widht [m].</p></li>
+<li><p><strong>d1</strong> (<em>float</em>) – foundation width [m].</p></li>
+<li><p><strong>b2</strong> (<em>float</em><em>, </em><em>None</em><em>, </em><em>optional.</em>) – Distance from the left edge to the center of the column [m]. If
+None then b/2. By default None.</p></li>
+<li><p><strong>dstrata</strong> (<em>list</em><em>, </em><em>None</em>) – Width of soil layers [m].</p></li>
+<li><p><strong>wt</strong> (<em>float</em><em>, </em><em>None</em>) – Water tabe depth [m]. By default None.</p></li>
+<li><p><strong>fill_angle</strong> (<em>float</em>) – Fill angle [deg].</p></li>
+<li><p><strong>bfill</strong> (<em>float</em>) – Distance between foundation edge and the start of the fill
+slope [m]. By default 0.5.</p></li>
+<li><p><strong>nfill</strong> (<em>int</em><em>, </em><em>None</em>) – Number of fill layers. By default None.</p></li>
+<li><p><strong>dfill</strong> (<em>list</em><em>, </em><em>None</em>) – (nfill,) width of fill layers [m]. By default None.</p></li>
+<li><p><strong>dratchetting</strong> (<em>float</em><em>, </em><em>None</em>) – Widht of soil under the foundation that is replaced when
+ratchetting occurs [m].</p></li>
+<li><p><strong>interface</strong> (<em>bool</em><em>, </em><em>dict</em><em>, </em><em>optional</em>) – Bool activates/deactivates all the interfaces. Otherwise a
+dictionary with the ‘top’, ‘bottom’, ‘column’ and ‘lateral’
+keys can be provided. For each key either a bool is provided
+indicating whether that interface will be considered in the
+model. Also a dict can be provided for each key with the
+soil material to be assigned to it. By default False.</p></li>
+<li><p><strong>model_widht</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model width [m]. By default None.</p></li>
+<li><p><strong>model_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model depth [m]. By default None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.solid.SolidGeometry.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#padtest.geometry.solid.SolidGeometry.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="padtest.geometry.solid.SymmetricSolidGeometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">padtest.geometry.solid.</span></span><span class="sig-name descname"><span class="pre">SymmetricSolidGeometry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dstrata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_angle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dfill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/padtest/geometry/solid.html#SymmetricSolidGeometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#padtest.geometry.solid.SymmetricSolidGeometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#padtest.geometry.solid.SolidGeometry" title="padtest.geometry.solid.SolidGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">SolidGeometry</span></code></a></p>
+<p>Geometry of a symmetric solid foundation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>b</strong> (<em>float</em>) – Foundation width [m].</p></li>
+<li><p><strong>d</strong> (<em>float</em>) – Foundation depth [m].</p></li>
+<li><p><strong>b1</strong> (<em>float</em>) – Foundation column widht [m].</p></li>
+<li><p><strong>d1</strong> (<em>float</em>) – Foundation width [m].</p></li>
+<li><p><strong>dstrata</strong> (<em>list</em><em>, </em><em>None</em>) – Width of soil layers [m].</p></li>
+<li><p><strong>wt</strong> (<em>float</em><em>, </em><em>None</em>) – Water tabe depth [m]. By default None.</p></li>
+<li><p><strong>fill_angle</strong> (<em>float</em>) – Fill angle [deg].</p></li>
+<li><p><strong>bfill</strong> (<em>float</em>) – Distance between foundation edge and the start of the fill
+slope [m]. By default 0.5.</p></li>
+<li><p><strong>nfill</strong> (<em>int</em><em>, </em><em>None</em>) – Number of fill layers. By default None.</p></li>
+<li><p><strong>dfill</strong> (<em>list</em><em>, </em><em>None</em>) – (nfill,) width of fill layers [m]. By default None.</p></li>
+<li><p><strong>dratchetting</strong> (<em>float</em><em>, </em><em>None</em>) – Widht of soil under the foundation that is replaced when
+ratchetting occurs [m].</p></li>
+<li><p><strong>interface</strong> (<em>bool</em><em>, </em><em>dict</em><em>, </em><em>optional</em>) – Bool activates/deactivates all the interfaces. Otherwise a
+dictionary with the ‘top’, ‘bottom’, ‘column’ and ‘lateral’
+keys can be provided. For each key either a bool is provided
+indicating whether that interface will be considered in the
+model. Also a dict can be provided for each key with the
+soil material to be assigned to it. By default False.</p></li>
+<li><p><strong>model_widht</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model width [m]. By default None.</p></li>
+<li><p><strong>model_depth</strong> (<em>float</em><em>, </em><em>optional</em>) – User specified model depth [m]. By default None.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="padtest.geometry.solid.SymmetricSolidGeometry.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">figsize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">foundation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">soil</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excavation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ratchetting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interface</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#padtest.geometry.solid.SymmetricSolidGeometry.plot" title="Permalink to this definition"></a></dt>
+<dd><p>Foundation plot.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-padtest.geometry">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-padtest.geometry" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Pablo Barbieri.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
