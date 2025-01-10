@@ -16,7 +16,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     keywords = ['civil', 'engineering', 'geotechnical', 'pad', 'foundation'], 
     url="https://github.com/p-barb/padtest",
-    download_url = 'https://github.com/p-barb/padtest/archive/v_101.tar.gz'
+    download_url = 'https://github.com/p-barb/padtest/archive/refs/tags/1.0.3.tar.gz'
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3.7.16",
