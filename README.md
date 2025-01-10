@@ -18,7 +18,7 @@ git clone https://github.com/p-barb/padtest
 
 ## Documentation
 
-Package documentation available at [Read the Docs](https://padtest.readthedocs.io/en/latest/materials.html).
+Package documentation available at [Read the Docs](https://padtest.readthedocs.io/en/latest/index.html).
 
 ## Acknowledgements
 padtest is developed by Pablo Barbieri (pbarbie2@uwo.ca).
