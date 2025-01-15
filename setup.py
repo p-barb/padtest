@@ -7,7 +7,7 @@ import setuptools
 
 setuptools.setup(
     name="padtest",
-    version="1.0.3",
+    version="1.0.4",
     author="Pablo Barbieri",
     author_email="pbarbie2@uwo.ca",
     license='MIT',
@@ -16,14 +16,14 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     keywords = ['civil', 'engineering', 'geotechnical', 'pad', 'foundation'], 
     url="https://github.com/p-barb/padtest",
-    download_url = 'https://github.com/p-barb/padtest/archive/refs/tags/1.0.3.tar.gz'
+    download_url = 'https://github.com/p-barb/padtest/archive/refs/tags/1.0.4.tar.gz',
     packages=setuptools.find_packages(),
     classifiers=[
-        "Programming Language :: Python :: 3.7.16",
+        "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: Windows",
+        "Operating System :: Microsoft :: Windows",
     ],
-    python_requires='==3.7.16',
-    install_requires=['numpy', 'pandas', 'matplotlib', 'pycryptodome'],
+    python_requires='>=3.7',
+    install_requires=['numpy', 'pandas', 'matplotlib'],
 
 )

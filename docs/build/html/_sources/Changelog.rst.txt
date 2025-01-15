@@ -1,11 +1,11 @@
 Changelog
 =========
 
-# 2023-10-31 -- 0.0.1:
+**2023-10-31 -- 0.0.1**
     * First working version.
 
 
-# 2023-11-05 -- 0.0.2: 
+**2023-11-05 -- 0.0.2**
     * Added model type to documentation. 
     * Complete docstrings.
     * Fixed compression positive, pull-out positive flags in test plot.
@@ -13,7 +13,7 @@ Changelog
     * Model size set at creation in Plaxis.
  
 
-# 2023-12-01 -- 0.0.3: 
+**2023-12-01 -- 0.0.3**
     * Non-symmetric foundation geometry.
     * Start phase selection in tests.
     * Rayleigh alpha & beta in materials.
@@ -25,7 +25,7 @@ Changelog
     * Updated documentation.
 
 
-# 2024-03-24 -- 1.0.1:
+**2024-03-24 -- 1.0.1**
     * Changed name to `padtest` for PyPI availability.
     * Migrated documentation to sphinx.
     * Interface material.
@@ -33,16 +33,18 @@ Changelog
     * Citation file.
 
 
-# 2025-10-01 -- 1.0.2:
+**2025-10-01 -- 1.0.2**
     * Updated to be compatible with Plaxis 2024.1.
     * Consideration of Plaxis license type.  
     * Removed old documentation from github README.
 
 
-# 2025-11-01 -- 1.0.3:
+**2025-11-01 -- 1.0.3**
     * Removed Plaxis license type.
     * Simplified material creation. No longer validates input parameters,\
       instead relies on Plaxis errors. Removed default values defined \
       in code since they are not transparent to the user when they are \
       different from Plaxis.
 
+**2025-15-01 -- 1.0.4**
+    * Fixed required python version in setup.

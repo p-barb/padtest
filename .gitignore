@@ -1,3 +1,4 @@
+\dist
 \ipynb_checkpoints
 \__pycache__
 \padtestenv
@@ -6,5 +7,6 @@
 *.egg
 .vscode
 .ipynb_checkpoints
+.pypirc
 
 
